@@ -14,7 +14,7 @@ Plataforma de la capacitación IA-abilities (Coknow: Daniel Restrepo y Juan Gonz
 
 ## Modos
 - **Práctica (`MODE: 'local'` o `?demo=1`)**: todo vive en el navegador y se sincroniza entre pestañas del mismo equipo. Clave del panel: `admin`.
-- **Producción (`MODE: 'supabase'`)**: correr `supabase/schema.sql` en el SQL Editor, crear cada sesión con el bloque del final del archivo (clave propia, no escribirla en documentos) y pegar URL y llave anon en `js/config.js`.
+- **Producción (`MODE: 'supabase'`, activo desde el 18-oct en el proyecto gratuito del foro, tablas `iaab_`)**: correr `supabase/schema.sql` en el SQL Editor, crear cada sesión con el bloque del final del archivo (clave propia, no escribirla en documentos) y pegar URL y llave anon en `js/config.js`.
 
 ## Seguridad (checklist de blindaje)
 - El navegador solo tiene la llave anon. Las tablas no se leen ni escriben directo: las escrituras pasan por funciones RPC que validan sesión, participante, actividad abierta y largo del texto.
