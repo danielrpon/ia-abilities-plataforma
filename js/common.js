@@ -45,6 +45,7 @@
     if (/ENCUESTA_CERRADA/.test(m)) return 'La encuesta ya se cerró.';
     if (/TEXTO_INVALIDO|check constraint/.test(m)) return 'Revise el texto: no puede ir vacío ni pasar de 4.000 caracteres.';
     if (/Failed to fetch|NetworkError/.test(m)) return 'Sin conexión. Intente de nuevo.';
+    if (/OP_DESCONOCIDA/.test(m)) return 'Falta actualizar la base de datos (supabase/002_resultados_en_muro.sql).';
     return 'No se pudo completar. Intente de nuevo.';
   };
 
@@ -70,6 +71,36 @@
     if (b.dataset.copy) U.copiar(U.PROMPTS[+b.dataset.copy]);
     if (b.dataset.wa) U.whatsapp(U.PROMPTS[+b.dataset.wa]);
   });
+
+  /* Resultados de una encuesta, siempre en agregado. El panel (fac) ve además la regla y la sugerencia;
+     el muro proyectado no, para no adelantar la discusión. */
+  U.resultados = (E, rows, fac) => {
+    const esc = U.esc;
+    if (E.tipo === 'escalon'){
+      const vals = rows.map(r => r.valor && r.valor.escalon).filter(x => x != null);
+      const n = vals.length, prom = n ? vals.reduce((a, b) => a + b, 0) / n : 0;
+      const sd = n ? Math.sqrt(vals.reduce((a, b) => a + (b - prom) ** 2, 0) / n) : 0;
+      const max = Math.max(1, ...window.ESCALERA.map(e => vals.filter(x => x === e.k).length));
+      const arriba2 = n ? Math.round(100 * vals.filter(x => x >= 2).length / n) : 0;
+      return `<div class="stats"><span><b>${n}</b>respuestas</span><span><b>${prom.toFixed(1).replace('.', ',')}</b>promedio</span><span><b>${sd.toFixed(1).replace('.', ',')}</b>dispersión</span><span><b>${arriba2} %</b>en el 2 o arriba</span></div>
+        <div class="bars">${window.ESCALERA.map(e => { const c = vals.filter(x => x === e.k).length; return `<div class="bar"><span>${e.k} · ${esc(e.t)}</span><span class="track"><span class="fill" style="display:block;width:${100 * c / max}%"></span></span><span>${c}</span></div>`; }).join('')}</div>
+        ${fac ? `<p class="hint">${n ? (arriba2 >= 80 ? 'El 80 % o más está en el escalón 2 o arriba: pase rápido por los escalones 0 y 1.' : sd >= 1.5 ? 'Dispersión alta: arme mesas mixtas con al menos una persona avanzada.' : 'Grupo parejo: siga el ritmo previsto.') : ''}</p>` : ''}`;
+    }
+    if (E.tipo === 'semaforo'){
+      const casos = rows.map(r => r.valor && r.valor.casos).filter(Boolean);
+      return `<div class="stats"><span><b>${casos.length}</b>respuestas</span></div><div class="bars">${window.SEMAFORO[C].map(([txt, col], j) => {
+        const c = { v: 0, a: 0, r: 0 }; casos.forEach(cs => { if (c[cs[j]] != null) c[cs[j]]++; });
+        const n = Math.max(1, casos.length), acuerdo = Math.max(c.v, c.a, c.r) / n;
+        const nota = [fac ? 'regla: ' + { v: 'verde', a: 'amarillo', r: 'rojo', d: 'debate' }[col] : '', casos.length && acuerdo < 0.7 ? 'sin acuerdo: discutir' : ''].filter(Boolean).join(' · ');
+        return `<div class="sem-caso"><div class="sem-t">${j + 1}. ${esc(txt)}${nota ? ` <span class="m">· ${nota}</span>` : ''}</div>
+          ${['v', 'a', 'r'].map(k => `<div class="bar"><span>${{ v: 'Verde', a: 'Amarillo', r: 'Rojo' }[k]}</span><span class="track"><span class="fill" style="display:block;width:${100 * c[k] / n}%;background:var(--${{ v: 'ok', a: 'warn', r: 'no' }[k]})"></span></span><span>${c[k]}</span></div>`).join('')}</div>`; }).join('')}</div>`;
+    }
+    if (E.tipo === 'multiple'){
+      const ops = rows.map(r => r.valor && r.valor.opcion).filter(x => x != null), n = Math.max(1, ops.length);
+      return `<div class="stats"><span><b>${ops.length}</b>respuestas</span></div><div class="bars">${E.opciones.map((o, j) => { const c = ops.filter(x => x === j).length; return `<div class="bar"><span>${esc(o)}</span><span class="track"><span class="fill" style="display:block;width:${100 * c / n}%"></span></span><span>${c}</span></div>`; }).join('')}</div>`;
+    }
+    return `<div class="posts">${rows.map(r => `<article class="post"><pre>${esc(r.valor && r.valor.texto)}</pre></article>`).join('') || '<p class="hint">Sin respuestas todavía.</p>'}</div>`;
+  };
 
   /* Aviso de modo demo */
   U.demoBanner = () => {

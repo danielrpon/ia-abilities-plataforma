@@ -27,6 +27,7 @@
     DB.votar = async (pub_id, pid) => ok(await sb.rpc('iaab_votar', { p_pub: pub_id, p_part: pid }));
     DB.quitarVoto = async (pub_id, pid) => ok(await sb.rpc('iaab_quitar_voto', { p_pub: pub_id, p_part: pid }));
     DB.responder = async (encuesta_id, pid, valor) => ok(await sb.rpc('iaab_responder', { p_sesion: SES, p_encuesta: encuesta_id, p_part: pid, p_valor: valor }));
+    DB.getResultados = async () => ok(await sb.rpc('iaab_resultados', { p_sesion: SES }));
     DB.admin = async (op, payload = {}, clave) => ok(await sb.rpc('iaab_admin_op', { p_sesion: SES, p_clave: clave || DB.clave, p_op: op, p_payload: payload }));
     DB.onChange = null; // las pantallas refrescan cada POLL_MS
   }
@@ -41,7 +42,7 @@
     const seed = () => ({
       seq: 1,
       sesion: { id: SES, cliente, nombre: 'IA-abilities · ' + (cliente === 'pco' ? 'Equipo de talento humano' : 'Equipo de mercadeo') + ' (práctica)',
-        habilitadas: [], actual: null, encuesta: null, clave_admin: 'admin', created_at: nowIso() },
+        habilitadas: [], actual: null, encuesta: null, muestra: null, clave_admin: 'admin', created_at: nowIso() },
       participantes: [], publicaciones: [], votos: [], respuestas: []
     });
     const load = () => { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.sesion) return s; } catch (e) {} const s = seed(); save(s); return s; };
@@ -71,6 +72,10 @@
       s.respuestas.push({ id: nextId(s), sesion_id: SES, encuesta_id, participante_id: pid, valor, created_at: nowIso() });
       save(s); return true;
     };
+    DB.getResultados = async () => {
+      const s = load(), m = s.sesion.muestra;
+      return m ? { encuesta_id: m, rows: s.respuestas.filter(x => x.encuesta_id === m).map(x => ({ valor: x.valor })) } : null;
+    };
     DB.admin = async (op, payload = {}, clave) => {
       const s = load(); clave = clave || DB.clave;
       if (clave !== s.sesion.clave_admin) throw new Error('CLAVE_INVALIDA');
@@ -84,11 +89,12 @@
         }
         case 'actual': s.sesion.actual = payload.id || null; break;
         case 'encuesta': s.sesion.encuesta = payload.id || null; break;
+        case 'muestra': s.sesion.muestra = payload.id || null; break;
         case 'estado_pub': { const p = s.publicaciones.find(p => p.id === Number(payload.id)); if (p) p.estado = payload.estado; break; }
         case 'publicaciones': r.rows = vPubs(s); break;
         case 'participantes': r.rows = s.participantes; break;
         case 'respuestas': r.rows = s.respuestas.filter(x => x.encuesta_id === payload.encuesta_id).map(({ participante_id, ...x }) => x); break;
-        case 'borrar_todo': Object.assign(s, { participantes: [], publicaciones: [], votos: [], respuestas: [] }); Object.assign(s.sesion, { habilitadas: [], actual: null, encuesta: null }); break;
+        case 'borrar_todo': Object.assign(s, { participantes: [], publicaciones: [], votos: [], respuestas: [] }); Object.assign(s.sesion, { habilitadas: [], actual: null, encuesta: null, muestra: null }); break;
         default: throw new Error('OP_DESCONOCIDA: ' + op);
       }
       save(s); return r;

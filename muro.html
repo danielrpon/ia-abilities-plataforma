@@ -23,6 +23,7 @@
   <h1 id="tit">Lo que está construyendo el grupo</h1>
   <p class="lede" id="lede">Toque «Me sirve» en lo que le gustaría usar. Lo más útil lo destacamos en la sala.</p>
   </div><div class="qr" id="qr" hidden></div></div>
+  <section class="res" id="res" hidden aria-live="polite"></section>
   <div class="chips" id="chips"></div>
   <div class="posts" id="posts"></div>
 </main>
@@ -48,7 +49,26 @@ function chips(){
     .concat(acts.map(a => `<button class="chip" data-f="${a.id}" aria-pressed="${FILTRO === a.id}">${a.id} · ${esc(a.t)}</button>`)).join('');
 }
 
+/* Resultados de la encuesta que el facilitador mandó al muro (en agregado). Proyectado, reemplazan las publicaciones. */
+let firmaRes = '';
+async function resultados(){
+  let R = null;
+  try { R = await DB.getResultados(); } catch (e) {}
+  const E = R && ENCUESTAS.find(x => x.id === R.encuesta_id);
+  const f = E ? JSON.stringify(R) : '';
+  if (f !== firmaRes) {
+    firmaRes = f;
+    $('#res').innerHTML = E ? `<div class="card-box"><div class="kick">Resultados del grupo</div><div class="res-t">${esc(E.titulo)}</div>${U.resultados(E, R.rows || [], false)}</div>` : '';
+  }
+  $('#res').hidden = !E;
+  const ocultar = PROJ && !!E;
+  $('#chips').hidden = ocultar; $('#posts').hidden = ocultar;
+  $('#tit').textContent = ocultar ? 'Así respondió el grupo' : 'Lo que está construyendo el grupo';
+  if (PROJ) $('#lede').textContent = ocultar ? 'Responda desde su celular: los resultados se actualizan solos.' : 'Publique desde su celular, en la actividad abierta del tablero.';
+}
+
 async function refrescar(){
+  resultados();
   let pubs;
   try { pubs = await DB.getPublicaciones(); if (YO) MIS = new Set(await DB.getMisVotos(YO.id)); } catch (e) { return; }
   if (FILTRO !== 'todas') pubs = pubs.filter(p => p.act_id === FILTRO);

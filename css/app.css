@@ -236,3 +236,22 @@ input:focus,select:focus{outline:2px solid var(--acc);outline-offset:1px;}
 .proj .post pre{font-size:15px;max-height:none;}
 .proj h1{font-size:40px;}
 .qr[hidden]{display:none;}
+
+/* Encuestas: fila del panel con tres botones y resultados en el muro */
+.enc-row{grid-template-columns:1fr auto auto auto;}
+@media (max-width:560px){.enc-row{grid-template-columns:repeat(3,auto);justify-content:start;}.enc-row .t{grid-column:1/-1;}}
+.sem-caso{margin-top:10px;}
+.sem-t{font-size:13px;font-weight:700;}
+.sem-t .m{font-family:var(--mono);font-weight:500;color:var(--muted);}
+.res[hidden]{display:none;}
+.res .card-box{margin-top:0;}
+.res-t{font-size:22px;font-weight:900;line-height:1.2;margin:4px 0 2px;}
+.proj .res-t{font-size:34px;}
+.proj .res .stats{font-size:15px;gap:40px;}
+.proj .res .stats b{font-size:46px;}
+.proj .res .bars{gap:12px;margin-top:22px;}
+.proj .res .bar{grid-template-columns:minmax(200px,30%) 1fr 64px;gap:16px;font-size:20px;}
+.proj .res .bar .track{height:30px;border-radius:6px;}
+.proj .res .sem-caso{margin-top:22px;}
+.proj .res .sem-t{font-size:20px;}
+.chips[hidden],.posts[hidden]{display:none;}

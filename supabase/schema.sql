@@ -58,9 +58,11 @@ create table if not exists iaab_respuestas (
   unique (sesion_id, encuesta_id, participante_id)
 );
 
+alter table iaab_sesiones add column if not exists muestra text;  -- encuesta en el muro (migración 002)
+
 -- ---------- Vistas públicas (sin claves; sin ocultas) ----------
 create or replace view iaab_v_sesiones with (security_invoker = true) as
-  select id, cliente, nombre, habilitadas, actual, encuesta, created_at from iaab_sesiones;
+  select id, cliente, nombre, habilitadas, actual, encuesta, created_at, muestra from iaab_sesiones;
 
 -- Sin participante_id: el id de cada persona solo lo conoce su propio dispositivo.
 -- Vista con permisos del dueño (no security_invoker) para poder contar votos sin exponer la tabla.
@@ -82,7 +84,7 @@ alter table iaab_respuestas    enable row level security;
 drop policy if exists iaab_ses_sel on iaab_sesiones;
 create policy iaab_ses_sel on iaab_sesiones for select using (true);
 revoke all on iaab_sesiones from anon, authenticated;
-grant select (id, cliente, nombre, habilitadas, actual, encuesta, created_at) on iaab_sesiones to anon, authenticated;
+grant select (id, cliente, nombre, habilitadas, actual, encuesta, created_at, muestra) on iaab_sesiones to anon, authenticated;
 
 -- Participantes: nada directo desde el navegador; el registro pasa por iaab_registrar y el admin los ve por RPC
 revoke all on iaab_participantes from anon, authenticated;
@@ -91,6 +93,7 @@ revoke all on iaab_participantes from anon, authenticated;
 revoke all on iaab_publicaciones from anon, authenticated;
 revoke all on iaab_votos from anon, authenticated;
 grant select on iaab_v_publicaciones to anon, authenticated;
+grant select on iaab_v_sesiones to anon, authenticated;
 
 -- Respuestas: nada directo desde el navegador (todo por RPC)
 revoke all on iaab_respuestas from anon, authenticated;
@@ -175,6 +178,8 @@ begin
     update iaab_sesiones set actual = nullif(p_payload->>'id', '') where id = p_sesion;
   elsif p_op = 'encuesta' then
     update iaab_sesiones set encuesta = nullif(p_payload->>'id', '') where id = p_sesion;
+  elsif p_op = 'muestra' then
+    update iaab_sesiones set muestra = nullif(p_payload->>'id', '') where id = p_sesion;
   elsif p_op = 'estado_pub' then
     update iaab_publicaciones set estado = p_payload->>'estado' where id = (p_payload->>'id')::bigint and sesion_id = p_sesion;
   elsif p_op = 'publicaciones' then
@@ -189,7 +194,7 @@ begin
       from iaab_respuestas where sesion_id = p_sesion and encuesta_id = p_payload->>'encuesta_id';
   elsif p_op = 'borrar_todo' then
     delete from iaab_participantes where sesion_id = p_sesion;  -- en cascada: publicaciones, votos, respuestas
-    update iaab_sesiones set habilitadas = '[]'::jsonb, actual = null, encuesta = null where id = p_sesion;
+    update iaab_sesiones set habilitadas = '[]'::jsonb, actual = null, encuesta = null, muestra = null where id = p_sesion;
   else raise exception 'OP_DESCONOCIDA'; end if;
   return r;
 end $$;
@@ -198,6 +203,19 @@ revoke all on function iaab_admin_op(text, text, text, jsonb) from public;
 grant execute on function iaab_admin_op(text, text, text, jsonb) to anon, authenticated;
 grant execute on function iaab_registrar(text, text, text), iaab_publicar(text, uuid, text, text, text), iaab_votar(bigint, uuid), iaab_mis_votos(uuid),
   iaab_ping(uuid), iaab_quitar_voto(bigint, uuid), iaab_responder(text, text, uuid, jsonb) to anon, authenticated;
+
+-- Resultados en agregado de la encuesta que está en el muro (sin ids de personas). Si no hay ninguna, devuelve null.
+create or replace function iaab_resultados(p_sesion text) returns jsonb
+language plpgsql stable security definer set search_path = public as $$
+declare m text;
+begin
+  select muestra into m from iaab_sesiones where id = p_sesion;
+  if m is null then return null; end if;
+  return jsonb_build_object('encuesta_id', m, 'rows', coalesce(
+    (select jsonb_agg(jsonb_build_object('valor', valor)) from iaab_respuestas where sesion_id = p_sesion and encuesta_id = m), '[]'::jsonb));
+end $$;
+revoke all on function iaab_resultados(text) from public;
+grant execute on function iaab_resultados(text) to anon, authenticated;
 
 -- ============================================================
 -- Crear una sesión (cambie la clave; no la escriba en ningún documento):

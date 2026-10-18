@@ -81,33 +81,13 @@ async function vEnc(){
   const E = ENC_VER ? ENCUESTAS.find(x => x.id === ENC_VER) : null;
   let rows = [];
   if (E) { try { rows = (await DB.admin('respuestas', { encuesta_id: E.id })).rows || []; } catch (e) {} }
-  let res = '';
-  if (E && E.tipo === 'escalon'){
-    const vals = rows.map(r => r.valor && r.valor.escalon).filter(x => x != null);
-    const n = vals.length, prom = n ? vals.reduce((a, b) => a + b, 0) / n : 0;
-    const sd = n ? Math.sqrt(vals.reduce((a, b) => a + (b - prom) ** 2, 0) / n) : 0;
-    const max = Math.max(1, ...ESCALERA.map(e => vals.filter(x => x === e.k).length));
-    const arriba2 = n ? Math.round(100 * vals.filter(x => x >= 2).length / n) : 0;
-    res = `<div class="stats"><span><b>${n}</b>respuestas</span><span><b>${prom.toFixed(1).replace(".", ",")}</b>promedio</span><span><b>${sd.toFixed(1).replace(".", ",")}</b>dispersión</span><span><b>${arriba2} %</b>en el 2 o arriba</span></div>
-      <div class="bars">${ESCALERA.map(e => { const c = vals.filter(x => x === e.k).length; return `<div class="bar"><span>${e.k} · ${esc(e.t)}</span><span class="track"><span class="fill" style="display:block;width:${100 * c / max}%"></span></span><span>${c}</span></div>`; }).join('')}</div>
-      <p class="hint">${n ? (arriba2 >= 80 ? 'El 80 % o más está en el escalón 2 o arriba: pase rápido por los escalones 0 y 1.' : sd >= 1.5 ? 'Dispersión alta: arme mesas mixtas con al menos una persona avanzada.' : 'Grupo parejo: siga el ritmo previsto.') : ''}</p>`;
-  } else if (E && E.tipo === 'semaforo'){
-    const casos = rows.map(r => r.valor && r.valor.casos).filter(Boolean);
-    res = `<div class="stats"><span><b>${casos.length}</b>respuestas</span></div><div class="bars">${SEMAFORO[U.C].map(([txt, col], j) => {
-      const c = { v: 0, a: 0, r: 0 }; casos.forEach(cs => { if (c[cs[j]] != null) c[cs[j]]++; });
-      const n = Math.max(1, casos.length), acuerdo = Math.max(c.v, c.a, c.r) / n;
-      return `<div style="margin-top:10px"><div style="font-size:13px;font-weight:700">${j + 1}. ${esc(txt)} <span class="m" style="font-family:var(--mono);font-weight:500;color:var(--muted)">· regla: ${{ v: 'verde', a: 'amarillo', r: 'rojo', d: 'debate' }[col]}${acuerdo < 0.7 ? ' · sin acuerdo: discutir' : ''}</span></div>
-        ${['v', 'a', 'r'].map(k => `<div class="bar"><span>${{ v: 'Verde', a: 'Amarillo', r: 'Rojo' }[k]}</span><span class="track"><span class="fill" style="display:block;width:${100 * c[k] / n}%;background:var(--${{ v: 'ok', a: 'warn', r: 'no' }[k]})"></span></span><span>${c[k]}</span></div>`).join('')}</div>`; }).join('')}</div>`;
-  } else if (E && E.tipo === 'multiple'){
-    const ops = rows.map(r => r.valor && r.valor.opcion).filter(x => x != null), n = Math.max(1, ops.length);
-    res = `<div class="stats"><span><b>${ops.length}</b>respuestas</span></div><div class="bars">${E.opciones.map((o, j) => { const c = ops.filter(x => x === j).length; return `<div class="bar"><span>${esc(o)}</span><span class="track"><span class="fill" style="display:block;width:${100 * c / n}%"></span></span><span>${c}</span></div>`; }).join('')}</div>`;
-  } else if (E){
-    res = `<div class="posts">${rows.map(r => `<article class="post"><pre>${esc(r.valor && r.valor.texto)}</pre></article>`).join('') || '<p class="hint">Sin respuestas todavía.</p>'}</div>`;
-  }
+  const res = E ? U.resultados(E, rows, true) : '';
+  const enMuro = id => S.muestra === id;
   $('#main').innerHTML = `<div class="kick">Encuestas</div><h1>Pregunte y vea el grupo en conjunto</h1>
-    <p class="lede">Al abrir una encuesta, aparece en todos los celulares. Los resultados nunca se muestran por persona.</p>
-    <div class="card-box">${ENCUESTAS.map(x => `<div class="adm-row ${S.encuesta === x.id ? 'cur' : ''}"><span class="t">${esc(x.titulo)}</span>
+    <p class="lede">Al abrir una encuesta, aparece en todos los celulares. «Al muro» muestra los resultados en el muro proyectado, en lugar de las publicaciones. Los resultados nunca se muestran por persona.</p>
+    <div class="card-box">${ENCUESTAS.map(x => `<div class="adm-row enc-row ${S.encuesta === x.id ? 'cur' : ''}"><span class="t">${esc(x.titulo)}${enMuro(x.id) ? '<br><span class="m">En el muro</span>' : ''}</span>
       <button class="mini" data-ver="${x.id}">Resultados</button>
+      <button class="mini ${enMuro(x.id) ? 'on' : ''}" data-mues="${x.id}">${enMuro(x.id) ? 'Quitar del muro' : 'Al muro'}</button>
       <button class="mini ${S.encuesta === x.id ? 'on' : ''}" data-enc="${x.id}">${S.encuesta === x.id ? 'Cerrar' : 'Abrir'}</button></div>`).join('')}</div>
     ${E ? `<div class="card-box"><div class="kick">${esc(E.titulo)}</div>${res}</div>` : ''}`;
 }
@@ -136,6 +116,7 @@ document.addEventListener('click', async e => {
   if (b.dataset.nivel){ const N = NIVELES.find(x => String(x.id) === b.dataset.nivel); return op('habilitar', { ids: N.capitulos.flatMap(c => c.tarjetas.map(x => x.id)), on: b.dataset.on === '1' }); }
   if (b.dataset.enc){ ENC_VER = b.dataset.enc; return op('encuesta', { id: S.encuesta === b.dataset.enc ? null : b.dataset.enc }); }
   if (b.dataset.ver){ ENC_VER = b.dataset.ver; return render(); }
+  if (b.dataset.mues){ ENC_VER = b.dataset.mues; return op('muestra', { id: S.muestra === b.dataset.mues ? null : b.dataset.mues }); }
   if (b.dataset.est) return op('estado_pub', { id: Number(b.dataset.est), estado: b.dataset.val });
   if (b.dataset.cp) return U.copiar(linkPart());
   if (b.dataset.borrar){ if (!armadoBorrar) { armadoBorrar = true; return render(); } armadoBorrar = false; return op('borrar_todo'); }
