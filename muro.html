@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>IA-abilities · Muro</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%230A0B0D%22/%3E%3Cpath d=%22M8 22h10%22 stroke=%22%2326E57C%22 stroke-width=%223%22/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body class="wall">
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <div class="fn">freaknerd <i>_</i></div>
+      <div class="who"><span class="only-mp">IA-abilities · Equipo de mercadeo</span><span class="only-pco">IA-abilities · Equipo de talento humano</span></div>
+    </div>
+    <nav class="tabs" id="tabs"></nav>
+  </div>
+</header>
+<main>
+  <div class="proj-head"><div>
+  <div class="kick">El muro</div>
+  <h1 id="tit">Lo que está construyendo el grupo</h1>
+  <p class="lede" id="lede">Toque «Me sirve» en lo que le gustaría usar. Lo más útil lo destacamos en la sala.</p>
+  </div><div class="qr" id="qr" hidden></div></div>
+  <div class="chips" id="chips"></div>
+  <div class="posts" id="posts"></div>
+</main>
+<script src="vendor/supabase.min.js"></script>
+<script src="vendor/qrcode.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/db.js"></script>
+<script src="js/contenido.js"></script>
+<script src="js/common.js"></script>
+<script>
+const { $, esc, store } = U;
+const q = new URLSearchParams(location.search);
+const PROJ = q.get('proyectar') === '1';
+let FILTRO = q.get('a') || 'todas', MIS = new Set(), firma = '';
+let YO = null; try { YO = JSON.parse(store.get('yo') || 'null'); } catch (e) {}
+if (PROJ) { document.body.classList.add('proj'); $('#qr').hidden = false; try { new QRCode($('#qr'), { text: location.href.replace(/muro\.html.*$/, '') + 'index.html?s=' + encodeURIComponent(DB.SES), width: 132, height: 132 }); } catch (e) {} $('#lede').textContent = 'Publique desde su celular, en la actividad abierta del tablero.'; }
+
+$('#tabs').innerHTML = `<a class="tab" href="index.html?s=${encodeURIComponent(DB.SES)}" style="text-decoration:none"><b>←</b>Tablero</a><span class="tab" aria-selected="true"><b>··</b>Muro</span>`;
+
+function chips(){
+  const acts = TARJETAS.filter(a => a.muro);
+  $('#chips').innerHTML = [`<button class="chip" data-f="todas" aria-pressed="${FILTRO === 'todas'}">Todas</button>`]
+    .concat(acts.map(a => `<button class="chip" data-f="${a.id}" aria-pressed="${FILTRO === a.id}">${a.id} · ${esc(a.t)}</button>`)).join('');
+}
+
+async function refrescar(){
+  let pubs;
+  try { pubs = await DB.getPublicaciones(); if (YO) MIS = new Set(await DB.getMisVotos(YO.id)); } catch (e) { return; }
+  if (FILTRO !== 'todas') pubs = pubs.filter(p => p.act_id === FILTRO);
+  pubs.sort((a, b) => (b.estado === 'destacada') - (a.estado === 'destacada') || b.created_at.localeCompare(a.created_at));
+  const f = JSON.stringify(pubs.map(p => [p.id, p.votos, p.estado])) + [...MIS].join(',');
+  if (f === firma) return; firma = f;
+  $('#posts').innerHTML = pubs.length ? pubs.map(p => `<article class="post ${p.estado === 'destacada' ? 'dest' : ''}">
+      <div class="meta"><span>${esc(U.actLabel(p.act_id))} · ${esc(U.TIPOS[p.tipo] || '')}</span><span>${esc(U.hora(p.created_at))}</span></div>
+      <div class="who-p">${esc(p.nombre)}${p.estado === 'destacada' ? ' · destacado' : ''}</div>
+      <pre>${esc(p.texto)}</pre>
+      <div class="acts-p">${PROJ ? `<span class="like" aria-hidden="true">♥ ${p.votos}</span>` : `<button class="like" data-like="${p.id}" aria-pressed="${MIS.has(p.id)}" ${YO ? '' : 'disabled title="Entre por el tablero para votar"'}>♥ Me sirve · ${p.votos}</button>`}</div>
+    </article>`).join('') : '<p class="lede">Todavía no hay publicaciones aquí.</p>';
+}
+
+document.addEventListener('click', async e => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.f){ FILTRO = b.dataset.f; chips(); firma = ''; return refrescar(); }
+  if (b.dataset.like && YO){
+    const id = Number(b.dataset.like);
+    try { MIS.has(id) ? await DB.quitarVoto(id, YO.id) : await DB.votar(id, YO.id); } catch (x) { U.toast(U.errMsg(x)); }
+    refrescar();
+  }
+});
+U.demoBanner();
+chips(); refrescar();
+if (DB.onChange) DB.onChange(refrescar);
+setInterval(refrescar, IAAB_CONFIG.POLL_MS || 4000);
+</script>
+</body>
+</html>

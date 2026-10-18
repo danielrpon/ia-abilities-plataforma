@@ -1,0 +1,82 @@
+/* ============================================================
+   Utilidades compartidas: cliente, textos, avisos, copiar, prompts.
+   ============================================================ */
+(function () {
+  const C = /^pco/.test(window.DB.SES) ? 'pco' : 'mp';
+  document.documentElement.setAttribute('data-client', C);
+
+  const U = { C };
+  U.$ = s => document.querySelector(s);
+  U.v = x => (x && typeof x === 'object' && !Array.isArray(x)) ? x[C] : x;
+  U.esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  U.DATASETS = 'datasets/' + C + '/';
+  U.store = {
+    get(k) { try { return localStorage.getItem('iaab:' + window.DB.SES + ':' + k); } catch (e) { return null; } },
+    set(k, val) { try { localStorage.setItem('iaab:' + window.DB.SES + ':' + k, val); } catch (e) {} }
+  };
+  U.tarjeta = id => window.TARJETAS.find(a => a.id === id);
+  U.cap = id => window.CAPITULOS.find(c => c.id === id);
+  U.actLabel = id => { const a = U.tarjeta(id) || U.cap(id); return a ? (a.id.startsWith('N') ? a.id + ' · ' : 'Nivel 0' + a.nivel + ' · ') + a.t : id; };
+  U.TIPOS = { hallazgo: 'Hallazgo', par: 'Sin estructura / con la guía', prompt: 'Prompt', loop: 'Loop' };
+  U.hora = iso => { try { return new Date(iso).toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit' }); } catch (e) { return ''; } };
+
+  let toastT;
+  U.toast = msg => {
+    let t = U.$('#toast');
+    if (!t) { t = document.createElement('div'); t.id = 'toast'; t.className = 'toast'; t.setAttribute('role', 'status'); t.setAttribute('aria-live', 'polite'); document.body.appendChild(t); }
+    t.innerHTML = msg; t.classList.add('show');
+    clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 1700);
+  };
+  U.copiar = async text => {
+    try { await navigator.clipboard.writeText(text); }
+    catch (e) {
+      const a = document.createElement('textarea'); a.value = text; a.setAttribute('readonly', '');
+      a.style.position = 'fixed'; a.style.opacity = '0'; document.body.appendChild(a); a.select();
+      try { document.execCommand('copy'); } catch (_) {}
+      a.remove();
+    }
+    U.toast('<i>✓</i> Copiado. Péguelo en su asistente.');
+  };
+  U.whatsapp = text => window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank', 'noopener');
+  U.errMsg = e => {
+    const m = String(e && e.message || e);
+    if (/CLAVE_INVALIDA/.test(m)) return 'Clave incorrecta.';
+    if (/ACTIVIDAD_CERRADA/.test(m)) return 'Esta actividad todavía no está abierta.';
+    if (/ENCUESTA_CERRADA/.test(m)) return 'La encuesta ya se cerró.';
+    if (/TEXTO_INVALIDO|check constraint/.test(m)) return 'Revise el texto: no puede ir vacío ni pasar de 4.000 caracteres.';
+    if (/Failed to fetch|NetworkError/.test(m)) return 'Sin conexión. Intente de nuevo.';
+    return 'No se pudo completar. Intente de nuevo.';
+  };
+
+  U.ICON_COPY = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>';
+  U.ICON_WA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12a9 9 0 0 1-13.4 7.9L3 21l1.2-4.4A9 9 0 1 1 21 12z"/></svg>';
+
+  /* Prompts copiables: se registran en una lista y los botones guardan el índice */
+  U.PROMPTS = [];
+  U.promptBox = (text, label, cls) => {
+    const i = U.PROMPTS.push(text) - 1;
+    return `<div class="prompt ${cls || ''}"><div class="prompt-h"><span>${U.esc(label || 'Prompt')}</span></div>
+      <pre>${U.esc(text)}</pre>
+      <div class="prompt-a"><button class="btn" data-copy="${i}">${U.ICON_COPY}Copiar</button>
+      <button class="btn alt" data-wa="${i}">${U.ICON_WA}Enviármelo por WhatsApp</button></div></div>`;
+  };
+  U.ladder = (N) => {
+    const on = new Set(N.escalones), asoma = new Set(N.asoma || []);
+    return `<div class="ladder" aria-hidden="true">${window.ESCALERA.map(e => `<div class="step ${on.has(e.k) ? 'here' : ''} ${asoma.has(e.k) ? 'on' : ''}" style="--i:${e.k}"></div>`).join('')}</div>
+      <div class="ladder-lbl"><span>0 · Buscador</span><span>7 · Piloto automático</span></div>`;
+  };
+  document.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.copy) U.copiar(U.PROMPTS[+b.dataset.copy]);
+    if (b.dataset.wa) U.whatsapp(U.PROMPTS[+b.dataset.wa]);
+  });
+
+  /* Aviso de modo demo */
+  U.demoBanner = () => {
+    if (window.DB.MODE !== 'local') return;
+    const d = document.createElement('div'); d.className = 'demo-banner';
+    d.textContent = 'Modo práctica: los datos viven solo en este navegador.';
+    document.body.prepend(d);
+  };
+  window.U = U;
+})();

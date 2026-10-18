@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>IA-abilities · Panel del facilitador</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%230A0B0D%22/%3E%3Cpath d=%22M8 22h10%22 stroke=%22%2326E57C%22 stroke-width=%223%22/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <div class="fn">freaknerd <i>_</i></div>
+      <div class="who">Panel del facilitador · <span id="ses"></span></div>
+    </div>
+    <nav class="tabs" id="tabs"></nav>
+  </div>
+</header>
+<main id="main"></main>
+<script src="vendor/supabase.min.js"></script>
+<script src="vendor/qrcode.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/db.js"></script>
+<script src="js/contenido.js"></script>
+<script src="js/common.js"></script>
+<script>
+const { $, esc } = U;
+let S = null, TAB = 'sesion', ENC_VER = null, firma = '', armadoBorrar = false;
+$('#ses').textContent = DB.SES;
+
+function login(){
+  $('#tabs').innerHTML = '';
+  $('#main').innerHTML = `<div class="kick">Facilitador</div><h1>Entrar al panel</h1>
+    <form class="card-box" id="lg"><label class="field"><span>Clave de la sesión</span><input type="password" id="clave" autocomplete="current-password" required></label>
+    <div class="prompt-a" style="padding:14px 0 0"><button class="btn" type="submit">Entrar</button></div><div class="err" id="lg-err"></div>
+    ${DB.MODE === 'local' ? '<p class="hint">Modo práctica: la clave es «admin».</p>' : ''}</form>`;
+  $('#lg').addEventListener('submit', async e => {
+    e.preventDefault();
+    const c = $('#clave').value;
+    try { await DB.admin('login', {}, c); DB.setClave(c); arrancar(); } catch (x) { $('#lg-err').textContent = U.errMsg(x); }
+  });
+}
+
+function tabs(){
+  const it = [['sesion', 'Sesión'], ['acts', 'Capítulos'], ['enc', 'Encuestas'], ['muro', 'Muro']];
+  $('#tabs').innerHTML = it.map(([id, l]) => `<button class="tab" data-tab="${id}" aria-selected="${TAB === id}">${l}</button>`).join('');
+}
+
+const base = () => location.href.replace(/admin\.html.*$/, '');
+const linkPart = () => base() + 'index.html?s=' + encodeURIComponent(DB.SES);
+const linkMuro = () => base() + 'muro.html?s=' + encodeURIComponent(DB.SES) + '&proyectar=1';
+
+async function vSesion(){
+  let parts = [];
+  try { parts = (await DB.admin('participantes')).rows || []; } catch (e) {}
+  $('#main').innerHTML = `<div class="kick">Sesión</div><h1>${esc(S.nombre || DB.SES)}</h1>
+    <div class="stats"><span><b>${parts.length}</b>participantes</span><span><b>${(S.habilitadas || []).length}</b>actividades abiertas</span><span><b>${S.encuesta ? 'Sí' : 'No'}</b>encuesta abierta</span></div>
+    ${S.actual ? `<div class="now"><span class="pulse"></span><span><span class="l">Ahora en la sala</span><br><span class="t">${esc(U.actLabel(S.actual))}</span></span></div>` : ''}
+    <div class="card-box"><div class="kick">Enlace para los participantes</div>
+      <p class="hint" style="word-break:break-all">${esc(linkPart())}</p><div class="qr" id="qr"></div>
+      <div class="prompt-a" style="padding:12px 0 0"><button class="btn" data-cp="part">${U.ICON_COPY}Copiar enlace</button><a class="btn alt" href="${esc(linkMuro())}" target="_blank" rel="noopener" style="text-decoration:none">Proyectar el muro</a></div></div>
+    <div class="card-box"><div class="kick">Reiniciar la sesión</div><p class="hint">Borra participantes, publicaciones, votos y respuestas, y cierra todas las actividades. Úselo después de un ensayo.</p>
+      <div class="prompt-a" style="padding:12px 0 0"><button class="btn alt" data-borrar="1">${armadoBorrar ? 'Toque otra vez para confirmar' : 'Reiniciar'}</button></div></div>`;
+  try { new QRCode($('#qr'), { text: linkPart(), width: 168, height: 168 }); } catch (e) {}
+}
+
+function vActs(){
+  const hab = new Set(S.habilitadas || []);
+  $('#main').innerHTML = `<div class="kick">Capítulos y tarjetas</div><h1>Abra el contenido a medida que avanza</h1>
+    <p class="lede">«Estamos aquí» marca el capítulo en todos los celulares y abre todas sus tarjetas. El interruptor abre o cierra una tarjeta suelta.</p>` +
+    NIVELES.filter(N => N.capitulos).map(N => `<div class="card-box"><div class="kick">Nivel 0${N.id} · ${N.verbo}</div>
+      <div class="prompt-a" style="padding:10px 0 4px"><button class="mini" data-nivel="${N.id}" data-on="1">Abrir todo el nivel</button><button class="mini" data-nivel="${N.id}" data-on="0">Cerrar el nivel</button></div>
+      ${N.capitulos.map((c, ci) => `<div class="adm-row ${S.actual === c.id ? 'cur' : ''}" style="grid-template-columns:1fr auto"><span><span class="t">C${ci} · ${esc(c.t)}</span><br><span class="m">${c.min}</span></span>
+          <button class="mini ${S.actual === c.id ? 'on' : ''}" data-cap="${c.id}">${S.actual === c.id ? 'Estamos aquí' : 'Estamos aquí ›'}</button></div>
+        ${c.tarjetas.map(x => `<div class="adm-row" style="padding-left:14px"><span><span class="t" style="font-weight:600">${x.id} · ${esc(x.t)}</span><br><span class="m">${x.tipo}${x.muro ? ' · muro' : ''}${x.encuesta ? ' · encuesta' : ''}</span></span><span></span>
+          <button class="switch" role="switch" aria-checked="${hab.has(x.id)}" aria-label="Abrir ${esc(x.t)}" data-hab="${x.id}"></button></div>`).join('')}`).join('')}</div>`).join('');
+}
+
+async function vEnc(){
+  const E = ENC_VER ? ENCUESTAS.find(x => x.id === ENC_VER) : null;
+  let rows = [];
+  if (E) { try { rows = (await DB.admin('respuestas', { encuesta_id: E.id })).rows || []; } catch (e) {} }
+  let res = '';
+  if (E && E.tipo === 'escalon'){
+    const vals = rows.map(r => r.valor && r.valor.escalon).filter(x => x != null);
+    const n = vals.length, prom = n ? vals.reduce((a, b) => a + b, 0) / n : 0;
+    const sd = n ? Math.sqrt(vals.reduce((a, b) => a + (b - prom) ** 2, 0) / n) : 0;
+    const max = Math.max(1, ...ESCALERA.map(e => vals.filter(x => x === e.k).length));
+    const arriba2 = n ? Math.round(100 * vals.filter(x => x >= 2).length / n) : 0;
+    res = `<div class="stats"><span><b>${n}</b>respuestas</span><span><b>${prom.toFixed(1).replace(".", ",")}</b>promedio</span><span><b>${sd.toFixed(1).replace(".", ",")}</b>dispersión</span><span><b>${arriba2} %</b>en el 2 o arriba</span></div>
+      <div class="bars">${ESCALERA.map(e => { const c = vals.filter(x => x === e.k).length; return `<div class="bar"><span>${e.k} · ${esc(e.t)}</span><span class="track"><span class="fill" style="display:block;width:${100 * c / max}%"></span></span><span>${c}</span></div>`; }).join('')}</div>
+      <p class="hint">${n ? (arriba2 >= 80 ? 'El 80 % o más está en el escalón 2 o arriba: pase rápido por los escalones 0 y 1.' : sd >= 1.5 ? 'Dispersión alta: arme mesas mixtas con al menos una persona avanzada.' : 'Grupo parejo: siga el ritmo previsto.') : ''}</p>`;
+  } else if (E && E.tipo === 'semaforo'){
+    const casos = rows.map(r => r.valor && r.valor.casos).filter(Boolean);
+    res = `<div class="stats"><span><b>${casos.length}</b>respuestas</span></div><div class="bars">${SEMAFORO[U.C].map(([txt, col], j) => {
+      const c = { v: 0, a: 0, r: 0 }; casos.forEach(cs => { if (c[cs[j]] != null) c[cs[j]]++; });
+      const n = Math.max(1, casos.length), acuerdo = Math.max(c.v, c.a, c.r) / n;
+      return `<div style="margin-top:10px"><div style="font-size:13px;font-weight:700">${j + 1}. ${esc(txt)} <span class="m" style="font-family:var(--mono);font-weight:500;color:var(--muted)">· regla: ${{ v: 'verde', a: 'amarillo', r: 'rojo', d: 'debate' }[col]}${acuerdo < 0.7 ? ' · sin acuerdo: discutir' : ''}</span></div>
+        ${['v', 'a', 'r'].map(k => `<div class="bar"><span>${{ v: 'Verde', a: 'Amarillo', r: 'Rojo' }[k]}</span><span class="track"><span class="fill" style="display:block;width:${100 * c[k] / n}%;background:var(--${{ v: 'ok', a: 'warn', r: 'no' }[k]})"></span></span><span>${c[k]}</span></div>`).join('')}</div>`; }).join('')}</div>`;
+  } else if (E && E.tipo === 'multiple'){
+    const ops = rows.map(r => r.valor && r.valor.opcion).filter(x => x != null), n = Math.max(1, ops.length);
+    res = `<div class="stats"><span><b>${ops.length}</b>respuestas</span></div><div class="bars">${E.opciones.map((o, j) => { const c = ops.filter(x => x === j).length; return `<div class="bar"><span>${esc(o)}</span><span class="track"><span class="fill" style="display:block;width:${100 * c / n}%"></span></span><span>${c}</span></div>`; }).join('')}</div>`;
+  } else if (E){
+    res = `<div class="posts">${rows.map(r => `<article class="post"><pre>${esc(r.valor && r.valor.texto)}</pre></article>`).join('') || '<p class="hint">Sin respuestas todavía.</p>'}</div>`;
+  }
+  $('#main').innerHTML = `<div class="kick">Encuestas</div><h1>Pregunte y vea el grupo en conjunto</h1>
+    <p class="lede">Al abrir una encuesta, aparece en todos los celulares. Los resultados nunca se muestran por persona.</p>
+    <div class="card-box">${ENCUESTAS.map(x => `<div class="adm-row ${S.encuesta === x.id ? 'cur' : ''}"><span class="t">${esc(x.titulo)}</span>
+      <button class="mini" data-ver="${x.id}">Resultados</button>
+      <button class="mini ${S.encuesta === x.id ? 'on' : ''}" data-enc="${x.id}">${S.encuesta === x.id ? 'Cerrar' : 'Abrir'}</button></div>`).join('')}</div>
+    ${E ? `<div class="card-box"><div class="kick">${esc(E.titulo)}</div>${res}</div>` : ''}`;
+}
+
+async function vMuro(){
+  let rows = [];
+  try { rows = (await DB.admin('publicaciones')).rows || []; } catch (e) {}
+  rows.sort((a, b) => b.created_at.localeCompare(a.created_at));
+  $('#main').innerHTML = `<div class="kick">Muro</div><h1>Modere y destaque</h1>
+    <p class="lede">Oculte lo que tenga datos de personas o no corresponda. Destaque lo que quiere comentar en la sala.</p>
+    <div class="posts">${rows.map(p => `<article class="post ${p.estado === 'destacada' ? 'dest' : ''}">
+      <div class="meta"><span>${esc(U.actLabel(p.act_id))} · ${esc(U.TIPOS[p.tipo] || '')}</span><span>${esc(p.estado)} · ♥ ${p.votos}</span></div>
+      <div class="who-p">${esc(p.nombre)}</div><pre>${esc(p.texto)}</pre>
+      <div class="acts-p"><button class="mini" data-est="${p.id}" data-val="${p.estado === 'destacada' ? 'visible' : 'destacada'}">${p.estado === 'destacada' ? 'Quitar destacado' : 'Destacar'}</button>
+      <button class="mini" data-est="${p.id}" data-val="${p.estado === 'oculta' ? 'visible' : 'oculta'}">${p.estado === 'oculta' ? 'Mostrar' : 'Ocultar'}</button></div></article>`).join('') || '<p class="hint">Sin publicaciones.</p>'}</div>`;
+}
+
+async function render(){ U.PROMPTS.length = 0; tabs(); if (TAB === 'sesion') await vSesion(); if (TAB === 'acts') vActs(); if (TAB === 'enc') await vEnc(); if (TAB === 'muro') await vMuro(); }
+async function op(o, p){ try { await DB.admin(o, p); S = await DB.getSesion(); await render(); } catch (x) { U.toast(U.errMsg(x)); } }
+
+document.addEventListener('click', async e => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.tab){ TAB = b.dataset.tab; armadoBorrar = false; return render(); }
+  if (b.dataset.hab) return op('habilitar', { ids: [b.dataset.hab], on: b.getAttribute('aria-checked') !== 'true' });
+  if (b.dataset.cap){ const c = U.cap(b.dataset.cap); await DB.admin('habilitar', { ids: c.tarjetas.map(x => x.id), on: true }).catch(() => {}); return op('actual', { id: S.actual === c.id ? null : c.id }); }
+  if (b.dataset.nivel){ const N = NIVELES.find(x => String(x.id) === b.dataset.nivel); return op('habilitar', { ids: N.capitulos.flatMap(c => c.tarjetas.map(x => x.id)), on: b.dataset.on === '1' }); }
+  if (b.dataset.enc){ ENC_VER = b.dataset.enc; return op('encuesta', { id: S.encuesta === b.dataset.enc ? null : b.dataset.enc }); }
+  if (b.dataset.ver){ ENC_VER = b.dataset.ver; return render(); }
+  if (b.dataset.est) return op('estado_pub', { id: Number(b.dataset.est), estado: b.dataset.val });
+  if (b.dataset.cp) return U.copiar(linkPart());
+  if (b.dataset.borrar){ if (!armadoBorrar) { armadoBorrar = true; return render(); } armadoBorrar = false; return op('borrar_todo'); }
+});
+
+async function arrancar(){
+  S = await DB.getSesion(); await render();
+  setInterval(async () => {
+    try { S = await DB.getSesion(); } catch (e) { return; }
+    const f = JSON.stringify(S), cambio = f !== firma; firma = f;
+    if (TAB === 'enc' || TAB === 'muro' || cambio) await render();
+  }, Math.max(5000, IAAB_CONFIG.POLL_MS || 4000));
+}
+U.demoBanner();
+if (DB.clave) DB.admin('login').then(arrancar).catch(login); else login();
+</script>
+</body>
+</html>

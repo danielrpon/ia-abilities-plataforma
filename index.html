@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>IA-abilities · Tablero</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%230A0B0D%22/%3E%3Cpath d=%22M8 22h10%22 stroke=%22%2326E57C%22 stroke-width=%223%22/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <div class="fn">freaknerd <i>_</i></div>
+      <div class="who"><span class="only-mp">IA-abilities · Equipo de mercadeo</span><span class="only-pco">IA-abilities · Equipo de talento humano</span></div>
+    </div>
+    <nav class="tabs" role="tablist" id="tabs"></nav>
+  </div>
+</header>
+<main id="main"></main>
+<footer>IA-abilities · Coknow · Sus notas y borradores se guardan solo en este dispositivo; lo que publique en el muro lo ve su grupo.</footer>
+
+<div class="modal-bg" id="enc" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="enc-t"><div class="kick">Encuesta</div><h2 id="enc-t" style="margin-top:6px"></h2><div id="enc-b"></div></div></div>
+
+<script src="vendor/supabase.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/db.js"></script>
+<script src="js/contenido.js"></script>
+<script src="js/common.js"></script>
+<script>
+const { $, v, esc, store } = U;
+const AREAS = { mp: ['Mercadeo y catálogo', 'Comercial', 'Diseño y contenido', 'Demanda y pronóstico', 'Dirección y servicio', 'Otra'],
+                pco: ['Compensación', 'Selección', 'Nómina', 'Talento y bienestar', 'Plataformas core', 'Otra'] }[U.C];
+const COLOR = { v: 'Verde', a: 'Amarillo', r: 'Rojo', d: 'Debate' };
+let S = null, YO = null, TAB = null, firma = '';
+try { YO = JSON.parse(store.get('yo') || 'null'); } catch (e) {}
+
+const pasosHtml = p => p ? `<ol class="steps">${p.map(x => `<li><span>${v(x)}</span></li>`).join('')}</ol>` : '';
+
+function postForm(c, m, n){
+  const k = c.id + '-' + n;
+  const campos = m.tipo === 'par'
+    ? `<label class="lbl" for="p1-${k}">1 · Sin estructura</label><textarea id="p1-${k}" data-k="p1-${k}" maxlength="1500"></textarea>
+       <label class="lbl" for="p2-${k}">2 · Con la guía</label><textarea id="p2-${k}" data-k="p2-${k}" maxlength="2000"></textarea>
+       <label class="lbl" for="p3-${k}">Qué cambió (una línea)</label><textarea id="p3-${k}" data-k="p3-${k}" maxlength="300" style="min-height:52px"></textarea>`
+    : `<textarea id="p1-${k}" data-k="p1-${k}" maxlength="4000" ${m.tipo === 'hallazgo' ? 'style="min-height:56px"' : ''} placeholder="${m.tipo === 'hallazgo' ? 'Una línea…' : 'Pegue aquí su texto…'}"></textarea>`;
+  return `<div class="post-form"><span class="tag">Al muro · ${esc(U.TIPOS[m.tipo] || m.tipo)}</span><p class="hint">${esc(m.guia)}</p>${campos}
+    <ul class="checks"><li><label><input type="checkbox" id="ok-${k}">Revisé que no hay datos que identifiquen personas ni información roja del semáforo.</label></li></ul>
+    <div class="prompt-a" style="padding:10px 0 0"><button class="btn" data-pub="${k}" data-card="${c.id}" data-tipo="${m.tipo}">Publicar en el muro</button>
+    <a class="btn alt" href="muro.html?s=${encodeURIComponent(DB.SES)}&a=${c.id}" style="text-decoration:none">Ver el muro</a></div>
+    <div class="err" id="err-${k}"></div></div>`;
+}
+
+function cardBody(c){
+  let h = c.intro ? `<p>${v(c.intro)}</p>` : '';
+  h += pasosHtml(c.pasos);
+  switch (c.tipo){
+    case 'prompt': h += U.promptBox(v(c.prompt)); break;
+    case 'comparar': h += `<div class="compare"><div class="bad">${U.promptBox(v(c.antes), '1 · Sin estructura')}</div><div>${U.promptBox(v(c.despues), '2 · Con la guía')}</div></div>` + (c.nota ? `<p><b>Qué notar:</b> ${esc(c.nota)}</p>` : ''); break;
+    case 'datasets':
+      h += `<ul class="files">${v(c.archivos).map(([f, d]) => `<li><a href="${esc(U.DATASETS + f)}" download>${esc(f)}</a><p>${esc(d)}</p></li>`).join('')}</ul>`;
+      if (c.prompt) h += U.promptBox(v(c.prompt)); break;
+    case 'checklist': h += `<ul class="checks">${c.checklist.map((x, j) => `<li><label><input type="checkbox" data-chk="${c.id}-${j}" ${store.get('chk-' + c.id + '-' + j) === '1' ? 'checked' : ''}>${esc(x)}</label></li>`).join('')}</ul>`; break;
+    case 'escalera-ref': h += `<ul class="map">${ESCALERA.map(e => `<li><span class="k">${e.k}</span><span><span class="t">${e.t}</span><div class="d">${e.d}</div><div class="w">${e.w}</div></span></li>`).join('')}</ul>`; break;
+    case 'semaforo-ref':
+      h += `<div class="lights"><div class="light v"><b>● Verde · avance, revise antes de usar</b>Público, genérico o suyo, sin datos de personas.</div>
+        <div class="light a"><b>● Amarillo · solo con la cuenta de la empresa</b>Interno, sin identificar a nadie; agregados de 5 o más personas.</div>
+        <div class="light r"><b>● Rojo · no va en un chat</b>Datos que identifican a una persona, o conectar la IA con sistemas. Anonimice primero o pase por TI.</div></div>
+        <ul class="cases">${SEMAFORO[U.C].map(([t, col, por], j) => `<li class="case" style="grid-template-columns:1fr"><span><b>${j + 1}. ${COLOR[col]}.</b> ${esc(t)}<br><span class="hint">${esc(por)}</span></span></li>`).join('')}</ul>`; break;
+    case 'texto': h += v(c.html); break;
+    case 'enlace': h += `<div class="prompt-a" style="padding:12px 0 0"><a class="btn" href="${esc(v(c.url))}" target="_blank" rel="noopener" style="text-decoration:none">${esc(c.label)}</a></div>`; break;
+    case 'encuesta': h += `<p class="hint">${S && S.encuesta === c.encuesta ? '<b>Abierta ahora.</b>' : 'Se abre cuando el facilitador la lance.'}</p>`; break;
+    case 'pendiente': h += `<span class="tag draft">Por nutrir</span>`; break;
+  }
+  if (c.muro) h += postForm(c, c.muro, 1);
+  if (c.muro2) h += postForm(c, c.muro2, 2);
+  return h;
+}
+
+function registro(){
+  $('#tabs').innerHTML = '';
+  $('#main').innerHTML = `<div class="kick">Bienvenida</div><h1>Su tablero de recursos</h1>
+    <p class="lede">Aquí encuentra los prompts, los pasos y los archivos de cada actividad, y el muro donde el grupo comparte lo que va construyendo. Las tarjetas se abren a medida que avanzamos.</p>
+    <form class="card-box" id="reg">
+      <label class="field"><span>Su nombre de pila o un seudónimo</span><input type="text" id="r-nom" maxlength="40" autocomplete="given-name" required></label>
+      <label class="field"><span>Su mesa o área</span><select id="r-area">${AREAS.map(a => `<option>${esc(a)}</option>`).join('')}</select></label>
+      <p class="hint">No escriba apellidos, cédula, celular ni correo.</p>
+      <div class="prompt-a" style="padding:14px 0 0"><button class="btn" type="submit">Entrar</button></div>
+      <div class="err" id="r-err"></div>
+    </form>`;
+  $('#reg').addEventListener('submit', async e => {
+    e.preventDefault();
+    const nombre = $('#r-nom').value.trim();
+    if (!nombre) return;
+    try { YO = await DB.registrar(nombre, $('#r-area').value); store.set('yo', JSON.stringify(YO)); arrancar(); }
+    catch (err) { $('#r-err').textContent = U.errMsg(err); }
+  });
+}
+
+function tabs(){
+  const items = [{ id: 'mapa', l: 'Mapa', b: '00' }].concat(NIVELES.map(n => ({ id: String(n.id), l: n.verbo, b: '0' + n.id })));
+  $('#tabs').innerHTML = items.map(t => `<button class="tab" role="tab" data-tab="${t.id}" aria-selected="${t.id === TAB}"><b>${t.b}</b>${t.l}</button>`).join('')
+    + `<a class="tab" href="muro.html?s=${encodeURIComponent(DB.SES)}" style="text-decoration:none"><b>··</b>Muro</a>`;
+}
+
+function ahora(){
+  if (!S || !S.actual) return '';
+  const c = U.cap(S.actual); if (!c) return '';
+  return `<a class="now" href="#${c.id}" data-goto="${c.id}"><span class="pulse"></span><span><span class="l">Ahora en la sala</span><br><span class="t">Nivel 0${c.nivel} · ${esc(c.t)}</span></span></a>`;
+}
+
+function render(){
+  U.PROMPTS.length = 0;
+  const abiertos = [...document.querySelectorAll('details.act[open]')].map(d => d.id);
+  if (TAB === 'mapa'){
+    $('#main').innerHTML = `${ahora()}<div class="kick" style="margin-top:18px">El mapa</div><h1>El piso y siete escalones</h1>
+      <p class="lede">Todo lo que vamos a ver cabe aquí. Inspirada en los niveles de uso de Juan Gabriel Gomila, traducida al trabajo de su equipo. La idea es subir un escalón cada vez.</p>
+      <ul class="map">${ESCALERA.map(e => `<li><span class="k">${e.k}</span><span><span class="t">${e.t}</span><div class="d">${e.d}</div><div class="w">${e.w}</div></span></li>`).join('')}</ul>`;
+    return;
+  }
+  const N = NIVELES.find(x => String(x.id) === TAB);
+  const hab = new Set(S.habilitadas || []);
+  let h = `${ahora()}<div class="kick" style="margin-top:18px">Nivel 0${N.id}</div><h1>${N.verbo}</h1><p class="lede">${N.lede}</p>${U.ladder(N)}`;
+  if (!N.capitulos){ $('#main').innerHTML = h + `<div class="soon"><div class="kick">Próximamente</div><p>${N.pronto}</p></div>`; return; }
+  if (N.borrador) h += `<span class="tag draft">Borrador · lo ajusta Juan Gonzalo</span>`;
+  N.capitulos.forEach((c, ci) => {
+    const abiertas = c.tarjetas.filter(t => hab.has(t.id));
+    const esAhora = S.actual === c.id;
+    if (!abiertas.length && !esAhora){
+      h += `<div class="locked-act" style="margin-top:12px"><span class="num">C${ci}</span><span><span class="act-t">${esc(c.t)}</span><br><span class="act-m">${c.min} · se abre durante la sesión</span></span></div>`;
+      return;
+    }
+    h += `<section id="${c.id}" style="margin-top:26px"><div class="kick">Capítulo ${ci} · ${c.min}${esAhora ? ' · ahora' : ''}</div><h2 style="margin-top:4px">${esc(c.t)}</h2>
+      <div class="layers" style="margin-top:10px">
+        <div class="layer"><div class="n">1 · Dónde estamos</div><h3>${c.donde}</h3></div>
+        <div class="layer"><div class="n">2 · Lo nuevo</div><ul>${c.nuevo.map(x => `<li>${v(x)}</li>`).join('')}</ul></div>
+        <div class="layer"><div class="n">3 · Lo que se habilita</div><ul>${c.habilita.map(x => `<li>${v(x)}</li>`).join('')}</ul></div>
+      </div><div class="acts" style="margin-top:10px">`;
+    c.tarjetas.forEach(t => {
+      if (!hab.has(t.id)) { h += `<div class="locked-act"><span class="num">${t.id.slice(3)}</span><span><span class="act-t">${esc(t.t)}</span><br><span class="act-m">${t.id} · se abre en un momento</span></span></div>`; return; }
+      h += `<details class="act" id="${t.id}" ${abiertos.includes(t.id) ? 'open' : ''}><summary><span class="num">${t.id.slice(3)}</span><span><span class="act-t">${esc(t.t)}</span><br><span class="act-m">${t.id}${t.muro ? ' · con muro' : ''}</span></span><span class="chev" aria-hidden="true"></span></summary>
+        <div class="act-b">${cardBody(t)}</div></details>`;
+    });
+    h += `</div></section>`;
+  });
+  h += `<h2>Mis notas</h2><textarea data-k="notas-${N.id}" aria-label="Mis notas del nivel" placeholder="Lo que quiero recordar de este nivel…"></textarea>`;
+  $('#main').innerHTML = h;
+  document.querySelectorAll('textarea[data-k]').forEach(t => { t.value = store.get(t.dataset.k) || ''; });
+}
+
+function go(id){ TAB = id; store.set('tab', id); tabs(); render(); window.scrollTo(0, 0); }
+
+function encuesta(){
+  const box = $('#enc');
+  const E = S && S.encuesta ? ENCUESTAS.find(x => x.id === S.encuesta) : null;
+  if (!E || store.get('enc-' + E.id)) { box.hidden = true; return; }
+  if (!box.hidden && box.dataset.id === E.id) return;
+  box.dataset.id = E.id;
+  $('#enc-t').textContent = E.titulo;
+  let b = '';
+  if (E.tipo === 'escalon') b = `<p class="hint">Toque el que más se parece a usted. Se ve en conjunto, nunca por persona.</p><div class="pick">${ESCALERA.map(e => `<button data-resp="${e.k}"><span class="k">${e.k}</span><span><span class="t">${e.t}</span><br><span class="d">${e.d}</span></span></button>`).join('')}</div>`;
+  if (E.tipo === 'semaforo') b = `<p class="hint">Por intuición: marque un color en cada caso y envíe.</p><ul class="cases">${SEMAFORO[U.C].map(([t], j) => `<li class="case"><span>${j + 1}. ${esc(t)}</span><span class="vote" role="group" aria-label="Color del caso ${j + 1}">${['v', 'a', 'r'].map(x => `<button class="dot ${x}" data-sem="${j}" data-val="${x}" aria-pressed="false" aria-label="${COLOR[x]}"></button>`).join('')}</span></li>`).join('')}</ul><div class="prompt-a" style="padding:12px 0 0"><button class="btn" data-resp="sem">Enviar mis votos</button></div>`;
+  if (E.tipo === 'multiple') b = `<div class="pick">${E.opciones.map((o, j) => `<button data-resp="op" data-op="${j}"><span class="k">${j + 1}</span><span class="t">${esc(o)}</span></button>`).join('')}</div>`;
+  if (E.tipo === 'abierta') b = `<textarea id="enc-txt" maxlength="1000" placeholder="Su respuesta…"></textarea><div class="prompt-a" style="padding:12px 0 0"><button class="btn" data-resp="txt">Enviar</button><button class="btn alt" data-resp="omitir">Ahora no</button></div>`;
+  $('#enc-b').innerHTML = b + '<div class="err" id="enc-err"></div>';
+  box.hidden = false;
+}
+
+async function refrescar(){
+  try { S = await DB.getSesion(); } catch (e) { return; }
+  if (!S) { $('#main').innerHTML = '<h1>Sesión no encontrada</h1><p class="lede">Revise el enlace que le compartieron.</p>'; return; }
+  const f = JSON.stringify([S.habilitadas, S.actual, S.encuesta]);
+  if (f !== firma) { firma = f; render(); }
+  encuesta();
+}
+
+async function responder(valor){
+  const E = ENCUESTAS.find(x => x.id === S.encuesta); if (!E) return;
+  try { await DB.responder(E.id, YO.id, valor); store.set('enc-' + E.id, '1'); $('#enc').hidden = true; U.toast('<i>✓</i> Gracias.'); }
+  catch (x) { $('#enc-err').textContent = U.errMsg(x); }
+}
+
+document.addEventListener('click', async e => {
+  const g = e.target.closest('[data-goto]');
+  if (g) { e.preventDefault(); const c = U.cap(g.dataset.goto); go(String(c.nivel)); const d = document.getElementById(c.id); if (d) d.scrollIntoView({ block: 'start' }); return; }
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.tab) return go(b.dataset.tab);
+  if (b.dataset.sem !== undefined){ b.parentElement.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); return; }
+  if (b.dataset.pub){
+    const k = b.dataset.pub, tipo = b.dataset.tipo, err = $('#err-' + k);
+    const val = id => ($('#' + id + '-' + k) ? $('#' + id + '-' + k).value.trim() : '');
+    const txt = tipo === 'par' ? (val('p1') && val('p2') ? `SIN ESTRUCTURA:\n${val('p1')}\n\nCON LA GUÍA:\n${val('p2')}${val('p3') ? `\n\nQUÉ CAMBIÓ: ${val('p3')}` : ''}` : '') : val('p1');
+    if (!txt) { err.textContent = tipo === 'par' ? 'Escriba los dos prompts antes de publicar.' : 'Escriba algo antes de publicar.'; return; }
+    if (!$('#ok-' + k).checked) { err.textContent = 'Confirme que revisó que no hay datos de personas.'; return; }
+    b.disabled = true;
+    try {
+      await DB.publicar(YO.id, YO.nombre, b.dataset.card, txt, tipo);
+      ['p1', 'p2', 'p3'].forEach(p => { const el = $('#' + p + '-' + k); if (el) { el.value = ''; store.set(p + '-' + k, ''); } });
+      $('#ok-' + k).checked = false; err.textContent = ''; U.toast('<i>✓</i> Publicado en el muro.');
+    } catch (x) { err.textContent = U.errMsg(x); }
+    b.disabled = false; return;
+  }
+  if (b.dataset.resp !== undefined){
+    const r = b.dataset.resp;
+    if (r === 'omitir') { store.set('enc-' + S.encuesta, 'omitida'); $('#enc').hidden = true; return; }
+    if (r === 'txt') { const t = ($('#enc-txt').value || '').trim().slice(0, 1000); if (t) responder({ texto: t }); return; }
+    if (r === 'op') return responder({ opcion: Number(b.dataset.op) });
+    if (r === 'sem') {
+      const casos = SEMAFORO[U.C].map((_, j) => { const p = document.querySelector(`#enc-b .dot[data-sem="${j}"][aria-pressed="true"]`); return p ? p.dataset.val : null; });
+      if (casos.some(x => !x)) { $('#enc-err').textContent = 'Marque un color en los ocho casos.'; return; }
+      return responder({ casos });
+    }
+    return responder({ escalon: Number(r) });
+  }
+});
+document.addEventListener('input', e => {
+  if (e.target.dataset.k) store.set(e.target.dataset.k, e.target.value);
+  if (e.target.dataset.chk !== undefined) store.set('chk-' + e.target.dataset.chk, e.target.checked ? '1' : '0');
+});
+
+async function arrancar(){
+  TAB = location.hash.slice(1) || store.get('tab') || 'mapa';
+  if (!['mapa', '1', '2', '3', '4'].includes(TAB)) TAB = 'mapa';
+  tabs(); firma = ''; await refrescar();
+  if (DB.onChange) DB.onChange(refrescar);
+  setInterval(refrescar, (IAAB_CONFIG.POLL_MS || 4000));
+  setInterval(() => DB.ping(YO.id), 60000);
+}
+U.demoBanner();
+if (YO && YO.id) arrancar(); else registro();
+</script>
+</body>
+</html>
