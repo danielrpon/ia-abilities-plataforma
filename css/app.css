@@ -258,3 +258,33 @@ input:focus,select:focus{outline:2px solid var(--acc);outline-offset:1px;}
 .proj .res .sem-caso{margin-top:22px;}
 .proj .res .sem-t{font-size:20px;}
 .chips[hidden],.posts[hidden]{display:none;}
+
+/* ===== Modo foco: «Ahora» muestra solo lo que pide la lámina ===== */
+.sw{display:inline-flex;gap:2px;padding:3px;margin:0 6px 10px 0;border-radius:999px;background:rgba(255,255,255,.08);flex:0 0 auto;align-self:center;}
+.sw button{display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:700;color:var(--dim);transition:transform 160ms var(--ease-out);touch-action:manipulation;}
+.sw button:active{transform:scale(0.97);}
+.sw button[aria-pressed=true]{background:var(--white);color:var(--ink);}
+.sw .pulse{width:7px;height:7px;border-radius:50%;background:var(--acc);}
+.tabs:has(.sw:only-child){margin-top:12px;}
+button.now{width:100%;text-align:left;font:inherit;}
+.foco{background:var(--card);border:2px solid var(--accdk);border-radius:var(--r);margin-top:10px;overflow:hidden;}
+.foco-h{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;padding:16px 16px 14px;}
+.foco-h h1{font-size:22px;margin-top:0;letter-spacing:-.4px;}
+.foco .act-b{border-top:1px solid var(--line);}
+.num{width:auto;min-width:36px;padding:0 7px;font-size:12px;}
+details.act>summary{grid-template-columns:auto 1fr auto;}
+.locked-act{grid-template-columns:auto 1fr;}
+details.grupo .act-b{padding-top:0;}
+details.notas{margin-top:22px;}
+details.notas>summary{grid-template-columns:auto 1fr auto;}
+.llego{background:var(--tint);color:var(--ink);border-radius:10px;padding:10px 12px;margin-top:12px;font-size:13.5px;}
+.enc-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:12px;font-size:13px;font-weight:700;}
+.offline{background:var(--warnbg);color:var(--warn);font-size:12.5px;font-weight:700;text-align:center;padding:6px 12px;position:sticky;top:0;z-index:25;}
+.offline[hidden]{display:none;}
+/* encuestas compactas: todo cabe en un celular y el botón queda siempre a la vista */
+.pick.compacta{gap:6px;}
+.pick.compacta button{grid-template-columns:22px 1fr;align-items:center;padding:9px 12px;}
+.pick-d{font-size:13px;color:var(--graph);min-height:2.6em;margin-top:8px;}
+.cases.compactos .case{padding:8px 10px;font-size:13px;line-height:1.35;}
+.enc-foot{position:sticky;bottom:-20px;display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--paper);padding:12px 0 20px;margin-top:8px;border-top:1px solid var(--line);font-family:var(--mono);font-size:11.5px;color:var(--muted);}
+.btn:disabled{opacity:.45;}

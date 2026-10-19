@@ -17,6 +17,7 @@
     <nav class="tabs" role="tablist" id="tabs"></nav>
   </div>
 </header>
+<div class="offline" id="off" role="status" hidden>Sin conexión · mostrando lo último</div>
 <main id="main"></main>
 <footer>IA-abilities · Coknow · Sus notas y borradores se guardan solo en este dispositivo; lo que publique en el muro lo ve su grupo.</footer>
 
@@ -32,10 +33,14 @@ const { $, v, esc, store } = U;
 const AREAS = { mp: ['Mercadeo y catálogo', 'Comercial', 'Diseño y contenido', 'Demanda y pronóstico', 'Dirección y servicio', 'Otra'],
                 pco: ['Compensación', 'Selección', 'Nómina', 'Talento y bienestar', 'Plataformas core', 'Otra'] }[U.C];
 const COLOR = { v: 'Verde', a: 'Amarillo', r: 'Rojo', d: 'Debate' };
-let S = null, YO = null, TAB = null, firma = '';
+/* MODO: «ahora» muestra solo lo que pide la lámina; «todo» es la biblioteca (pestañas por nivel).
+   Sin «Ahora en la sala» (antes y después de la sesión) siempre es la biblioteca. */
+let S = null, YO = null, TAB = null, MODO = 'ahora', firma = '', pendiente = false, recien = false;
 try { YO = JSON.parse(store.get('yo') || 'null'); } catch (e) {}
 
 const pasosHtml = p => p ? `<ol class="steps">${p.map(x => `<li><span>${v(x)}</span></li>`).join('')}</ol>` : '';
+const visible = (t, hab) => hab.has(t.id) && t.tipo !== 'encuesta';   // las tarjetas de encuesta las reemplaza la hoja
+const respondida = id => store.get('enc-' + id) === '1';
 
 function postForm(c, m, n){
   const k = c.id + '-' + n;
@@ -69,13 +74,22 @@ function cardBody(c){
         <ul class="cases">${SEMAFORO[U.C].map(([t, col, por], j) => `<li class="case" style="grid-template-columns:1fr"><span><b>${j + 1}. ${COLOR[col]}.</b> ${esc(t)}<br><span class="hint">${esc(por)}</span></span></li>`).join('')}</ul>`; break;
     case 'texto': h += v(c.html); break;
     case 'enlace': h += `<div class="prompt-a" style="padding:12px 0 0"><a class="btn" href="${esc(v(c.url))}" target="_blank" rel="noopener" style="text-decoration:none">${esc(c.label)}</a></div>`; break;
-    case 'encuesta': h += `<p class="hint">${S && S.encuesta === c.encuesta ? '<b>Abierta ahora.</b>' : 'Se abre cuando el facilitador la lance.'}</p>`; break;
+    case 'encuesta':
+      h += S && S.encuesta === c.encuesta
+        ? (respondida(c.encuesta) ? `<p class="hint"><b>Ya respondió.</b> Puede cambiar su respuesta mientras siga abierta.</p><div class="prompt-a" style="padding:10px 0 0"><button class="btn alt" data-cambiar="${c.encuesta}">Cambiar mi respuesta</button></div>`
+                                  : `<p class="hint"><b>Abierta ahora:</b> le aparece en pantalla.</p>`)
+        : `<p class="hint">Se abre cuando el facilitador la lance.</p>`; break;
     case 'pendiente': h += `<span class="tag draft">Por nutrir</span>`; break;
   }
   if (c.muro) h += postForm(c, c.muro, 1);
   if (c.muro2) h += postForm(c, c.muro2, 2);
   return h;
 }
+
+/* Una tarjeta plegada: el código (N1-10) es lo que dicta el facilitador */
+const fila = t => `<details class="act" id="${t.id}"><summary><span class="num">${t.id}</span><span><span class="act-t">${esc(t.t)}</span>${t.muro ? '<br><span class="act-m">con muro</span>' : ''}</span><span class="chev" aria-hidden="true"></span></summary>
+  <div class="act-b">${cardBody(t)}</div></details>`;
+const bloqueada = t => `<div class="locked-act"><span class="num">${t.id}</span><span><span class="act-t">${esc(t.t)}</span><br><span class="act-m">se abre en un momento</span></span></div>`;
 
 function registro(){
   $('#tabs').innerHTML = '';
@@ -92,100 +106,185 @@ function registro(){
     e.preventDefault();
     const nombre = $('#r-nom').value.trim();
     if (!nombre) return;
-    try { YO = await DB.registrar(nombre, $('#r-area').value); store.set('yo', JSON.stringify(YO)); arrancar(); }
+    try { YO = await DB.registrar(nombre, $('#r-area').value); store.set('yo', JSON.stringify(YO)); recien = true; arrancar(); }
     catch (err) { $('#r-err').textContent = U.errMsg(err); }
   });
 }
 
+/* Niveles que se muestran en la biblioteca: el mapa, los que ya tienen tarjetas abiertas y el muro */
+function nivelesAbiertos(){
+  const hab = new Set((S && S.habilitadas) || []);
+  return NIVELES.filter(n => n.capitulos && n.capitulos.some(c => c.tarjetas.some(t => hab.has(t.id))));
+}
+
 function tabs(){
-  const items = [{ id: 'mapa', l: 'Mapa', b: '00' }].concat(NIVELES.map(n => ({ id: String(n.id), l: n.verbo, b: '0' + n.id })));
-  $('#tabs').innerHTML = items.map(t => `<button class="tab" role="tab" data-tab="${t.id}" aria-selected="${t.id === TAB}"><b>${t.b}</b>${t.l}</button>`).join('')
+  const F = U.foco(S);
+  const sw = F ? `<div class="sw" role="group" aria-label="Qué mostrar"><button data-modo="ahora" aria-pressed="${MODO === 'ahora'}"><span class="pulse"></span>Ahora</button><button data-modo="todo" aria-pressed="${MODO === 'todo'}">Todo</button></div>` : '';
+  if (F && MODO === 'ahora') { $('#tabs').innerHTML = sw; return; }
+  const items = [{ id: 'mapa', l: 'Mapa', b: '00' }].concat(nivelesAbiertos().map(n => ({ id: String(n.id), l: n.verbo, b: '0' + n.id })));
+  if (!TAB || !items.some(t => t.id === TAB)) TAB = items[items.length - 1].id;   // por defecto, el último nivel con tarjetas abiertas
+  $('#tabs').innerHTML = sw + items.map(t => `<button class="tab" role="tab" data-tab="${t.id}" aria-selected="${t.id === TAB}"><b>${t.b}</b>${t.l}</button>`).join('')
     + `<a class="tab" href="muro.html?s=${encodeURIComponent(DB.SES)}" style="text-decoration:none"><b>··</b>Muro</a>`;
 }
 
+/* En la biblioteca, un enlace de vuelta a lo que pasa en la sala */
 function ahora(){
-  if (!S || !S.actual) return '';
-  const c = U.cap(S.actual); if (!c) return '';
-  return `<a class="now" href="#${c.id}" data-goto="${c.id}"><span class="pulse"></span><span><span class="l">Ahora en la sala</span><br><span class="t">Nivel 0${c.nivel} · ${esc(c.t)}</span></span></a>`;
+  const F = U.foco(S); if (!F) return '';
+  return `<button class="now" data-modo="ahora"><span class="pulse"></span><span><span class="l">Ahora en la sala</span><br><span class="t">${esc(F.tarjeta ? F.tarjeta.id + ' · ' + F.tarjeta.t : F.cap.t)}</span></span></button>`;
+}
+
+/* Encuesta abierta que esta persona ya respondió (o dejó para después) */
+function encBar(){
+  if (!S || !S.encuesta) return '';
+  const st = store.get('enc-' + S.encuesta);
+  if (st === '1') return `<div class="enc-bar"><span>Encuesta abierta · ya respondió</span><button class="mini" data-cambiar="${S.encuesta}">Cambiar mi respuesta</button></div>`;
+  if (st === 'omitida') return `<div class="enc-bar"><span>Hay una encuesta abierta</span><button class="mini" data-cambiar="${S.encuesta}">Responder</button></div>`;
+  return '';
 }
 
 function render(){
   U.PROMPTS.length = 0;
   const abiertos = [...document.querySelectorAll('details.act[open]')].map(d => d.id);
+  tabs();
+  const F = U.foco(S);
+  if (F && MODO === 'ahora') vivo(F); else biblioteca();
+  abiertos.forEach(id => { const d = document.getElementById(id); if (d && d.tagName === 'DETAILS') d.open = true; });
+  document.querySelectorAll('textarea[data-k]').forEach(t => { t.value = store.get(t.dataset.k) || ''; });
+}
+
+/* EN VIVO: lo de ahora arriba; lo ya visto, plegado abajo; lo que viene no aparece */
+function vivo(F){
+  const hab = new Set(S.habilitadas || []);
+  const c = F.cap, N = NIVELES.find(n => n.id === c.nivel), ci = N.capitulos.findIndex(x => x.id === c.id);
+  const ref = F.tarjeta ? U.orden(F.tarjeta.id) : -1;
+  let h = encBar();
+  if (recien && ci > 0) h += `<p class="hint llego">La sala va en el capítulo ${ci}. Lo anterior está abajo, en «Lo que ya vimos».</p>`;
+  h += `<div class="kick" style="margin-top:14px">Ahora en la sala · Capítulo ${ci} · ${esc(c.t)}</div>`;
+  let antes = [];
+  if (F.tarjeta){
+    const t = F.tarjeta;
+    h += `<article class="foco" id="f-${t.id}"><div class="foco-h"><span class="num">${t.id}</span><h1>${esc(t.t)}</h1></div><div class="act-b">${cardBody(t)}</div></article>`;
+    const resto = c.tarjetas.filter(x => x.id !== t.id);
+    antes = resto.filter(x => U.orden(x.id) < ref && visible(x, hab));
+    const sig = resto.filter(x => U.orden(x.id) > ref && visible(x, hab));
+    const faltan = resto.filter(x => U.orden(x.id) > ref && !hab.has(x.id) && x.tipo !== 'encuesta').length;
+    if (sig.length) h += `<h2>También abierto ahora</h2><div class="acts">${sig.map(fila).join('')}</div>`;
+    if (faltan) h += `<p class="hint" style="margin-top:12px">${faltan === 1 ? 'Una tarjeta más se abre' : faltan + ' tarjetas más se abren'} en un momento.</p>`;
+  } else {
+    h += `<h1>${esc(c.t)}</h1><div class="layers" style="margin-top:12px">
+        <div class="layer"><div class="n">1 · Dónde estamos</div><h3>${c.donde}</h3></div>
+        <div class="layer"><div class="n">2 · Lo nuevo</div><ul>${c.nuevo.map(x => `<li>${v(x)}</li>`).join('')}</ul></div></div>`;
+    const ab = c.tarjetas.filter(x => visible(x, hab));
+    if (ab.length) h += `<div class="acts" style="margin-top:12px">${ab.map(fila).join('')}</div>`;
+    else h += `<p class="hint" style="margin-top:12px">Las tarjetas de este capítulo se abren en un momento.</p>`;
+  }
+  const previos = N.capitulos.slice(0, ci).map((x, k) => ({ x, k, ts: x.tarjetas.filter(t => visible(t, hab)) })).filter(g => g.ts.length).reverse();
+  if (antes.length || previos.length){
+    h += `<h2>Lo que ya vimos</h2><div class="acts">${antes.reverse().map(fila).join('')}${previos.map(g => `<details class="act grupo" id="g-${g.x.id}"><summary><span class="num">C${g.k}</span><span><span class="act-t">${esc(g.x.t)}</span><br><span class="act-m">${g.ts.length} ${g.ts.length === 1 ? 'tarjeta' : 'tarjetas'}</span></span><span class="chev" aria-hidden="true"></span></summary>
+      <div class="act-b"><div class="acts" style="margin-top:12px">${g.ts.map(fila).join('')}</div></div></details>`).join('')}</div>`;
+  }
+  h += `<details class="act notas" id="g-notas"><summary><span class="num">✎</span><span class="act-t">Mis notas</span><span class="chev" aria-hidden="true"></span></summary>
+    <div class="act-b"><textarea data-k="notas-${N.id}" aria-label="Mis notas del nivel" placeholder="Lo que quiero recordar de este nivel…"></textarea></div></details>`;
+  $('#main').innerHTML = h;
+}
+
+/* BIBLIOTECA: el mapa o un nivel completo, con todo lo abierto */
+function biblioteca(){
   if (TAB === 'mapa'){
-    $('#main').innerHTML = `${ahora()}<div class="kick" style="margin-top:18px">El mapa</div><h1>El piso y siete escalones</h1>
+    $('#main').innerHTML = `${encBar()}${ahora()}<div class="kick" style="margin-top:18px">El mapa</div><h1>El piso y siete escalones</h1>
       <p class="lede">Todo lo que vamos a ver cabe aquí. Inspirada en los niveles de uso de Juan Gabriel Gomila, traducida al trabajo de su equipo. La idea es subir un escalón cada vez.</p>
       <ul class="map">${ESCALERA.map(e => `<li><span class="k">${e.k}</span><span><span class="t">${e.t}</span><div class="d">${e.d}</div><div class="w">${e.w}</div></span></li>`).join('')}</ul>`;
     return;
   }
   const N = NIVELES.find(x => String(x.id) === TAB);
   const hab = new Set(S.habilitadas || []);
-  let h = `${ahora()}<div class="kick" style="margin-top:18px">Nivel 0${N.id}</div><h1>${N.verbo}</h1><p class="lede">${N.lede}</p>${U.ladder(N)}`;
+  let h = `${encBar()}${ahora()}<div class="kick" style="margin-top:18px">Nivel 0${N.id}</div><h1>${N.verbo}</h1><p class="lede">${N.lede}</p>${U.ladder(N)}`;
   if (!N.capitulos){ $('#main').innerHTML = h + `<div class="soon"><div class="kick">Próximamente</div><p>${N.pronto}</p></div>`; return; }
-  if (N.borrador) h += `<span class="tag draft">Borrador · lo ajusta Juan Gonzalo</span>`;
   N.capitulos.forEach((c, ci) => {
     const abiertas = c.tarjetas.filter(t => hab.has(t.id));
-    const esAhora = S.actual === c.id;
-    if (!abiertas.length && !esAhora){
+    if (!abiertas.length){
       h += `<div class="locked-act" style="margin-top:12px"><span class="num">C${ci}</span><span><span class="act-t">${esc(c.t)}</span><br><span class="act-m">${c.min} · se abre durante la sesión</span></span></div>`;
       return;
     }
-    h += `<section id="${c.id}" style="margin-top:26px"><div class="kick">Capítulo ${ci} · ${c.min}${esAhora ? ' · ahora' : ''}</div><h2 style="margin-top:4px">${esc(c.t)}</h2>
+    h += `<section id="${c.id}" style="margin-top:26px"><div class="kick">Capítulo ${ci} · ${c.min}</div><h2 style="margin-top:4px">${esc(c.t)}</h2>
       <div class="layers" style="margin-top:10px">
         <div class="layer"><div class="n">1 · Dónde estamos</div><h3>${c.donde}</h3></div>
         <div class="layer"><div class="n">2 · Lo nuevo</div><ul>${c.nuevo.map(x => `<li>${v(x)}</li>`).join('')}</ul></div>
         <div class="layer"><div class="n">3 · Lo que se habilita</div><ul>${c.habilita.map(x => `<li>${v(x)}</li>`).join('')}</ul></div>
-      </div><div class="acts" style="margin-top:10px">`;
-    c.tarjetas.forEach(t => {
-      if (!hab.has(t.id)) { h += `<div class="locked-act"><span class="num">${t.id.slice(3)}</span><span><span class="act-t">${esc(t.t)}</span><br><span class="act-m">${t.id} · se abre en un momento</span></span></div>`; return; }
-      h += `<details class="act" id="${t.id}" ${abiertos.includes(t.id) ? 'open' : ''}><summary><span class="num">${t.id.slice(3)}</span><span><span class="act-t">${esc(t.t)}</span><br><span class="act-m">${t.id}${t.muro ? ' · con muro' : ''}</span></span><span class="chev" aria-hidden="true"></span></summary>
-        <div class="act-b">${cardBody(t)}</div></details>`;
-    });
-    h += `</div></section>`;
+      </div><div class="acts" style="margin-top:10px">${c.tarjetas.map(t => hab.has(t.id) ? fila(t) : bloqueada(t)).join('')}</div></section>`;
   });
   h += `<h2>Mis notas</h2><textarea data-k="notas-${N.id}" aria-label="Mis notas del nivel" placeholder="Lo que quiero recordar de este nivel…"></textarea>`;
   $('#main').innerHTML = h;
-  document.querySelectorAll('textarea[data-k]').forEach(t => { t.value = store.get(t.dataset.k) || ''; });
 }
 
-function go(id){ TAB = id; store.set('tab', id); tabs(); render(); window.scrollTo(0, 0); }
+function go(id){ TAB = id; MODO = 'todo'; store.set('tab', id); render(); window.scrollTo(0, 0); }
 
 function encuesta(){
   const box = $('#enc');
   const E = S && S.encuesta ? ENCUESTAS.find(x => x.id === S.encuesta) : null;
-  if (!E || store.get('enc-' + E.id)) { box.hidden = true; return; }
+  if (!E || store.get('enc-' + E.id)) { box.hidden = true; box.dataset.id = ''; return; }
   if (!box.hidden && box.dataset.id === E.id) return;
   box.dataset.id = E.id;
   $('#enc-t').textContent = E.titulo;
   let b = '';
-  if (E.tipo === 'escalon') b = `<p class="hint">Toque el que más se parece a usted. Se ve en conjunto, nunca por persona.</p><div class="pick">${ESCALERA.map(e => `<button data-resp="${e.k}"><span class="k">${e.k}</span><span><span class="t">${e.t}</span><br><span class="d">${e.d}</span></span></button>`).join('')}</div>`;
-  if (E.tipo === 'semaforo') b = `<p class="hint">Por intuición: marque un color en cada caso y envíe.</p><ul class="cases">${SEMAFORO[U.C].map(([t], j) => `<li class="case"><span>${j + 1}. ${esc(t)}</span><span class="vote" role="group" aria-label="Color del caso ${j + 1}">${['v', 'a', 'r'].map(x => `<button class="dot ${x}" data-sem="${j}" data-val="${x}" aria-pressed="false" aria-label="${COLOR[x]}"></button>`).join('')}</span></li>`).join('')}</ul><div class="prompt-a" style="padding:12px 0 0"><button class="btn" data-resp="sem">Enviar mis votos</button></div>`;
+  if (E.tipo === 'escalon'){
+    const prev = store.get('encv-' + E.id);
+    b = `<p class="hint">Escoja el que más se parece a usted y confirme. Se ve en conjunto, nunca por persona.</p>
+      <div class="pick compacta">${ESCALERA.map(e => `<button data-pick="${e.k}" aria-pressed="${prev === String(e.k)}"><span class="k">${e.k}</span><span class="t">${e.t}</span></button>`).join('')}</div>
+      <p class="pick-d" id="pick-d">${prev !== null && prev !== '' && ESCALERA[+prev] ? ESCALERA[+prev].d : ''}</p>
+      <div class="enc-foot"><span></span><button class="btn" data-resp="esc" ${prev ? '' : 'disabled'}>Confirmar</button></div>`;
+  }
+  if (E.tipo === 'semaforo') b = `<p class="hint">Por intuición: marque un color en cada caso y envíe.</p><ul class="cases compactos">${SEMAFORO[U.C].map(([t], j) => `<li class="case"><span>${j + 1}. ${esc(t)}</span><span class="vote" role="group" aria-label="Color del caso ${j + 1}">${['v', 'a', 'r'].map(x => `<button class="dot ${x}" data-sem="${j}" data-val="${x}" aria-pressed="false" aria-label="${COLOR[x]}"></button>`).join('')}</span></li>`).join('')}</ul>
+    <div class="enc-foot"><span id="sem-n">0 de ${SEMAFORO[U.C].length} marcados</span><button class="btn" data-resp="sem">Enviar mis votos</button></div>`;
   if (E.tipo === 'multiple') b = `<div class="pick">${E.opciones.map((o, j) => `<button data-resp="op" data-op="${j}"><span class="k">${j + 1}</span><span class="t">${esc(o)}</span></button>`).join('')}</div>`;
   if (E.tipo === 'abierta') b = `<textarea id="enc-txt" maxlength="1000" placeholder="Su respuesta…"></textarea><div class="prompt-a" style="padding:12px 0 0"><button class="btn" data-resp="txt">Enviar</button><button class="btn alt" data-resp="omitir">Ahora no</button></div>`;
   $('#enc-b').innerHTML = b + '<div class="err" id="enc-err"></div>';
   box.hidden = false;
 }
 
+const escribiendo = () => { const a = document.activeElement; return !!(a && $('#main').contains(a) && /^(TEXTAREA|INPUT)$/.test(a.tagName)); };
+
 async function refrescar(){
-  try { S = await DB.getSesion(); } catch (e) { return; }
+  try { S = await DB.getSesion(); $('#off').hidden = true; } catch (e) { $('#off').hidden = false; return; }
   if (!S) { $('#main').innerHTML = '<h1>Sesión no encontrada</h1><p class="lede">Revise el enlace que le compartieron.</p>'; return; }
   const f = JSON.stringify([S.habilitadas, S.actual, S.encuesta]);
-  if (f !== firma) { firma = f; render(); }
+  if (f !== firma){
+    const antes = firma ? JSON.parse(firma)[1] : undefined;
+    const nuevoFoco = firma && antes !== S.actual;
+    firma = f;
+    if (nuevoFoco){ MODO = 'ahora'; recien = false; }
+    // Si la persona está escribiendo, no se le pisa el borrador: se repinta al salir del cuadro
+    if (escribiendo()) pendiente = true;
+    else { render(); if (nuevoFoco) window.scrollTo(0, 0); }
+  }
   encuesta();
 }
 
 async function responder(valor){
   const E = ENCUESTAS.find(x => x.id === S.encuesta); if (!E) return;
-  try { await DB.responder(E.id, YO.id, valor); store.set('enc-' + E.id, '1'); $('#enc').hidden = true; U.toast('<i>✓</i> Gracias.'); }
+  try {
+    await DB.responder(E.id, YO.id, valor); store.set('enc-' + E.id, '1');
+    if (valor.escalon != null) store.set('encv-' + E.id, String(valor.escalon));
+    $('#enc').hidden = true; $('#enc').dataset.id = ''; U.toast('<i>✓</i> Gracias.'); render();
+  }
   catch (x) { $('#enc-err').textContent = U.errMsg(x); }
 }
 
 document.addEventListener('click', async e => {
-  const g = e.target.closest('[data-goto]');
-  if (g) { e.preventDefault(); const c = U.cap(g.dataset.goto); go(String(c.nivel)); const d = document.getElementById(c.id); if (d) d.scrollIntoView({ block: 'start' }); return; }
   const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.modo){ MODO = b.dataset.modo; if (MODO === 'todo') { const F = U.foco(S); if (F) TAB = String(F.cap.nivel); } render(); window.scrollTo(0, 0); return; }
   if (b.dataset.tab) return go(b.dataset.tab);
-  if (b.dataset.sem !== undefined){ b.parentElement.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); return; }
+  if (b.dataset.cambiar){ store.set('enc-' + b.dataset.cambiar, ''); encuesta(); return; }
+  if (b.dataset.pick !== undefined){
+    b.parentElement.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b));
+    $('#pick-d').textContent = ESCALERA[+b.dataset.pick].d;
+    $('#enc-b [data-resp="esc"]').disabled = false; return;
+  }
+  if (b.dataset.sem !== undefined){
+    b.parentElement.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b));
+    $('#sem-n').textContent = `${document.querySelectorAll('#enc-b .vote').length - [...document.querySelectorAll('#enc-b .vote')].filter(g => !g.querySelector('[aria-pressed="true"]')).length} de ${SEMAFORO[U.C].length} marcados`;
+    return;
+  }
   if (b.dataset.pub){
     const k = b.dataset.pub, tipo = b.dataset.tipo, err = $('#err-' + k);
     const val = id => ($('#' + id + '-' + k) ? $('#' + id + '-' + k).value.trim() : '');
@@ -202,26 +301,26 @@ document.addEventListener('click', async e => {
   }
   if (b.dataset.resp !== undefined){
     const r = b.dataset.resp;
-    if (r === 'omitir') { store.set('enc-' + S.encuesta, 'omitida'); $('#enc').hidden = true; return; }
+    if (r === 'omitir') { store.set('enc-' + S.encuesta, 'omitida'); $('#enc').hidden = true; render(); return; }
     if (r === 'txt') { const t = ($('#enc-txt').value || '').trim().slice(0, 1000); if (t) responder({ texto: t }); return; }
     if (r === 'op') return responder({ opcion: Number(b.dataset.op) });
+    if (r === 'esc') { const p = document.querySelector('#enc-b [data-pick][aria-pressed="true"]'); if (p) responder({ escalon: Number(p.dataset.pick) }); return; }
     if (r === 'sem') {
       const casos = SEMAFORO[U.C].map((_, j) => { const p = document.querySelector(`#enc-b .dot[data-sem="${j}"][aria-pressed="true"]`); return p ? p.dataset.val : null; });
-      if (casos.some(x => !x)) { $('#enc-err').textContent = 'Marque un color en los ocho casos.'; return; }
+      if (casos.some(x => !x)) { $('#enc-err').textContent = `Marque un color en los ${SEMAFORO[U.C].length} casos.`; return; }
       return responder({ casos });
     }
-    return responder({ escalon: Number(r) });
   }
 });
 document.addEventListener('input', e => {
   if (e.target.dataset.k) store.set(e.target.dataset.k, e.target.value);
   if (e.target.dataset.chk !== undefined) store.set('chk-' + e.target.dataset.chk, e.target.checked ? '1' : '0');
 });
+document.addEventListener('focusout', () => { setTimeout(() => { if (pendiente && !escribiendo()) { pendiente = false; render(); } }, 0); });
 
 async function arrancar(){
-  TAB = location.hash.slice(1) || store.get('tab') || 'mapa';
-  if (!['mapa', '1', '2', '3', '4'].includes(TAB)) TAB = 'mapa';
-  tabs(); firma = ''; await refrescar();
+  TAB = location.hash.slice(1) || store.get('tab') || null;
+  firma = ''; await refrescar();
   if (DB.onChange) DB.onChange(refrescar);
   setInterval(refrescar, (IAAB_CONFIG.POLL_MS || 4000));
   setInterval(() => DB.ping(YO.id), 60000);

@@ -16,6 +16,14 @@
   };
   U.tarjeta = id => window.TARJETAS.find(a => a.id === id);
   U.cap = id => window.CAPITULOS.find(c => c.id === id);
+  /* «Ahora en la sala»: actual puede ser un capítulo (n1-c3) o una tarjeta (N1-10); el capítulo sale de la tarjeta.
+     El orden de las tarjetas es el de contenido.js (N1-00…N1-17 son cronológicos). */
+  U.orden = id => window.TARJETAS.findIndex(t => t.id === id);
+  U.foco = S => {
+    const a = S && S.actual; if (!a) return null;
+    const t = U.tarjeta(a); if (t) return { cap: U.cap(t.capitulo), tarjeta: t };
+    const c = U.cap(a); return c ? { cap: c, tarjeta: null } : null;
+  };
   U.actLabel = id => { const a = U.tarjeta(id) || U.cap(id); return a ? (a.id.startsWith('N') ? a.id + ' · ' : 'Nivel 0' + a.nivel + ' · ') + a.t : id; };
   U.TIPOS = { hallazgo: 'Hallazgo', par: 'Sin estructura / con la guía', prompt: 'Prompt', loop: 'Loop' };
   U.hora = iso => { try { return new Date(iso).toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit' }); } catch (e) { return ''; } };

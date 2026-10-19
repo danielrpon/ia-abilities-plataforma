@@ -68,12 +68,12 @@ async function vSesion(){
 function vActs(){
   const hab = new Set(S.habilitadas || []);
   $('#main').innerHTML = `<div class="kick">Capítulos y tarjetas</div><h1>Abra el contenido a medida que avanza</h1>
-    <p class="lede">«Estamos aquí» marca el capítulo en todos los celulares y abre todas sus tarjetas. El interruptor abre o cierra una tarjeta suelta.</p>` +
+    <p class="lede">«Ahora en la sala ›» lleva todos los celulares a ese capítulo y abre sus tarjetas. «Foco ›» los lleva a una sola tarjeta (y la abre). El interruptor abre o cierra una tarjeta sin moverlos.</p>` +
     NIVELES.filter(N => N.capitulos).map(N => `<div class="card-box"><div class="kick">Nivel 0${N.id} · ${N.verbo}</div>
       <div class="prompt-a" style="padding:10px 0 4px"><button class="mini" data-nivel="${N.id}" data-on="1">Abrir todo el nivel</button><button class="mini" data-nivel="${N.id}" data-on="0">Cerrar el nivel</button></div>
       ${N.capitulos.map((c, ci) => `<div class="adm-row ${S.actual === c.id ? 'cur' : ''}" style="grid-template-columns:1fr auto"><span><span class="t">C${ci} · ${esc(c.t)}</span><br><span class="m">${c.min}</span></span>
-          <button class="mini ${S.actual === c.id ? 'on' : ''}" data-cap="${c.id}">${S.actual === c.id ? 'Estamos aquí' : 'Estamos aquí ›'}</button></div>
-        ${c.tarjetas.map(x => `<div class="adm-row" style="padding-left:14px"><span><span class="t" style="font-weight:600">${x.id} · ${esc(x.t)}</span><br><span class="m">${x.tipo}${x.muro ? ' · muro' : ''}${x.encuesta ? ' · encuesta' : ''}</span></span><span></span>
+          <button class="mini ${S.actual === c.id ? 'on' : ''}" data-cap="${c.id}">${S.actual === c.id ? 'Ahora en la sala' : 'Ahora en la sala ›'}</button></div>
+        ${c.tarjetas.map(x => `<div class="adm-row" style="padding-left:14px"><span><span class="t" style="font-weight:600">${x.id} · ${esc(x.t)}</span><br><span class="m">${x.tipo}${x.muro ? ' · muro' : ''}${x.encuesta ? ' · encuesta' : ''}</span></span><button class="mini ${S.actual === x.id ? 'on' : ''}" data-foco="${x.id}">${S.actual === x.id ? 'Foco' : 'Foco ›'}</button>
           <button class="switch" role="switch" aria-checked="${hab.has(x.id)}" aria-label="Abrir ${esc(x.t)}" data-hab="${x.id}"></button></div>`).join('')}`).join('')}</div>`).join('');
 }
 
@@ -113,6 +113,7 @@ document.addEventListener('click', async e => {
   if (b.dataset.tab){ TAB = b.dataset.tab; armadoBorrar = false; return render(); }
   if (b.dataset.hab) return op('habilitar', { ids: [b.dataset.hab], on: b.getAttribute('aria-checked') !== 'true' });
   if (b.dataset.cap){ const c = U.cap(b.dataset.cap); await DB.admin('habilitar', { ids: c.tarjetas.map(x => x.id), on: true }).catch(() => {}); return op('actual', { id: S.actual === c.id ? null : c.id }); }
+  if (b.dataset.foco){ const id = b.dataset.foco; if (S.actual !== id) await DB.admin('habilitar', { ids: [id], on: true }).catch(() => {}); return op('actual', { id: S.actual === id ? null : id }); }
   if (b.dataset.nivel){ const N = NIVELES.find(x => String(x.id) === b.dataset.nivel); return op('habilitar', { ids: N.capitulos.flatMap(c => c.tarjetas.map(x => x.id)), on: b.dataset.on === '1' }); }
   if (b.dataset.enc){ ENC_VER = b.dataset.enc; return op('encuesta', { id: S.encuesta === b.dataset.enc ? null : b.dataset.enc }); }
   if (b.dataset.ver){ ENC_VER = b.dataset.ver; return render(); }

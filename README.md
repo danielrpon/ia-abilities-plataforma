@@ -16,6 +16,11 @@ Plataforma de la capacitación IA-abilities (Coknow: Daniel Restrepo y Juan Gonz
 - **Práctica (`MODE: 'local'` o `?demo=1`)**: todo vive en el navegador y se sincroniza entre pestañas del mismo equipo. Clave del panel: `admin`.
 - **Producción (`MODE: 'supabase'`, activo desde el 18-oct en el proyecto gratuito del foro, tablas `iaab_`)**: correr `supabase/schema.sql` en el SQL Editor, crear cada sesión con el bloque del final del archivo (clave propia, no escribirla en documentos) y pegar URL y llave anon en `js/config.js`.
 
+## Modo foco (tablero del asistente)
+- **Ahora**: cuando la sesión tiene «Ahora en la sala» (`iaab_sesiones.actual`), el celular muestra solo eso. Si `actual` es una tarjeta (`N1-10`), la tarjeta abierta; si es un capítulo (`n1-c3`), sus capas 1 y 2 y las tarjetas abiertas. Lo anterior queda plegado en «Lo que ya vimos»; lo que no se ha abierto no aparece.
+- **Todo**: la biblioteca por niveles (solo los niveles con tarjetas abiertas, el mapa y el muro). Sin `actual` (antes y después de la sesión) siempre es la biblioteca.
+- La presentación manda el foco con la marca `foco:N1-10` o `foco:n1-c2` (sin abrir todo el capítulo); el panel, con «Foco ›» por tarjeta. El orden «ya vimos / viene» sale del orden de `contenido.js`: numere las tarjetas en el orden en que se usan.
+
 ## Seguridad (checklist de blindaje)
 - El navegador solo tiene la llave anon. Las tablas no se leen ni escriben directo: las escrituras pasan por funciones RPC que validan sesión, participante, actividad abierta y largo del texto.
 - Los ids de participante no se exponen en el muro (cada dispositivo conoce solo el suyo).
