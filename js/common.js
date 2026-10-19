@@ -76,14 +76,16 @@
      el muro proyectado no, para no adelantar la discusión. */
   U.resultados = (E, rows, fac) => {
     const esc = U.esc;
+    /* Cada barra: porcentaje sobre el total de respuestas y, entre paréntesis, el número de votos */
+    const bar = (label, c, n, color) => { const pc = n ? Math.round(100 * c / n) : 0;
+      return `<div class="bar"><span>${label}</span><span class="track"><span class="fill" style="display:block;width:${pc}%${color ? ';background:' + color : ''}"></span></span><span class="v">${pc} % <i>(${c})</i></span></div>`; };
     if (E.tipo === 'escalon'){
       const vals = rows.map(r => r.valor && r.valor.escalon).filter(x => x != null);
       const n = vals.length, prom = n ? vals.reduce((a, b) => a + b, 0) / n : 0;
       const sd = n ? Math.sqrt(vals.reduce((a, b) => a + (b - prom) ** 2, 0) / n) : 0;
-      const max = Math.max(1, ...window.ESCALERA.map(e => vals.filter(x => x === e.k).length));
       const arriba2 = n ? Math.round(100 * vals.filter(x => x >= 2).length / n) : 0;
       return `<div class="stats"><span><b>${n}</b>respuestas</span><span><b>${prom.toFixed(1).replace('.', ',')}</b>promedio</span><span><b>${sd.toFixed(1).replace('.', ',')}</b>dispersión</span><span><b>${arriba2} %</b>en el 2 o arriba</span></div>
-        <div class="bars">${window.ESCALERA.map(e => { const c = vals.filter(x => x === e.k).length; return `<div class="bar"><span>${e.k} · ${esc(e.t)}</span><span class="track"><span class="fill" style="display:block;width:${100 * c / max}%"></span></span><span>${c}</span></div>`; }).join('')}</div>
+        <div class="bars">${window.ESCALERA.map(e => bar(`${e.k} · ${esc(e.t)}`, vals.filter(x => x === e.k).length, n)).join('')}</div>
         ${fac ? `<p class="hint">${n ? (arriba2 >= 80 ? 'El 80 % o más está en el escalón 2 o arriba: pase rápido por los escalones 0 y 1.' : sd >= 1.5 ? 'Dispersión alta: arme mesas mixtas con al menos una persona avanzada.' : 'Grupo parejo: siga el ritmo previsto.') : ''}</p>` : ''}`;
     }
     if (E.tipo === 'semaforo'){
@@ -93,11 +95,11 @@
         const n = Math.max(1, casos.length), acuerdo = Math.max(c.v, c.a, c.r) / n;
         const nota = [fac ? 'regla: ' + { v: 'verde', a: 'amarillo', r: 'rojo', d: 'debate' }[col] : '', casos.length && acuerdo < 0.7 ? 'sin acuerdo: discutir' : ''].filter(Boolean).join(' · ');
         return `<div class="sem-caso"><div class="sem-t">${j + 1}. ${esc(txt)}${nota ? ` <span class="m">· ${nota}</span>` : ''}</div>
-          ${['v', 'a', 'r'].map(k => `<div class="bar"><span>${{ v: 'Verde', a: 'Amarillo', r: 'Rojo' }[k]}</span><span class="track"><span class="fill" style="display:block;width:${100 * c[k] / n}%;background:var(--${{ v: 'ok', a: 'warn', r: 'no' }[k]})"></span></span><span>${c[k]}</span></div>`).join('')}</div>`; }).join('')}</div>`;
+          ${['v', 'a', 'r'].map(k => bar({ v: 'Verde', a: 'Amarillo', r: 'Rojo' }[k], c[k], casos.length, `var(--${{ v: 'ok', a: 'warn', r: 'no' }[k]})`)).join('')}</div>`; }).join('')}</div>`;
     }
     if (E.tipo === 'multiple'){
-      const ops = rows.map(r => r.valor && r.valor.opcion).filter(x => x != null), n = Math.max(1, ops.length);
-      return `<div class="stats"><span><b>${ops.length}</b>respuestas</span></div><div class="bars">${E.opciones.map((o, j) => { const c = ops.filter(x => x === j).length; return `<div class="bar"><span>${esc(o)}</span><span class="track"><span class="fill" style="display:block;width:${100 * c / n}%"></span></span><span>${c}</span></div>`; }).join('')}</div>`;
+      const ops = rows.map(r => r.valor && r.valor.opcion).filter(x => x != null);
+      return `<div class="stats"><span><b>${ops.length}</b>respuestas</span></div><div class="bars">${E.opciones.map((o, j) => bar(esc(o), ops.filter(x => x === j).length, ops.length)).join('')}</div>`;
     }
     return `<div class="posts">${rows.map(r => `<article class="post"><pre>${esc(r.valor && r.valor.texto)}</pre></article>`).join('') || '<p class="hint">Sin respuestas todavía.</p>'}</div>`;
   };
