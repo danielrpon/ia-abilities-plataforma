@@ -35,6 +35,8 @@ const { $, v, esc, store } = U;
 const AREAS = { mp: ['Mercadeo y catálogo', 'Comercial', 'Diseño y contenido', 'Demanda y pronóstico', 'Dirección y servicio', 'Otra'],
                 pco: ['Compensación', 'Selección', 'Nómina', 'Talento y bienestar', 'Plataformas core', 'Otra'] }[U.C];
 const COLOR = { v: 'Verde', a: 'Amarillo', r: 'Rojo', d: 'Debate' };
+/* PCO: nombre real, porque es la prueba de la autorización de grabación (ODS, cláusula 11). MP sigue con seudónimo. */
+const NOMBRE_REAL = U.C === 'pco';
 /* MODO: «ahora» muestra solo lo que pide la lámina; «todo» es la biblioteca (pestañas por nivel).
    Sin «Ahora en la sala» (antes y después de la sesión) siempre es la biblioteca. */
 let S = null, YO = null, TAB = null, MODO = 'ahora', firma = '', pendiente = false, recien = false;
@@ -98,9 +100,9 @@ function registro(){
   $('#main').innerHTML = `<div class="kick">Bienvenida</div><h1>Su tablero de recursos</h1>
     <p class="lede">Aquí encuentra los prompts, los pasos y los archivos de cada actividad, y el muro donde el grupo comparte lo que va construyendo. Las tarjetas se abren a medida que avanzamos.</p>
     <form class="card-box" id="reg">
-      <label class="field"><span>Su nombre de pila o un seudónimo</span><input type="text" id="r-nom" maxlength="40" autocomplete="given-name" required></label>
+      <label class="field"><span>${NOMBRE_REAL ? 'Su nombre y apellido' : 'Su nombre de pila o un seudónimo'}</span><input type="text" id="r-nom" maxlength="40" autocomplete="${NOMBRE_REAL ? 'name' : 'given-name'}" required></label>
       <label class="field"><span>Su mesa o área</span><select id="r-area">${AREAS.map(a => `<option>${esc(a)}</option>`).join('')}</select></label>
-      <p class="hint">No escriba apellidos, cédula, celular ni correo.</p>
+      <p class="hint">${NOMBRE_REAL ? 'Su nombre queda como prueba de su respuesta sobre la grabación. En el muro solo se ve su primer nombre. No escriba cédula, celular ni correo.' : 'No escriba apellidos, cédula, celular ni correo.'}</p>
       <div class="field"><span>Grabación de la sesión</span><p class="hint" style="margin-top:0">${esc(U.GRABACION.resumen)}</p>
         <details class="consent-d"><summary>Leer la autorización completa</summary>${U.grabacionHtml()}</details>
         <div id="r-graba">${U.grabacionPick(null)}</div></div>
@@ -116,6 +118,7 @@ function registro(){
     e.preventDefault();
     const nombre = $('#r-nom').value.trim();
     if (!nombre) return;
+    if (NOMBRE_REAL && nombre.split(/\s+/).length < 2) { $('#r-err').textContent = 'Escriba su nombre y su apellido.'; return; }
     if (graba === null) { $('#r-err').textContent = U.errMsg('FALTA_GRABACION'); return; }
     try { YO = await DB.registrar(nombre, $('#r-area').value, graba); YO.graba = graba; store.set('yo', JSON.stringify(YO)); recien = true; arrancar(); }
     catch (err) { $('#r-err').textContent = U.errMsg(err); }

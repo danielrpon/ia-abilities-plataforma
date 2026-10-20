@@ -38,4 +38,5 @@ Al registrarse, cada participante elige si autoriza o no la grabación del audio
 - **Participante:** una barra bajo el encabezado muestra su decisión y deja cambiarla («Cambiar»). Retirar la autorización es un derecho.
 - **Panel:** en cualquier pestaña aparece «■ Detenga la grabación» si alguien no autoriza, «Grabación en espera» si alguien no ha respondido y «● Grabación autorizada» si todos autorizan. El panel solo muestra conteos: nadie queda expuesto por nombre.
 - **Prueba:** «Descargar autorizaciones (CSV)» en la pestaña Sesión. El historial vive en `iaab_consentimientos` y sobrevive a «Reiniciar».
+- **Nombre:** en las sesiones `pco-…` se pide nombre y apellido (es la prueba de la autorización); en el muro solo se ve el primer nombre. En MP sigue el seudónimo.
 - **Base de datos:** correr una vez `supabase/003_consentimiento_grabacion.sql` ANTES de publicar este cambio.
