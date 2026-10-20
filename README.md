@@ -30,3 +30,12 @@ Plataforma de la capacitación IA-abilities (Coknow: Daniel Restrepo y Juan Gonz
 
 ## Pruebas locales
 `python3 -m http.server 8765` y abrir `http://localhost:8765/admin.html?s=mp-demo` y `index.html?s=mp-demo` en pestañas del mismo navegador.
+
+## Autorización de grabación (Ley 1581 de 2012)
+
+Al registrarse, cada participante elige si autoriza o no la grabación del audio (responder es obligatorio; autorizar no). El texto está en `U.GRABACION` (`js/common.js`). Si cambia el texto, suba `ver`: cada decisión queda guardada con la versión que la persona leyó.
+
+- **Participante:** una barra bajo el encabezado muestra su decisión y deja cambiarla («Cambiar»). Retirar la autorización es un derecho.
+- **Panel:** en cualquier pestaña aparece «■ Detenga la grabación» si alguien no autoriza, «Grabación en espera» si alguien no ha respondido y «● Grabación autorizada» si todos autorizan. El panel solo muestra conteos: nadie queda expuesto por nombre.
+- **Prueba:** «Descargar autorizaciones (CSV)» en la pestaña Sesión. El historial vive en `iaab_consentimientos` y sobrevive a «Reiniciar».
+- **Base de datos:** correr una vez `supabase/003_consentimiento_grabacion.sql` ANTES de publicar este cambio.

@@ -16,6 +16,7 @@
     </div>
     <nav class="tabs" id="tabs"></nav>
   </div>
+  <div class="rec-alert" id="grab" role="status" aria-live="assertive" hidden></div>
 </header>
 <main id="main"></main>
 <script src="vendor/supabase.min.js"></script>
@@ -26,7 +27,7 @@
 <script src="js/common.js"></script>
 <script>
 const { $, esc } = U;
-let S = null, TAB = 'sesion', ENC_VER = null, firma = '', armadoBorrar = false;
+let S = null, TAB = 'sesion', ENC_VER = null, firma = '', armadoBorrar = false, GRAB = null;
 $('#ses').textContent = DB.SES;
 
 function login(){
@@ -47,6 +48,29 @@ function tabs(){
   $('#tabs').innerHTML = it.map(([id, l]) => `<button class="tab" data-tab="${id}" aria-selected="${TAB === id}">${l}</button>`).join('');
 }
 
+/* Grabación: se revisa en cada ciclo, en cualquier pestaña. Solo conteos: nadie queda expuesto por nombre. */
+async function grabacion(){
+  const el = $('#grab');
+  try { GRAB = await DB.grabacion(); }
+  catch (x) { el.hidden = false; el.className = 'rec-alert sin'; el.innerHTML = `<b>Grabación</b><span>${esc(U.errMsg(x))}</span>`; return; }
+  const { si, no, sin } = GRAB, pers = n => n === 1 ? '1 persona' : n + ' personas';
+  el.hidden = !(si || no || sin);
+  if (no) { el.className = 'rec-alert no'; el.innerHTML = `<b>■ Detenga la grabación</b><span>${pers(no)} no ${no === 1 ? 'autoriza' : 'autorizan'} que se grabe esta sesión.</span>`; }
+  else if (sin) { el.className = 'rec-alert sin'; el.innerHTML = `<b>Grabación en espera</b><span>${pers(sin)} no ${sin === 1 ? 'ha' : 'han'} respondido. No grabe hasta que respondan.</span>`; }
+  else { el.className = 'rec-alert si'; el.innerHTML = `<b>● Grabación autorizada</b><span>${si === 1 ? 'La persona registrada la autoriza.' : `Las ${si} personas registradas la autorizan.`}</span>`; }
+}
+function csvGrabacion(){
+  const rows = (GRAB && GRAB.rows) || [];
+  if (!rows.length) return U.toast('Aún no hay autorizaciones.');
+  const q = x => '"' + String(x == null ? '' : x).replace(/"/g, '""') + '"';
+  const csv = '\ufeff' + [['fecha', 'nombre', 'area', 'decision', 'version_del_texto'].join(',')]
+    .concat(rows.map(r => [new Date(r.created_at).toLocaleString('es-CO'), r.nombre, r.area, r.graba ? 'autoriza' : 'no autoriza', r.texto_ver].map(q).join(','))).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+  a.download = `autorizaciones-grabacion-${DB.SES}-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
 const base = () => location.href.replace(/admin\.html.*$/, '');
 const linkPart = () => base() + 'index.html?s=' + encodeURIComponent(DB.SES);
 const linkMuro = () => base() + 'muro.html?s=' + encodeURIComponent(DB.SES) + '&proyectar=1';
@@ -55,12 +79,14 @@ async function vSesion(){
   let parts = [];
   try { parts = (await DB.admin('participantes')).rows || []; } catch (e) {}
   $('#main').innerHTML = `<div class="kick">Sesión</div><h1>${esc(S.nombre || DB.SES)}</h1>
-    <div class="stats"><span><b>${parts.length}</b>participantes</span><span><b>${(S.habilitadas || []).length}</b>actividades abiertas</span><span><b>${S.encuesta ? 'Sí' : 'No'}</b>encuesta abierta</span></div>
+    <div class="stats"><span><b>${parts.length}</b>participantes</span><span><b>${(S.habilitadas || []).length}</b>actividades abiertas</span><span><b>${S.encuesta ? 'Sí' : 'No'}</b>encuesta abierta</span>${GRAB ? `<span><b>${GRAB.si}/${GRAB.si + GRAB.no + GRAB.sin}</b>autorizan grabar</span>` : ''}</div>
     ${S.actual ? `<div class="now"><span class="pulse"></span><span><span class="l">Ahora en la sala</span><br><span class="t">${esc(U.actLabel(S.actual))}</span></span></div>` : ''}
     <div class="card-box"><div class="kick">Enlace para los participantes</div>
       <p class="hint" style="word-break:break-all">${esc(linkPart())}</p><div class="qr" id="qr"></div>
       <div class="prompt-a" style="padding:12px 0 0"><button class="btn" data-cp="part">${U.ICON_COPY}Copiar enlace</button><a class="btn alt" href="${esc(linkMuro())}" target="_blank" rel="noopener" style="text-decoration:none">Proyectar el muro</a></div></div>
-    <div class="card-box"><div class="kick">Reiniciar la sesión</div><p class="hint">Borra participantes, publicaciones, votos y respuestas, y cierra todas las actividades. Úselo después de un ensayo.</p>
+    <div class="card-box"><div class="kick">Autorizaciones de grabación</div><p class="hint">Cada decisión queda guardada con fecha, nombre y versión del texto: es la prueba que pide la Ley 1581. Descárguelas al cerrar cada sesión y guárdelas en la carpeta del cliente.</p>
+      <div class="prompt-a" style="padding:12px 0 0"><button class="btn alt" data-csv="1">Descargar autorizaciones (CSV)</button></div></div>
+    <div class="card-box"><div class="kick">Reiniciar la sesión</div><p class="hint">Borra participantes, publicaciones, votos y respuestas, y cierra todas las actividades. Úselo después de un ensayo. Las autorizaciones de grabación no se borran.</p>
       <div class="prompt-a" style="padding:12px 0 0"><button class="btn alt" data-borrar="1">${armadoBorrar ? 'Toque otra vez para confirmar' : 'Reiniciar'}</button></div></div>`;
   try { new QRCode($('#qr'), { text: linkPart(), width: 168, height: 168 }); } catch (e) {}
 }
@@ -120,13 +146,15 @@ document.addEventListener('click', async e => {
   if (b.dataset.mues){ ENC_VER = b.dataset.mues; return op('muestra', { id: S.muestra === b.dataset.mues ? null : b.dataset.mues }); }
   if (b.dataset.est) return op('estado_pub', { id: Number(b.dataset.est), estado: b.dataset.val });
   if (b.dataset.cp) return U.copiar(linkPart());
+  if (b.dataset.csv) return csvGrabacion();
   if (b.dataset.borrar){ if (!armadoBorrar) { armadoBorrar = true; return render(); } armadoBorrar = false; return op('borrar_todo'); }
 });
 
 async function arrancar(){
-  S = await DB.getSesion(); await render();
+  S = await DB.getSesion(); await grabacion(); await render();
   setInterval(async () => {
     try { S = await DB.getSesion(); } catch (e) { return; }
+    await grabacion();
     const f = JSON.stringify(S), cambio = f !== firma; firma = f;
     if (TAB === 'enc' || TAB === 'muro' || cambio) await render();
   }, Math.max(5000, IAAB_CONFIG.POLL_MS || 4000));

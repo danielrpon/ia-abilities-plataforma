@@ -18,9 +18,11 @@
   </div>
 </header>
 <div class="offline" id="off" role="status" hidden>Sin conexión · mostrando lo último</div>
+<div class="rec" id="rec" hidden></div>
 <main id="main"></main>
 <footer>IA-abilities · Coknow · Sus notas y borradores se guardan solo en este dispositivo; lo que publique en el muro lo ve su grupo.</footer>
 
+<div class="modal-bg" id="rec-m" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="rec-t"><div class="kick">Grabación de la sesión</div><h2 id="rec-t" style="margin-top:6px">¿Autoriza que se grabe el audio?</h2><div id="rec-b"></div></div></div>
 <div class="modal-bg" id="enc" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="enc-t"><div class="kick">Encuesta</div><h2 id="enc-t" style="margin-top:6px"></h2><div id="enc-b"></div></div></div>
 
 <script src="vendor/supabase.min.js"></script>
@@ -99,17 +101,51 @@ function registro(){
       <label class="field"><span>Su nombre de pila o un seudónimo</span><input type="text" id="r-nom" maxlength="40" autocomplete="given-name" required></label>
       <label class="field"><span>Su mesa o área</span><select id="r-area">${AREAS.map(a => `<option>${esc(a)}</option>`).join('')}</select></label>
       <p class="hint">No escriba apellidos, cédula, celular ni correo.</p>
+      <div class="field"><span>Grabación de la sesión</span><p class="hint" style="margin-top:0">${esc(U.GRABACION.resumen)}</p>
+        <details class="consent-d"><summary>Leer la autorización completa</summary>${U.grabacionHtml()}</details>
+        <div id="r-graba">${U.grabacionPick(null)}</div></div>
       <div class="prompt-a" style="padding:14px 0 0"><button class="btn" type="submit">Entrar</button></div>
       <div class="err" id="r-err"></div>
     </form>`;
+  let graba = null;
+  $('#r-graba').addEventListener('click', e => {
+    const b = e.target.closest('[data-graba]'); if (!b) return;
+    graba = b.dataset.graba === 'si'; $('#r-graba').innerHTML = U.grabacionPick(graba); $('#r-err').textContent = '';
+  });
   $('#reg').addEventListener('submit', async e => {
     e.preventDefault();
     const nombre = $('#r-nom').value.trim();
     if (!nombre) return;
-    try { YO = await DB.registrar(nombre, $('#r-area').value); store.set('yo', JSON.stringify(YO)); recien = true; arrancar(); }
+    if (graba === null) { $('#r-err').textContent = U.errMsg('FALTA_GRABACION'); return; }
+    try { YO = await DB.registrar(nombre, $('#r-area').value, graba); YO.graba = graba; store.set('yo', JSON.stringify(YO)); recien = true; arrancar(); }
     catch (err) { $('#r-err').textContent = U.errMsg(err); }
   });
 }
+
+/* Grabación: la decisión vigente siempre a la vista, con «Cambiar» (retirarla es un derecho) */
+function pintarRec(){
+  const g = YO && YO.graba, el = $('#rec');
+  el.hidden = false;
+  el.className = 'rec' + (g === false ? ' no' : g === true ? '' : ' sin');
+  el.innerHTML = (g === true ? '<span><b>●</b> Grabación: usted la autorizó</span>'
+    : g === false ? '<span><b>■</b> Usted no autorizó la grabación: la sesión no debe grabarse</span>'
+    : '<span><b>?</b> Falta su respuesta sobre la grabación</span>') + '<button type="button" data-rec="1">' + (g == null ? 'Responder' : 'Cambiar') + '</button>';
+}
+function abrirRec(){
+  $('#rec-b').innerHTML = `<p class="lede" style="font-size:14px">${esc(U.GRABACION.resumen)}</p>${U.grabacionHtml()}${U.grabacionPick(YO.graba)}<div class="err" id="rec-err"></div>
+    <div class="prompt-a" style="padding:12px 0 0"><button class="btn alt" type="button" data-rec-cerrar="1">Cerrar</button></div>`;
+  $('#rec-m').hidden = false;
+}
+$('#rec-m').addEventListener('click', async e => {
+  if (e.target === $('#rec-m') || e.target.closest('[data-rec-cerrar]')) { $('#rec-m').hidden = true; return; }
+  const b = e.target.closest('[data-graba]'); if (!b) return;
+  const g = b.dataset.graba === 'si';
+  try { await DB.consentir(YO.id, g); YO.graba = g; store.set('yo', JSON.stringify(YO)); pintarRec(); $('#rec-m').hidden = true;
+    U.toast(g ? '<i>✓</i> Autorización registrada.' : '<i>✓</i> Registrado. El facilitador verá el aviso.'); }
+  catch (err) { $('#rec-err').textContent = U.errMsg(err); }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#rec-m').hidden) $('#rec-m').hidden = true; });
+$('#rec').addEventListener('click', e => { if (e.target.closest('[data-rec]')) abrirRec(); });
 
 /* Niveles que se muestran en la biblioteca: el mapa, los que ya tienen tarjetas abiertas y el muro */
 function nivelesAbiertos(){
@@ -319,6 +355,7 @@ document.addEventListener('input', e => {
 document.addEventListener('focusout', () => { setTimeout(() => { if (pendiente && !escribiendo()) { pendiente = false; render(); } }, 0); });
 
 async function arrancar(){
+  pintarRec();
   TAB = location.hash.slice(1) || store.get('tab') || null;
   firma = ''; await refrescar();
   if (DB.onChange) DB.onChange(refrescar);

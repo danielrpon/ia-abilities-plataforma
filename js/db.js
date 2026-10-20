@@ -19,7 +19,9 @@
     const sb = window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY);
     const ok = (r) => { if (r.error) throw new Error(r.error.message || JSON.stringify(r.error)); return r.data; };
     DB.getSesion = async () => ok(await sb.from('iaab_v_sesiones').select('*').eq('id', SES).maybeSingle());
-    DB.registrar = async (nombre, area) => ok(await sb.rpc('iaab_registrar', { p_sesion: SES, p_nombre: nombre, p_area: area }));
+    DB.registrar = async (nombre, area, graba) => ok(await sb.rpc('iaab_registrar_v2', { p_sesion: SES, p_nombre: nombre, p_area: area, p_graba: graba, p_ver: U.GRABACION.ver }));
+    DB.consentir = async (pid, graba) => ok(await sb.rpc('iaab_consentir', { p_part: pid, p_graba: graba, p_ver: U.GRABACION.ver }));
+    DB.grabacion = async () => ok(await sb.rpc('iaab_grabacion', { p_sesion: SES, p_clave: DB.clave }));
     DB.ping = async (pid) => { try { await sb.rpc('iaab_ping', { p_id: pid }); } catch (e) {} };
     DB.getPublicaciones = async () => ok(await sb.from('iaab_v_publicaciones').select('*').eq('sesion_id', SES).order('created_at', { ascending: false }));
     DB.publicar = async (pid, nombre, act_id, texto, tipo) => ok(await sb.rpc('iaab_publicar', { p_sesion: SES, p_part: pid, p_act: act_id, p_texto: texto, p_tipo: tipo || 'prompt' }));
@@ -43,7 +45,7 @@
       seq: 1,
       sesion: { id: SES, cliente, nombre: 'IA-abilities · ' + (cliente === 'pco' ? 'Equipo de talento humano' : 'Equipo de mercadeo') + ' (práctica)',
         habilitadas: [], actual: null, encuesta: null, muestra: null, clave_admin: 'admin', created_at: nowIso() },
-      participantes: [], publicaciones: [], votos: [], respuestas: []
+      participantes: [], publicaciones: [], votos: [], respuestas: [], consentimientos: []
     });
     const load = () => { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.sesion) return s; } catch (e) {} const s = seed(); save(s); return s; };
     const save = (s) => { localStorage.setItem(KEY, JSON.stringify(s)); if (chan) chan.postMessage('upd'); };
@@ -52,7 +54,19 @@
     const vPubs = (s) => s.publicaciones.map(p => ({ ...p, votos: s.votos.filter(v => v.publicacion_id === p.id).length }));
 
     DB.getSesion = async () => pub(load());
-    DB.registrar = async (nombre, area) => { const s = load(); const p = { id: uuid(), sesion_id: SES, nombre, area, created_at: nowIso(), last_seen: nowIso() }; s.participantes.push(p); save(s); return p; };
+    /* La prueba de la autorización sobrevive a «Reiniciar», como en Supabase */
+    const consta = (s, p) => { (s.consentimientos = s.consentimientos || []).push({ created_at: nowIso(), nombre: p.nombre, area: p.area, graba: p.graba, texto_ver: U.GRABACION.ver }); };
+    DB.registrar = async (nombre, area, graba) => {
+      if (typeof graba !== 'boolean') throw new Error('FALTA_GRABACION');
+      const s = load(); const p = { id: uuid(), sesion_id: SES, nombre, area, graba, created_at: nowIso(), last_seen: nowIso() };
+      s.participantes.push(p); consta(s, p); save(s); return p;
+    };
+    DB.consentir = async (pid, graba) => { const s = load(); const p = s.participantes.find(p => p.id === pid); if (!p) throw new Error('PARTICIPANTE_INVALIDO'); p.graba = graba; consta(s, p); save(s); return { graba }; };
+    DB.grabacion = async () => {
+      const s = load(); if (DB.clave !== s.sesion.clave_admin) throw new Error('CLAVE_INVALIDA');
+      const ps = s.participantes;
+      return { si: ps.filter(p => p.graba === true).length, no: ps.filter(p => p.graba === false).length, sin: ps.filter(p => typeof p.graba !== 'boolean').length, rows: s.consentimientos || [] };
+    };
     DB.ping = async (pid) => { const s = load(); const p = s.participantes.find(p => p.id === pid); if (p) { p.last_seen = nowIso(); localStorage.setItem(KEY, JSON.stringify(s)); } };
     DB.getPublicaciones = async () => vPubs(load()).filter(p => p.estado !== 'oculta').sort((a, b) => b.created_at.localeCompare(a.created_at));
     DB.publicar = async (pid, nombre, act_id, texto, tipo) => {

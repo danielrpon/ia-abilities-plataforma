@@ -54,10 +54,32 @@
     if (/TEXTO_INVALIDO|check constraint/.test(m)) return 'Revise el texto: no puede ir vacío ni pasar de 4.000 caracteres.';
     if (/Failed to fetch|NetworkError/.test(m)) return 'Sin conexión. Intente de nuevo.';
     if (/OP_DESCONOCIDA/.test(m)) return 'Falta actualizar la base de datos (supabase/002_resultados_en_muro.sql).';
+    if (/FALTA_GRABACION/.test(m)) return 'Elija si autoriza o no la grabación de la sesión.';
+    if (/iaab_registrar_v2|iaab_consentir|iaab_grabacion/.test(m)) return 'Falta actualizar la base de datos (supabase/003_consentimiento_grabacion.sql).';
     return 'No se pudo completar. Intente de nuevo.';
   };
 
-  U.ICON_COPY = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>';
+  /* Autorización de grabación (Ley 1581 de 2012). Si cambia el texto, suba «ver»:
+     cada decisión queda guardada con la versión que la persona leyó. */
+  U.GRABACION = {
+    ver: 'v1 · 2026-10-19',
+    resumen: 'Para preparar las memorias del programa grabamos el audio de la sesión con Plaud. Es voluntario: si alguien no lo autoriza, la sesión no se graba y su participación sigue igual.',
+    texto: [
+      ['Responsable', 'Daniel Restrepo Núñez, facilitador del programa IA-abilities. Contacto: contacto@freaknerd.co.'],
+      ['Qué se graba', 'Solo el audio de la sesión, que incluye su voz y lo que diga en ella. La voz es un dato personal según la Ley 1581 de 2012. No se graba video.'],
+      ['Para qué', 'Transcribir y resumir la sesión para elaborar las memorias, ajustar el programa y preparar el material de seguimiento de su equipo. No se publica ni se usa para otros fines.'],
+      ['Con qué herramienta', 'Plaud. El audio se procesa con proveedores de IA (OpenAI, Google o Microsoft) fuera de Colombia, bajo contratos que les impiden conservarlo o usarlo para entrenar modelos de inteligencia artificial.'],
+      ['Por cuánto tiempo', 'Hasta tres meses después de terminar el programa. Luego se borran el audio y la transcripción.'],
+      ['Sus derechos', 'Conocer, actualizar, rectificar y suprimir sus datos, y retirar esta autorización cuando quiera, desde este tablero («Grabación · Cambiar») o escribiendo a contacto@freaknerd.co.'],
+      ['Es voluntaria', 'No está obligado a autorizar y no autorizar no afecta su participación. Si una persona no autoriza, el facilitador detiene la grabación.']
+    ]
+  };
+  U.grabacionHtml = () => `<dl class="consent">${U.GRABACION.texto.map(([t, d]) => `<dt>${U.esc(t)}</dt><dd>${U.esc(d)}</dd>`).join('')}</dl><p class="hint">Versión ${U.esc(U.GRABACION.ver)}</p>`;
+  U.grabacionPick = (val) => `<div class="pick" role="group" aria-label="Grabación de la sesión">
+    <button type="button" data-graba="si" aria-pressed="${val === true}"><span class="k">●</span><span class="td"><span class="t">Autorizo la grabación</span><span class="d">Mi voz puede quedar en el audio de la sesión.</span></span></button>
+    <button type="button" data-graba="no" aria-pressed="${val === false}"><span class="k">■</span><span class="td"><span class="t">No autorizo la grabación</span><span class="d">El facilitador verá un aviso para detenerla.</span></span></button></div>`;
+
+  U.ICON_COPY ='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>';
   U.ICON_WA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12a9 9 0 0 1-13.4 7.9L3 21l1.2-4.4A9 9 0 1 1 21 12z"/></svg>';
 
   /* Prompts copiables: se registran en una lista y los botones guardan el índice */

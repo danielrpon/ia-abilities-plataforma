@@ -288,3 +288,25 @@ details.notas>summary{grid-template-columns:auto 1fr auto;}
 .cases.compactos .case{padding:8px 10px;font-size:13px;line-height:1.35;}
 .enc-foot{position:sticky;bottom:-20px;display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--paper);padding:12px 0 20px;margin-top:8px;border-top:1px solid var(--line);font-family:var(--mono);font-size:11.5px;color:var(--muted);}
 .btn:disabled{opacity:.45;}
+
+/* grabación: autorización (participante) y aviso (panel) */
+.consent-d{margin-top:10px;border:1px solid var(--line);border-radius:10px;background:#FBFCFB;}
+.consent-d summary{cursor:pointer;padding:10px 12px;font-size:13px;font-weight:700;color:var(--accdk);}
+.consent-d[open] summary{border-bottom:1px solid var(--line);}
+.consent-d .consent,.consent-d .hint{padding:0 12px;}
+.consent-d .hint{padding-bottom:10px;}
+.consent{display:grid;gap:2px;margin-top:10px;}
+.consent dt{font-weight:700;font-size:13px;color:var(--ink);margin-top:8px;}
+.consent dd{font-size:13px;color:var(--graph);text-wrap:pretty;}
+.rec{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px max(16px, calc((100% - 760px) / 2 + 16px));font-size:12.5px;font-weight:600;color:var(--graph);}
+.rec b{font-weight:800;color:var(--ok);}
+.rec.no{background:var(--nobg);color:var(--no);} .rec.no b{color:var(--no);}
+.rec.sin{background:var(--warnbg);color:var(--warn);} .rec.sin b{color:var(--warn);}
+.rec button{flex:0 0 auto;font-weight:700;text-decoration:underline;text-underline-offset:3px;padding:4px 0;}
+.rec[hidden],.rec-alert[hidden]{display:none;}
+.rec-alert{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;margin:0 -16px;padding:12px max(16px, calc((100vw - 760px) / 2));font-size:13.5px;}
+.rec-alert b{font-weight:800;}
+.rec-alert.no{background:var(--no);color:#fff;font-size:15px;}
+.rec-alert.sin{background:var(--warnbg);color:var(--warn);}
+.rec-alert.si{background:var(--okbg);color:var(--ok);}
+.pick .td{display:grid;gap:2px;} .pick .td .d{font-weight:500;}
