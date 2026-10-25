@@ -63,11 +63,13 @@ function postForm(c, m, n){
 function cardBody(c){
   let h = c.intro ? `<p>${v(c.intro)}</p>` : '';
   h += pasosHtml(c.pasos);
+  if (c.prompts) h += c.prompts.map(([l, t]) => U.promptBox(v(t), l)).join('');
   switch (c.tipo){
     case 'prompt': h += U.promptBox(v(c.prompt)); break;
     case 'comparar': h += `<div class="compare"><div class="bad">${U.promptBox(v(c.antes), '1 · Sin estructura')}</div><div>${U.promptBox(v(c.despues), '2 · Con la guía')}</div></div>` + (c.nota ? `<p><b>Qué notar:</b> ${esc(c.nota)}</p>` : ''); break;
     case 'datasets':
-      h += `<ul class="files">${v(c.archivos).map(([f, d]) => `<li><a href="${esc(U.DATASETS + f)}" download>${esc(f)}</a><p>${esc(d)}</p></li>`).join('')}</ul>`;
+      h += `<ul class="files">${v(c.archivos).map(([f, d]) => `<li><a href="${esc(U.DATASETS + f)}" download>${esc(f)}</a><p>${esc(d)}</p>
+        <a class="btn alt dl" href="${esc(U.DATASETS + f)}" download>${U.ICON_DL}Descargar archivo</a></li>`).join('')}</ul>`;
       if (c.prompt) h += U.promptBox(v(c.prompt)); break;
     case 'checklist': h += `<ul class="checks">${c.checklist.map((x, j) => `<li><label><input type="checkbox" data-chk="${c.id}-${j}" ${store.get('chk-' + c.id + '-' + j) === '1' ? 'checked' : ''}>${esc(x)}</label></li>`).join('')}</ul>`; break;
     case 'escalera-ref': h += `<ul class="map">${ESCALERA.map(e => `<li><span class="k">${e.k}</span><span><span class="t">${e.t}</span><div class="d">${e.d}</div><div class="w">${e.w}</div></span></li>`).join('')}</ul>`; break;
@@ -108,7 +110,10 @@ function registro(){
         <div id="r-graba">${U.grabacionPick(null)}</div></div>
       <div class="prompt-a" style="padding:14px 0 0"><button class="btn" type="submit">Entrar</button></div>
       <div class="err" id="r-err"></div>
-    </form>`;
+    </form>
+    <div class="card-box ya"><div class="kick">¿Ya se registró en una sesión anterior?</div>
+      <p class="hint">Si entra desde otro celular o desde otro navegador, búsquese en la lista y siga con sus prompts.</p>
+      <div class="prompt-a" style="padding:10px 0 0"><button class="btn alt" type="button" data-ya="1">Ya me registré</button></div></div>`;
   let graba = null;
   $('#r-graba').addEventListener('click', e => {
     const b = e.target.closest('[data-graba]'); if (!b) return;
@@ -123,6 +128,39 @@ function registro(){
     try { YO = await DB.registrar(nombre, $('#r-area').value, graba); YO.graba = graba; store.set('yo', JSON.stringify(YO)); recien = true; arrancar(); }
     catch (err) { $('#r-err').textContent = U.errMsg(err); }
   });
+}
+
+/* «Ya me registré»: la persona se busca en la lista de la sesión y confirma quién es antes de entrar */
+async function yaRegistrado(aviso){
+  $('#tabs').innerHTML = '';
+  $('#main').innerHTML = `<div class="kick">Ya me registré</div><h1>Búsquese en la lista</h1><p class="lede">Toque su nombre. Antes de entrar le preguntamos si es usted.</p><div id="ya-l"><p class="hint">Cargando…</p></div>
+    <div class="prompt-a" style="padding:16px 0 0"><button class="btn alt" type="button" data-volver="1">Soy nuevo: registrarme</button></div>`;
+  let L = [];
+  try { L = await DB.listaParticipantes(); }
+  catch (x) { $('#ya-l').innerHTML = `<p class="err">${esc(U.errMsg(x))}</p>`; return; }
+  $('#ya-l').innerHTML = L.length
+    ? `<div class="pick lista">${L.map(p => `<button type="button" data-soy="${esc(p.id)}" data-n="${esc(p.corto)}" data-a="${esc(p.area || '')}"><span class="td"><span class="t">${esc(p.corto)}</span><span class="d">${esc(p.area || '')}</span></span></button>`).join('')}</div>`
+    : '<p class="hint">Todavía no hay nadie registrado en esta sesión. Regístrese como nuevo.</p>';
+}
+function confirmarSoy(b){
+  $('#ya-l').innerHTML = `<div class="card-box"><h2 style="margin-top:0">¿Usted es ${esc(b.dataset.n)}${b.dataset.a ? ' · ' + esc(b.dataset.a) : ''}?</h2>
+    <p class="hint">Si no es usted, vuelva a la lista. Entrar con el nombre de otra persona mezcla sus prompts con los suyos.</p>
+    <div class="prompt-a" style="padding:12px 0 0"><button class="btn" type="button" data-sisoy="${esc(b.dataset.id || b.dataset.soy)}">Sí, soy yo</button><button class="btn alt" type="button" data-ya="1">No, volver a la lista</button></div>
+    <div class="err" id="ya-err"></div></div>`;
+}
+async function entrarComo(pid){
+  try { YO = await DB.recuperar(pid); store.set('yo', JSON.stringify(YO)); recien = true; U.toast('<i>✓</i> Bienvenido de nuevo.'); arrancar(); }
+  catch (x) { const e = $('#ya-err'); if (e) e.textContent = U.errMsg(x); }
+}
+
+/* «Mis prompts»: todo lo que esta persona publicó en la sesión, en cualquier nivel, para copiarlo y seguir */
+async function misPrompts(el){
+  el.innerHTML = '<p class="hint">Cargando…</p>';
+  let L = [];
+  try { L = await DB.misPublicaciones(YO.id); }
+  catch (x) { el.innerHTML = `<p class="err">${esc(U.errMsg(x))}</p>`; return; }
+  if (!L.length) { el.innerHTML = '<p class="hint">Todavía no ha publicado nada. Lo que publique en el muro aparece aquí, nivel por nivel, para retomarlo en la siguiente sesión.</p>'; return; }
+  el.innerHTML = L.map(p => U.promptBox(p.texto, `${U.actLabel(p.act_id)} · ${U.TIPOS[p.tipo] || ''} · ${U.dia(p.created_at)}${p.estado === 'oculta' ? ' · oculto por el facilitador' : ''}`)).join('');
 }
 
 /* Grabación: la decisión vigente siempre a la vista, con «Cambiar» (retirarla es un derecho) */
@@ -161,8 +199,9 @@ function tabs(){
   const sw = F ? `<div class="sw" role="group" aria-label="Qué mostrar"><button data-modo="ahora" aria-pressed="${MODO === 'ahora'}"><span class="pulse"></span>Ahora</button><button data-modo="todo" aria-pressed="${MODO === 'todo'}">Todo</button></div>` : '';
   if (F && MODO === 'ahora') { $('#tabs').innerHTML = sw; return; }
   const items = [{ id: 'mapa', l: 'Mapa', b: '00' }].concat(nivelesAbiertos().map(n => ({ id: String(n.id), l: n.verbo, b: '0' + n.id })));
-  if (!TAB || !items.some(t => t.id === TAB)) TAB = items[items.length - 1].id;   // por defecto, el último nivel con tarjetas abiertas
+  if (!TAB || (TAB !== 'mios' && !items.some(t => t.id === TAB))) TAB = items[items.length - 1].id;   // por defecto, el último nivel con tarjetas abiertas
   $('#tabs').innerHTML = sw + items.map(t => `<button class="tab" role="tab" data-tab="${t.id}" aria-selected="${t.id === TAB}"><b>${t.b}</b>${t.l}</button>`).join('')
+    + `<button class="tab" role="tab" data-tab="mios" aria-selected="${TAB === 'mios'}"><b>✎</b>Mis prompts</button>`
     + `<a class="tab" href="muro.html?s=${encodeURIComponent(DB.SES)}" style="text-decoration:none"><b>··</b>Muro</a>`;
 }
 
@@ -222,6 +261,8 @@ function vivo(F){
     h += `<h2>Lo que ya vimos</h2><div class="acts">${antes.reverse().map(fila).join('')}${previos.map(g => `<details class="act grupo" id="g-${g.x.id}"><summary><span class="num">C${g.k}</span><span><span class="act-t">${esc(g.x.t)}</span><br><span class="act-m">${g.ts.length} ${g.ts.length === 1 ? 'tarjeta' : 'tarjetas'}</span></span><span class="chev" aria-hidden="true"></span></summary>
       <div class="act-b"><div class="acts" style="margin-top:12px">${g.ts.map(fila).join('')}</div></div></details>`).join('')}</div>`;
   }
+  h += `<details class="act notas" id="g-mios"><summary><span class="num">✎</span><span><span class="act-t">Mis prompts</span><br><span class="act-m">lo que ha publicado en todos los niveles</span></span><span class="chev" aria-hidden="true"></span></summary>
+    <div class="act-b"><div id="mios-v"></div></div></details>`;
   h += `<details class="act notas" id="g-notas"><summary><span class="num">✎</span><span class="act-t">Mis notas</span><span class="chev" aria-hidden="true"></span></summary>
     <div class="act-b"><textarea data-k="notas-${N.id}" aria-label="Mis notas del nivel" placeholder="Lo que quiero recordar de este nivel…"></textarea></div></details>`;
   $('#main').innerHTML = h;
@@ -229,6 +270,11 @@ function vivo(F){
 
 /* BIBLIOTECA: el mapa o un nivel completo, con todo lo abierto */
 function biblioteca(){
+  if (TAB === 'mios'){
+    $('#main').innerHTML = `${encBar()}${ahora()}<div class="kick" style="margin-top:18px">Lo suyo</div><h1>Mis prompts</h1>
+      <p class="lede">Todo lo que ha publicado en el muro, en todos los niveles. Cópielo, péguelo en su asistente y siga mejorándolo.</p><div id="mios"></div>`;
+    misPrompts($('#mios')); return;
+  }
   if (TAB === 'mapa'){
     $('#main').innerHTML = `${encBar()}${ahora()}<div class="kick" style="margin-top:18px">El mapa</div><h1>El piso y siete escalones</h1>
       <p class="lede">Todo lo que vamos a ver cabe aquí. Inspirada en los niveles de uso de Juan Gabriel Gomila, traducida al trabajo de su equipo. La idea es subir un escalón cada vez.</p>
@@ -311,6 +357,10 @@ async function responder(valor){
 
 document.addEventListener('click', async e => {
   const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.ya) return yaRegistrado();
+  if (b.dataset.volver) return registro();
+  if (b.dataset.soy) return confirmarSoy(b);
+  if (b.dataset.sisoy) { b.disabled = true; return entrarComo(b.dataset.sisoy); }
   if (b.dataset.modo){ MODO = b.dataset.modo; if (MODO === 'todo') { const F = U.foco(S); if (F) TAB = String(F.cap.nivel); } render(); window.scrollTo(0, 0); return; }
   if (b.dataset.tab) return go(b.dataset.tab);
   if (b.dataset.cambiar){ store.set('enc-' + b.dataset.cambiar, ''); encuesta(); return; }
@@ -355,6 +405,7 @@ document.addEventListener('input', e => {
   if (e.target.dataset.k) store.set(e.target.dataset.k, e.target.value);
   if (e.target.dataset.chk !== undefined) store.set('chk-' + e.target.dataset.chk, e.target.checked ? '1' : '0');
 });
+document.addEventListener('toggle', e => { if (e.target.id === 'g-mios' && e.target.open) misPrompts($('#mios-v')); }, true);
 document.addEventListener('focusout', () => { setTimeout(() => { if (pendiente && !escribiendo()) { pendiente = false; render(); } }, 0); });
 
 async function arrancar(){
@@ -365,8 +416,17 @@ async function arrancar(){
   setInterval(refrescar, (IAAB_CONFIG.POLL_MS || 4000));
   setInterval(() => DB.ping(YO.id), 60000);
 }
+/* Si el perfil del celular ya no existe en la base (la sesión se reinició), se limpia y se pide registro.
+   Si la base aún no tiene la migración 004 o no hay conexión, se sigue como antes. */
+async function inicio(){
+  if (!(YO && YO.id)) return registro();
+  let r;
+  try { r = await DB.yo(YO.id); } catch (e) { return arrancar(); }
+  if (r === null || r === undefined) { YO = null; store.set('yo', ''); registro(); $('#r-err').textContent = 'Su registro anterior ya no existe en esta sesión. Regístrese de nuevo.'; return; }
+  YO = Object.assign(YO, r); store.set('yo', JSON.stringify(YO)); arrancar();
+}
 U.demoBanner();
-if (YO && YO.id) arrancar(); else registro();
+inicio();
 </script>
 </body>
 </html>

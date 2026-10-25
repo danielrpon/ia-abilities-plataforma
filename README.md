@@ -40,3 +40,13 @@ Al registrarse, cada participante elige si autoriza o no la grabación del audio
 - **Prueba:** «Descargar autorizaciones (CSV)» en la pestaña Sesión. El historial vive en `iaab_consentimientos` y sobrevive a «Reiniciar».
 - **Nombre:** en las sesiones `pco-…` se pide nombre y apellido (es la prueba de la autorización); en el muro solo se ve el primer nombre. En MP sigue el seudónimo.
 - **Base de datos:** correr una vez `supabase/003_consentimiento_grabacion.sql` ANTES de publicar este cambio.
+
+## Identidad entre sesiones y «Mis prompts» (migración 004, 25-oct-2026)
+
+Correr `supabase/004_identidad.sql` una vez en el SQL Editor (es idempotente). Sin ella la plataforma sigue funcionando como antes y «Ya me registré» / «Mis prompts» muestran «Falta actualizar la base de datos».
+
+- **Ya me registré:** en la pantalla de registro. La persona ve la lista de la sesión (primer nombre + inicial y área), toca la suya y confirma «¿Usted es …?». Entra con el mismo perfil y su decisión de grabación vigente. Riesgo aceptado: alguien podría tocar el nombre de otro.
+- **Mis prompts:** pestaña en la biblioteca y plegable en «Ahora»: todo lo que la persona publicó en cualquier nivel, con Copiar.
+- **Usuario huérfano:** si el perfil guardado en el celular ya no existe (tras «Reiniciar»), se limpia y se pide registro.
+- **Una sesión por programa:** use la misma sesión en todas las sesiones de un cliente y no la reinicie entre ellas (se pierden los prompts).
+- **Panel:** «Descargar publicaciones (CSV)» en la pestaña Sesión.

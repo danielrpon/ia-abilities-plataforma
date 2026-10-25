@@ -31,6 +31,11 @@
     DB.responder = async (encuesta_id, pid, valor) => ok(await sb.rpc('iaab_responder', { p_sesion: SES, p_encuesta: encuesta_id, p_part: pid, p_valor: valor }));
     DB.getResultados = async () => ok(await sb.rpc('iaab_resultados', { p_sesion: SES }));
     DB.admin = async (op, payload = {}, clave) => ok(await sb.rpc('iaab_admin_op', { p_sesion: SES, p_clave: clave || DB.clave, p_op: op, p_payload: payload }));
+    /* Identidad entre sesiones (migración 004) */
+    DB.yo = async (pid) => ok(await sb.rpc('iaab_yo', { p_sesion: SES, p_part: pid }));
+    DB.listaParticipantes = async () => ok(await sb.rpc('iaab_lista_participantes', { p_sesion: SES })) || [];
+    DB.recuperar = async (pid) => ok(await sb.rpc('iaab_recuperar', { p_sesion: SES, p_part: pid }));
+    DB.misPublicaciones = async (pid) => ok(await sb.rpc('iaab_mis_publicaciones', { p_sesion: SES, p_part: pid })) || [];
     DB.onChange = null; // las pantallas refrescan cada POLL_MS
   }
 
@@ -113,6 +118,13 @@
       }
       save(s); return r;
     };
+    const corto = n => { const w = String(n).trim().split(/\s+/); return w.length > 1 ? w[0] + ' ' + w[1][0] + '.' : w[0]; };
+    const perfil = p => ({ id: p.id, nombre: p.nombre, area: p.area, graba: p.graba });
+    DB.yo = async (pid) => { const p = load().participantes.find(p => p.id === pid); return p ? perfil(p) : null; };
+    DB.listaParticipantes = async () => load().participantes.slice().sort((a, b) => a.nombre.toLowerCase().localeCompare(b.nombre.toLowerCase())).map(p => ({ id: p.id, corto: corto(p.nombre), area: p.area }));
+    DB.recuperar = async (pid) => { const s = load(); const p = s.participantes.find(p => p.id === pid); if (!p) throw new Error('PARTICIPANTE_INVALIDO'); p.last_seen = nowIso(); save(s); return perfil(p); };
+    DB.misPublicaciones = async (pid) => load().publicaciones.filter(p => p.participante_id === pid).sort((a, b) => b.created_at.localeCompare(a.created_at))
+      .map(({ id, act_id, tipo, texto, estado, created_at }) => ({ id, act_id, tipo, texto, estado, created_at }));
     DB.onChange = (fn) => { if (chan) chan.onmessage = fn; window.addEventListener('storage', (e) => { if (e.key === KEY) fn(); }); };
   }
 

@@ -71,6 +71,21 @@ function csvGrabacion(){
   a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
 
+/* Biblioteca de prompts: todo lo publicado en la sesión (también lo oculto), sin ids de personas */
+async function csvPublicaciones(){
+  let rows = [];
+  try { rows = (await DB.admin('publicaciones')).rows || []; } catch (x) { return U.toast(U.errMsg(x)); }
+  if (!rows.length) return U.toast('Aún no hay publicaciones.');
+  rows.sort((a, b) => a.created_at.localeCompare(b.created_at));
+  const q = x => '"' + String(x == null ? '' : x).replace(/"/g, '""') + '"';
+  const csv = '\ufeff' + [['fecha', 'nombre', 'actividad', 'tipo', 'estado', 'me_sirve', 'texto'].join(',')]
+    .concat(rows.map(r => [new Date(r.created_at).toLocaleString('es-CO'), r.nombre, U.actLabel(r.act_id), U.TIPOS[r.tipo] || r.tipo, r.estado, r.votos, r.texto].map(q).join(','))).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+  a.download = `publicaciones-${DB.SES}-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
 const base = () => location.href.replace(/admin\.html.*$/, '');
 const linkPart = () => base() + 'index.html?s=' + encodeURIComponent(DB.SES);
 const linkMuro = () => base() + 'muro.html?s=' + encodeURIComponent(DB.SES) + '&proyectar=1';
@@ -86,7 +101,9 @@ async function vSesion(){
       <div class="prompt-a" style="padding:12px 0 0"><button class="btn" data-cp="part">${U.ICON_COPY}Copiar enlace</button><a class="btn alt" href="${esc(linkMuro())}" target="_blank" rel="noopener" style="text-decoration:none">Proyectar el muro</a></div></div>
     <div class="card-box"><div class="kick">Autorizaciones de grabación</div><p class="hint">Cada decisión queda guardada con fecha, nombre y versión del texto: es la prueba que pide la Ley 1581. Descárguelas al cerrar cada sesión y guárdelas en la carpeta del cliente.</p>
       <div class="prompt-a" style="padding:12px 0 0"><button class="btn alt" data-csv="1">Descargar autorizaciones (CSV)</button></div></div>
-    <div class="card-box"><div class="kick">Reiniciar la sesión</div><p class="hint">Borra participantes, publicaciones, votos y respuestas, y cierra todas las actividades. Úselo después de un ensayo. Las autorizaciones de grabación no se borran.</p>
+    <div class="card-box"><div class="kick">Biblioteca de prompts</div><p class="hint">Todo lo que el grupo publicó en el muro, en todos los niveles (también lo oculto). Descárguela al cerrar cada sesión.</p>
+      <div class="prompt-a" style="padding:12px 0 0"><button class="btn alt" data-csvpub="1">Descargar publicaciones (CSV)</button></div></div>
+    <div class="card-box"><div class="kick">Reiniciar la sesión</div><p class="hint">Borra participantes, publicaciones, votos y respuestas, y cierra todas las actividades. Úselo solo después de un ensayo, <b>nunca entre sesiones del mismo programa</b>: se pierden los prompts que el grupo retoma de un nivel a otro. Las autorizaciones de grabación no se borran.</p>
       <div class="prompt-a" style="padding:12px 0 0"><button class="btn alt" data-borrar="1">${armadoBorrar ? 'Toque otra vez para confirmar' : 'Reiniciar'}</button></div></div>`;
   try { new QRCode($('#qr'), { text: linkPart(), width: 168, height: 168 }); } catch (e) {}
 }
@@ -147,6 +164,7 @@ document.addEventListener('click', async e => {
   if (b.dataset.est) return op('estado_pub', { id: Number(b.dataset.est), estado: b.dataset.val });
   if (b.dataset.cp) return U.copiar(linkPart());
   if (b.dataset.csv) return csvGrabacion();
+  if (b.dataset.csvpub) return csvPublicaciones();
   if (b.dataset.borrar){ if (!armadoBorrar) { armadoBorrar = true; return render(); } armadoBorrar = false; return op('borrar_todo'); }
 });
 

@@ -26,6 +26,7 @@
   };
   U.actLabel = id => { const a = U.tarjeta(id) || U.cap(id); return a ? (a.id.startsWith('N') ? a.id + ' · ' : 'Nivel 0' + a.nivel + ' · ') + a.t : id; };
   U.TIPOS = { hallazgo: 'Hallazgo', par: 'Sin estructura / con la guía', prompt: 'Prompt', loop: 'Loop' };
+  U.dia = iso => { try { const d = new Date(iso); return d.toLocaleDateString('es-CO', { weekday: 'short', day: 'numeric', month: 'short' }) + ' · ' + U.hora(iso); } catch (e) { return ''; } };
   U.hora = iso => { try { return new Date(iso).toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit' }); } catch (e) { return ''; } };
 
   let toastT;
@@ -55,6 +56,8 @@
     if (/Failed to fetch|NetworkError/.test(m)) return 'Sin conexión. Intente de nuevo.';
     if (/OP_DESCONOCIDA/.test(m)) return 'Falta actualizar la base de datos (supabase/002_resultados_en_muro.sql).';
     if (/FALTA_GRABACION/.test(m)) return 'Elija si autoriza o no la grabación de la sesión.';
+    if (/iaab_yo|iaab_lista_participantes|iaab_recuperar|iaab_mis_publicaciones/.test(m)) return 'Falta actualizar la base de datos (supabase/004_identidad.sql).';
+    if (/PARTICIPANTE_INVALIDO/.test(m)) return 'No encontramos ese registro. Regístrese de nuevo.';
     if (/iaab_registrar_v2|iaab_consentir|iaab_grabacion/.test(m)) return 'Falta actualizar la base de datos (supabase/003_consentimiento_grabacion.sql).';
     return 'No se pudo completar. Intente de nuevo.';
   };
@@ -80,6 +83,7 @@
     <button type="button" data-graba="no" aria-pressed="${val === false}"><span class="k">■</span><span class="td"><span class="t">No autorizo la grabación</span><span class="d">El facilitador verá un aviso para detenerla.</span></span></button></div>`;
 
   U.ICON_COPY ='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>';
+  U.ICON_DL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4v11m0 0l-4.5-4.5M12 15l4.5-4.5M5 20h14"/></svg>';
   U.ICON_WA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12a9 9 0 0 1-13.4 7.9L3 21l1.2-4.4A9 9 0 1 1 21 12z"/></svg>';
 
   /* Prompts copiables: se registran en una lista y los botones guardan el índice */

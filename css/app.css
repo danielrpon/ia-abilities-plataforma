@@ -310,3 +310,8 @@ details.notas>summary{grid-template-columns:auto 1fr auto;}
 .rec-alert.sin{background:var(--warnbg);color:var(--warn);}
 .rec-alert.si{background:var(--okbg);color:var(--ok);}
 .pick .td{display:grid;gap:2px;} .pick .td .d{font-weight:500;}
+/* Descarga visible en el archivo de la mesa (pedido del ensayo del 25-oct) */
+.files a.dl{display:inline-flex;margin-top:8px;font-size:13px;}
+.files a.dl:after{content:none;}
+/* «Ya me registré»: lista de una columna, sin el hueco del número */
+.pick.lista button{grid-template-columns:1fr;}

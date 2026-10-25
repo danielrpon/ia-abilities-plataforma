@@ -142,7 +142,7 @@ window.NIVELES = [
     habilita:['<b>El mapa de la evolución</b> sobre la escalera.'],
     tarjetas:[
       {id:'N2-01', t:'Retorno: ¿qué tuvo que corregir?', tipo:'encuesta', encuesta:'retorno-n2',
-       intro:'Si hubo tarea entre sesiones, responda cuando se abra la encuesta. Si es la misma tarde, abra en el muro su par del nivel 01: ese prompt es su punto de partida.'},
+       intro:'Responda cuando se abra la encuesta. Su punto de partida de hoy es uno de los prompts que publicó en el nivel 01: lo encuentra en «Mis prompts».'},
       {id:'N2-02', t:'La evolución sobre la escalera', tipo:'texto',
        html:'<ol class="steps"><li><span><b>Prompt</b> (pedir bien) = escalón 1.</span></li><li><span><b>Contexto</b> (la inducción) = escalón 2.</span></li><li><span><b>Arnés</b> (límites y reglas) = las reglas del 2 y el 3.</span></li><li><span><b>Loop</b> (hace, comprueba, corrige, para) = escalones 5 y 6.</span></li></ol>'}
     ]},
@@ -173,7 +173,11 @@ window.NIVELES = [
        intro:'En un chat nuevo, con el mismo archivo. ¿Cuántas preguntas hizo? ¿Qué vacío encontró que la primera versión rellenó inventando?',
        prompt:{mp:'Necesito [las piezas de la campaña de Navidad para diseño · o · una lectura de una página para la reunión de mercadeo y comercial] para [quién y para qué]. No ejecutes nada todavía. Hazme, una por una, las preguntas que necesites sobre el objetivo, los datos que tienes y los que te faltan, el formato, las restricciones y cómo sabremos que quedó bien. Cuando tengas todo, escribe el plan en pasos numerados, con lo que necesita cada paso, y espera mi aprobación antes de empezar.',
                pco:'Necesito un informe de una página para el comité del área para [quién y para qué]. No ejecutes nada todavía. Hazme, una por una, las preguntas que necesites sobre el objetivo, los datos que tienes y los que te faltan, el formato, las restricciones y cómo sabremos que quedó bien. Cuando tengas todo, escribe el plan en pasos numerados, con lo que necesita cada paso, y espera mi aprobación antes de empezar.'},
-       muro:{tipo:'hallazgo', guia:'Una por mesa: la mejor pregunta que le hizo la IA en modo plan.'}}
+       muro:{tipo:'hallazgo', guia:'Una por mesa: la mejor pregunta que le hizo la IA en modo plan.'}},
+      {id:'N2-20', t:'Dos técnicas más: respuesta en pirámide y «¿Cómo podemos…?»', tipo:'texto',
+       prompts:[['Respuesta en pirámide', 'Empieza por la conclusión en una frase, luego tres argumentos y los datos al final.']],
+       html:{mp:'<p><b>Respuesta en pirámide:</b> la conclusión en una frase, tres argumentos que la sostienen y los datos de cada argumento. Quien lee solo la primera línea ya sabe qué hacer; quien quiere más, baja.</p><p style="margin-top:10px"><b>«¿Cómo podemos…?»:</b> convierta la queja en una pregunta que se pueda trabajar. De «Las asesoras nuevas no se quedan» a «¿Cómo podemos lograr que una asesora nueva haga pedido en sus tres primeras campañas?».</p><p style="margin-top:10px">Abre opciones en vez de buscar culpables, le da a la IA un objetivo y una restricción, y sirve como primera línea del modo plan.</p>',
+             pco:'<p><b>Respuesta en pirámide:</b> la conclusión en una frase, tres argumentos que la sostienen y los datos de cada argumento. Quien lee solo la primera línea ya sabe qué hacer; quien quiere más, baja.</p><p style="margin-top:10px"><b>«¿Cómo podemos…?»:</b> convierta la queja en una pregunta que se pueda trabajar. De «La gente no participa en los retos» a «¿Cómo podemos subir la participación de las áreas que más cayeron sin aumentar el presupuesto de premios?».</p><p style="margin-top:10px">Abre opciones en vez de buscar culpables, le da a la IA un objetivo y una restricción, y sirve como primera línea del modo plan.</p>'}}
     ]},
   { id:'n2-c3', t:'Un archivo real: contexto y verificación', min:'30 min',
     donde:'Escalón 2: darle el manual de la tarea.',
@@ -217,17 +221,26 @@ window.NIVELES = [
       {id:'N2-14', t:'Criterios del revisor por mesa', tipo:'texto',
        html:{mp:'<ul class="checks"><li><b>Demanda:</b> supuestos explícitos y retroprueba contra 2024.</li><li><b>Diseño:</b> ninguna restricción del brief violada; sin precios inventados.</li><li><b>Mercadeo:</b> devoluciones por referencia con porcentaje y campaña de quiebre.</li><li><b>Comercial:</b> actividad, orden promedio y número de asesoras por separado; sin nombres.</li><li><b>Servicio:</b> tres problemas con conteo y dos citas textuales cada uno.</li></ul>',
              pco:'<ul class="checks"><li><b>Nómina:</b> cada novedad marcada cita la regla R1–R6 que incumple.</li><li><b>Selección:</b> cada requisito tiene evidencia textual de la hoja de vida; no se menciona edad, género ni foto.</li><li><b>Compensación:</b> toda cifra tiene hoja y fila; ninguna persona identificable.</li><li><b>Talento:</b> conclusión primero, máximo una página.</li><li><b>Plataformas core:</b> cada inconsistencia dice fila y columna.</li></ul>'}},
-      {id:'N2-15', t:'Plantillas de loop A y B', tipo:'pendiente', intro:'Las plantillas probadas de Juan Gonzalo (A: análisis con auditor de cifras · B: documento contra criterios). Por nutrir.'}
+      {id:'N2-15', t:'Tres loops para llevarse', tipo:'texto',
+       intro:'A y B, para copiar. C es un adelanto del nivel 04.',
+       prompts:[['A · Analista + auditor de cifras', 'OBJETIVO: [qué decisión apoya]. CONTEXTO: [archivo + reglas].\nANALISTA: describe el archivo, señala los datos faltantes, analiza y concluye.\nAUDITOR: recalcula cada cifra contra el archivo, con código o paso a paso, y marca «coincide» o «no coincide».\nSi alguna no coincide, el analista corrige solo esa. Para cuando todas coincidan o tras 3 vueltas.'],
+                ['B · Redactor + revisor de criterios', 'OBJETIVO: [documento y para quién]. CRITERIOS: [1] [2] [3], cada uno comprobable citando una frase.\nREDACTOR: escribe o ajusta el texto.\nREVISOR (exigente, no complaciente): por cada criterio di «cumple» o «no cumple» y cita la frase.\nSi no cumple, corrige solo lo señalado. Para cuando cumpla todo o tras 3 vueltas.']],
+       html:{mp:'<p><b>C · Con agentes (adelanto del nivel 04, de lectura):</b> cada rol es un agente con su tarea; el loop no termina hasta pasar la prueba de aceptación. Ejemplo, clasificación de comentarios de clientas:</p><ol class="steps"><li><span><b>Planeador:</b> define las categorías.</span></li><li><span><b>Hacedor:</b> clasifica cada comentario.</span></li><li><span><b>Verificador:</b> «una sola categoría y su evidencia por comentario».</span></li><li><span><b>Seguridad:</b> «no salen nombres ni teléfonos».</span></li></ol>',
+             pco:'<p><b>C · Con agentes (adelanto del nivel 04, de lectura):</b> cada rol es un agente con su tarea; el loop no termina hasta pasar la prueba de aceptación. Ejemplo, validación de novedades de nómina:</p><ol class="steps"><li><span><b>Planeador:</b> lee las reglas R1 a R6 y arma el plan.</span></li><li><span><b>Hacedor:</b> revisa cada novedad.</span></li><li><span><b>Verificador:</b> «todo hallazgo cita la fila y la regla».</span></li><li><span><b>Seguridad:</b> «no salen nombres ni salarios».</span></li></ol>'}}
     ]},
   { id:'n2-c5', t:'Cierre', min:'15 min',
     donde:'Hoy subimos al 2 y miramos el 5 y el 6 desde ahí.',
     nuevo:['<b>Las 4D</b> (delegación, descripción, discernimiento, diligencia) <b>y una quinta: dirigir.</b>'],
     habilita:['<b>La tarea,</b> la evidencia en el muro y la pregunta de salida.'],
     tarjetas:[
-      {id:'N2-16', t:'Las 4D + Dirigir', tipo:'pendiente', intro:'Con un ejemplo de cada D tomado del muro de hoy. La definición de «Dirigir» la trae Juan Gonzalo.'},
+      {id:'N2-16', t:'Las 4D + Dirigir', tipo:'texto',
+       html:{mp:'<ol class="steps"><li><span><b>D1 Delegación:</b> decidir qué hace usted, qué hace la IA y qué hacen juntos.</span></li><li><span><b>D2 Descripción:</b> decir con claridad qué quiere, cómo trabajar y qué espera recibir.</span></li><li><span><b>D3 Discernimiento:</b> evaluar con criterio si es correcto, completo y útil.</span></li><li><span><b>D4 Diligencia:</b> datos cuidados, transparencia sobre el uso y responsabilidad por el resultado.</span></li><li><span><b>+D Dirigir:</b> pedir es describir; dirigir es decidir. Usted decide la intención, el criterio de calidad y cuándo se acepta el resultado. La IA ejecuta; usted conduce.</span></li></ol><p style="margin-top:10px"><b>Hoy:</b> la IA descompuso la venta por zona y usted decidió dónde enfocar la campaña (D1); ¿vio que la caída de la zona Z05 la escondía la orden promedio? (D3); asesoras solo con código, en la cuenta de la empresa (D4); usted fijó los criterios y cuándo parar el loop (+D).</p>',
+             pco:'<ol class="steps"><li><span><b>D1 Delegación:</b> decidir qué hace usted, qué hace la IA y qué hacen juntos.</span></li><li><span><b>D2 Descripción:</b> decir con claridad qué quiere, cómo trabajar y qué espera recibir.</span></li><li><span><b>D3 Discernimiento:</b> evaluar con criterio si es correcto, completo y útil.</span></li><li><span><b>D4 Diligencia:</b> datos cuidados, transparencia sobre el uso y responsabilidad por el resultado.</span></li><li><span><b>+D Dirigir:</b> pedir es describir; dirigir es decidir. Usted decide la intención, el criterio de calidad y cuándo se acepta el resultado. La IA ejecuta; usted conduce.</span></li></ol><p style="margin-top:10px"><b>Hoy:</b> la IA revisó las novedades regla por regla y usted aprobó la liquidación (D1); ¿encontró las novedades que incumplen o concluyó encima de ellas? (D3); datos ficticios en la herramienta corporativa (D4); usted fijó los criterios y cuándo parar el loop (+D).</p>'}},
       {id:'N2-18', t:'Tarea: el loop con un archivo real', tipo:'texto',
        html:{mp:'<p>Corra el loop con un archivo real de su área, en la cuenta de la empresa (verde o amarillo), y anote qué corrigió el revisor. <b>Traiga una tarea que se repite cada semana.</b></p>',
-             pco:'<p>Corra el loop con un archivo real del proceso, en ChatGPT Enterprise (verde o amarillo). <b>Traiga el perfil de su cargo al nivel 03.</b></p>'}},
+             pco:'<p>Corra el loop con un archivo real del proceso, en ChatGPT Enterprise (verde o amarillo). <b>Traiga el perfil de su cargo al nivel 03.</b></p>'},
+       muro:{tipo:'prompt', guia:'Prompt 1 de hoy: el de su mesa, con modo plan (el que funcionó en la práctica 1).'},
+       muro2:{tipo:'loop', guia:'Prompt 2 de hoy: su loop con los criterios de su mesa. Los dos quedan en «Mis prompts» para el nivel 03.'}},
       {id:'N2-19', t:'Salida: ¿qué fue lo más útil y qué sobró?', tipo:'encuesta', encuesta:'salida-n2',
        intro:'Responda cuando se abra la encuesta.'}
     ]}
@@ -262,6 +275,9 @@ window.ENCUESTAS = [
   { id:'escalon-inicio', titulo:'¿En qué escalón está usted hoy?', tipo:'escalon' },
   { id:'semaforo', titulo:'¿Verde, amarillo o rojo?', tipo:'semaforo' },
   { id:'retorno-n2', titulo:'Cuando lo usó en su trabajo, ¿qué tuvo que corregir?', tipo:'multiple', opciones:['El contexto','El formato','Datos inventados','El tono','Nada: salió bien'] },
+  { id:'comparar-n2', titulo:'¿Qué ronda le entregaría a su jefe?', tipo:'multiple', opciones:['La ronda 1: a mi manera','La ronda 2: con plan','Ninguna todavía'] },
+  { id:'revisor-n2', titulo:'¿Cómo fue su revisor?', tipo:'multiple', opciones:['Exigente: encontró algo real','Complaciente: dijo que todo cumplía','No paró: llegó a las 3 vueltas'] },
+  { id:'plazo-n2', titulo:'Lo que dice el video es…', tipo:'multiple', opciones:['Un hecho','Un pronóstico','Una opinión'] },
   { id:'salida-n2', titulo:'Nivel 02 · ¿Qué fue lo más útil y qué sobró?', tipo:'abierta' },
   { id:'escalon-final', titulo:'Al cerrar el programa: ¿en qué escalón está ahora?', tipo:'escalon' }
 ];
