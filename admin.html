@@ -25,9 +25,15 @@
 <script src="js/db.js"></script>
 <script src="js/contenido.js"></script>
 <script src="js/common.js"></script>
+<script src="js/grupos.js"></script>
 <script>
 const { $, esc } = U;
 let S = null, TAB = 'sesion', ENC_VER = null, firma = '', armadoBorrar = false, GRAB = null;
+/* Grupos: PART = participantes con su grupo (de la base); PREV = vista previa sin publicar */
+let PART = null, PREV = null, G_OPC = { modo: 'area', tam: 4 }, armadoGrupos = false;
+const G_VENTANA_MIN = 3;   // activo = hizo ping (cada 60 s) en los últimos 3 minutos
+const G_AREAS = { mp: ['Mercadeo y catálogo', 'Comercial', 'Diseño y contenido', 'Demanda y pronóstico', 'Dirección y servicio', 'Otra'],
+                  pco: ['Compensación', 'Selección', 'Nómina', 'Talento y bienestar', 'Plataformas core', 'Otra'] }[U.C];
 $('#ses').textContent = DB.SES;
 
 function login(){
@@ -44,7 +50,7 @@ function login(){
 }
 
 function tabs(){
-  const it = [['sesion', 'Sesión'], ['acts', 'Capítulos'], ['enc', 'Encuestas'], ['muro', 'Muro']];
+  const it = [['sesion', 'Sesión'], ['acts', 'Capítulos'], ['enc', 'Encuestas'], ['grupos', 'Grupos'], ['muro', 'Muro']];
   $('#tabs').innerHTML = it.map(([id, l]) => `<button class="tab" data-tab="${id}" aria-selected="${TAB === id}">${l}</button>`).join('');
 }
 
@@ -148,12 +154,68 @@ async function vMuro(){
       <button class="mini" data-est="${p.id}" data-val="${p.estado === 'oculta' ? 'visible' : 'oculta'}">${p.estado === 'oculta' ? 'Mostrar' : 'Ocultar'}</button></div></article>`).join('') || '<p class="hint">Sin publicaciones.</p>'}</div>`;
 }
 
-async function render(){ U.PROMPTS.length = 0; tabs(); if (TAB === 'sesion') await vSesion(); if (TAB === 'acts') vActs(); if (TAB === 'enc') await vEnc(); if (TAB === 'muro') await vMuro(); }
+
+/* GRUPOS: forma grupos con las personas activas (por área o mezclados), con roles que rotan.
+   «Formar» muestra una vista previa; «Publicar» la guarda y aparece en cada celular. */
+/* Tras mover: una mesa mixta que quedó con una sola área pasa a ser la mesa de esa área */
+function ajustarMesas(filas){
+  const por = {}; filas.forEach(f => (por[f.grupo] = por[f.grupo] || []).push(f));
+  Object.values(por).forEach(g => {
+    const as = [...new Set(g.map(f => (PART.find(p => p.id === f.pid) || {}).area || ''))];
+    if (!g[0].mesa && as.length === 1 && as[0] && as[0] !== 'Otra') g.forEach(f => { f.mesa = as[0]; });
+  });
+  return filas;
+}
+const filasDe = parts => parts.filter(p => p.grupo).map(p => ({ pid: p.id, grupo: p.grupo, rol: p.rol, mesa: p.mesa || '', orden: p.orden || 0 }));
+async function cargarPart(){ PART = await DB.gruposAdmin(G_VENTANA_MIN); return PART; }
+function tablaGrupos(filas, previa){
+  const por = {}; filas.forEach(f => (por[f.grupo] = por[f.grupo] || []).push(f));
+  const k = Object.keys(por).length, P = id => PART.find(p => p.id === id) || {};
+  const opts = cur => Array.from({ length: k }, (_, i) => i + 1).map(n => `<option value="${n}" ${n === cur ? 'selected' : ''}>Grupo ${n}</option>`).join('') + '<option value="nuevo">Grupo nuevo</option>';
+  return Object.keys(por).sort((a, b) => a - b).map(g => {
+    const m = por[g].sort((a, b) => a.orden - b.orden), mesa = m[0].mesa;
+    const areas = [...new Set(m.map(f => P(f.pid).area || '—'))];
+    return `<div class="card-box grp"><div class="kick">Grupo ${g} · ${esc(mesa || 'Mesa mixta')} · ${m.length} ${m.length === 1 ? 'persona' : 'personas'}</div>
+      ${!mesa ? `<p class="hint" style="margin-top:2px">Áreas: ${esc(areas.join(', '))}</p>` : ''}
+      ${m.map(f => { const p = P(f.pid); return `<div class="adm-row grp-row"><span><span class="t">${esc(p.corto || '?')}</span>${p.activo === false ? ' <span class="tag draft" style="margin-top:0">inactivo</span>' : ''}<br>
+        <span class="m">${esc(GRUPOS.ROLES[f.rol] ? GRUPOS.ROLES[f.rol].t : f.rol)} · ${esc(p.area || '')}${p.escalon != null ? ' · E' + p.escalon : ''}</span></span>
+        <select class="mini" aria-label="Mover a ${esc(p.corto || '')}" data-mover="${esc(f.pid)}" data-previa="${previa ? 1 : ''}">${opts(f.grupo)}</select></div>`; }).join('')}</div>`;
+  }).join('');
+}
+async function vGrupos(){
+  $('#main').innerHTML = '<div class="kick">Grupos</div><h1>Grupos y roles</h1><p class="hint">Cargando…</p>';
+  try { await cargarPart(); }
+  catch (x) { $('#main').innerHTML = `<div class="kick">Grupos</div><h1>Grupos y roles</h1><p class="err">${esc(U.errMsg(x))}</p>`; return; }
+  const act = PART.filter(p => p.activo), pub = filasDe(PART), sinGrupo = act.filter(p => !p.grupo);
+  const enGrupo = new Set(pub.map(f => f.pid));
+  $('#main').innerHTML = `<div class="kick">Grupos</div><h1>Grupos y roles</h1>
+    <p class="lede">Forme los grupos con las personas conectadas ahora. Cada celular muestra su grupo, su rol y las reglas. Rote los roles entre rondas: así cambia el piloto y se reparte el consumo de las cuentas gratuitas.</p>
+    <div class="stats"><span><b>${act.length}</b>activos (últimos ${G_VENTANA_MIN} min)</span><span><b>${PART.length}</b>registrados</span><span><b>${new Set(pub.map(f => f.grupo)).size}</b>grupos publicados</span></div>
+    <div class="card-box"><div class="kick">Formar</div>
+      <div class="g-opc"><label class="field"><span>Cómo</span><select id="g-modo"><option value="area" ${G_OPC.modo === 'area' ? 'selected' : ''}>Por área</option><option value="mezclados" ${G_OPC.modo === 'mezclados' ? 'selected' : ''}>Mezclados</option></select></label>
+      <label class="field"><span>Tamaño</span><select id="g-tam">${[3, 4, 5].map(n => `<option ${G_OPC.tam === n ? 'selected' : ''}>${n}</option>`).join('')}</select></label></div>
+      <p class="hint">Por área: cada área con 3 o más arma sus grupos; quien queda solo en su área se suma al grupo más pequeño, y si son 3 o más forman una mesa mixta. Los escalones altos se reparten entre grupos.</p>
+      <div class="prompt-a" style="padding:12px 0 0"><button class="btn" data-gformar="1" ${act.length ? '' : 'disabled'}>Formar grupos</button><button class="btn alt" data-grefrescar="1">Actualizar activos</button></div></div>
+    ${PREV ? `<div class="card-box previa"><div class="kick">Vista previa · aún no la ven los celulares</div><p class="hint">Mueva a quien haga falta y publique.</p>
+        <div class="prompt-a" style="padding:12px 0 0"><button class="btn" data-gpublicar="1">Publicar grupos</button><button class="btn alt" data-gdescartar="1">Descartar</button></div></div>${tablaGrupos(PREV, true)}` : ''}
+    ${!PREV && pub.length ? `<div class="card-box"><div class="kick">Publicados</div>${sinGrupo.length ? `<p class="hint"><b>${sinGrupo.length} ${sinGrupo.length === 1 ? 'persona activa sin grupo' : 'personas activas sin grupo'}:</b> ${esc(sinGrupo.map(p => p.corto).join(', '))} · vuelva a formar o agréguelas a mano.</p>` : ''}
+        <div class="prompt-a" style="padding:12px 0 0"><button class="btn" data-grotar="1">Rotar roles</button><button class="btn alt" data-gborrar="1">${armadoGrupos ? 'Toque otra vez para borrar' : 'Borrar grupos'}</button></div></div>
+      ${tablaGrupos(pub, false)}
+      ${sinGrupo.length ? `<div class="card-box"><div class="kick">Sin grupo</div>${sinGrupo.map(p => `<div class="adm-row grp-row"><span><span class="t">${esc(p.corto)}</span><br><span class="m">${esc(p.area || '')}</span></span>
+        <select class="mini" aria-label="Agregar a ${esc(p.corto)}" data-agregar="${esc(p.id)}"><option value="">Agregar a…</option>${[...new Set(pub.map(f => f.grupo))].sort((a, b) => a - b).map(n => `<option value="${n}">Grupo ${n}</option>`).join('')}<option value="nuevo">Grupo nuevo</option></select></div>`).join('')}</div>` : ''}` : ''}
+    ${!PREV && !pub.length ? '<p class="hint" style="margin-top:14px">No hay grupos publicados.</p>' : ''}`;
+}
+async function guardarGrupos(filas, msg){
+  try { await DB.gruposGuardar(filas); if (msg) U.toast(msg); } catch (x) { U.toast(U.errMsg(x)); }
+  await vGrupos();
+}
+
+async function render(){ U.PROMPTS.length = 0; tabs(); if (TAB === 'sesion') await vSesion(); if (TAB === 'acts') vActs(); if (TAB === 'enc') await vEnc(); if (TAB === 'grupos') await vGrupos(); if (TAB === 'muro') await vMuro(); }
 async function op(o, p){ try { await DB.admin(o, p); S = await DB.getSesion(); await render(); } catch (x) { U.toast(U.errMsg(x)); } }
 
 document.addEventListener('click', async e => {
   const b = e.target.closest('button'); if (!b) return;
-  if (b.dataset.tab){ TAB = b.dataset.tab; armadoBorrar = false; return render(); }
+  if (b.dataset.tab){ TAB = b.dataset.tab; armadoBorrar = false; armadoGrupos = false; return render(); }
   if (b.dataset.hab) return op('habilitar', { ids: [b.dataset.hab], on: b.getAttribute('aria-checked') !== 'true' });
   if (b.dataset.cap){ const c = U.cap(b.dataset.cap); await DB.admin('habilitar', { ids: c.tarjetas.map(x => x.id), on: true }).catch(() => {}); return op('actual', { id: S.actual === c.id ? null : c.id }); }
   if (b.dataset.foco){ const id = b.dataset.foco; if (S.actual !== id) await DB.admin('habilitar', { ids: [id], on: true }).catch(() => {}); return op('actual', { id: S.actual === id ? null : id }); }
@@ -165,7 +227,33 @@ document.addEventListener('click', async e => {
   if (b.dataset.cp) return U.copiar(linkPart());
   if (b.dataset.csv) return csvGrabacion();
   if (b.dataset.csvpub) return csvPublicaciones();
+  if (b.dataset.gformar){
+    G_OPC = { modo: $('#g-modo').value, tam: Number($('#g-tam').value) };
+    try { await cargarPart(); } catch (x) { return U.toast(U.errMsg(x)); }
+    const act = PART.filter(p => p.activo);
+    PREV = GRUPOS.asignar(GRUPOS.formar(act, { modo: G_OPC.modo, tam: G_OPC.tam, areas: G_AREAS }));
+    return vGrupos();
+  }
+  if (b.dataset.gdescartar){ PREV = null; return vGrupos(); }
+  if (b.dataset.gpublicar){ const f = PREV; PREV = null; return guardarGrupos(f, '<i>✓</i> Grupos publicados.'); }
+  if (b.dataset.grefrescar) return vGrupos();
+  if (b.dataset.grotar) return guardarGrupos(GRUPOS.rotar(filasDe(PART)), '<i>✓</i> Roles rotados.');
+  if (b.dataset.gborrar){ if (!armadoGrupos) { armadoGrupos = true; return vGrupos(); } armadoGrupos = false; return guardarGrupos([], 'Grupos borrados.'); }
   if (b.dataset.borrar){ if (!armadoBorrar) { armadoBorrar = true; return render(); } armadoBorrar = false; return op('borrar_todo'); }
+});
+
+/* Mover o agregar a mano (select) */
+document.addEventListener('change', async e => {
+  const el = e.target;
+  if (el.dataset.mover){
+    if (el.dataset.previa) { PREV = ajustarMesas(GRUPOS.mover(PREV, el.dataset.mover, el.value)); return vGrupos(); }
+    return guardarGrupos(ajustarMesas(GRUPOS.mover(filasDe(PART), el.dataset.mover, el.value)), '<i>✓</i> Movido.');
+  }
+  if (el.dataset.agregar && el.value){
+    const filas = filasDe(PART), p = PART.find(x => x.id === el.dataset.agregar);
+    filas.push({ pid: p.id, grupo: 0, rol: 'apoyo', mesa: p.area || '', orden: 999 });
+    return guardarGrupos(ajustarMesas(GRUPOS.mover(filas, p.id, el.value)), '<i>✓</i> Agregado.');
+  }
 });
 
 async function arrancar(){
@@ -174,7 +262,7 @@ async function arrancar(){
     try { S = await DB.getSesion(); } catch (e) { return; }
     await grabacion();
     const f = JSON.stringify(S), cambio = f !== firma; firma = f;
-    if (TAB === 'enc' || TAB === 'muro' || cambio) await render();
+    if (TAB !== 'grupos' && (TAB === 'enc' || TAB === 'muro' || cambio)) await render();   // en Grupos no se repinta solo: no cierra un «Mover a…» abierto
   }, Math.max(5000, IAAB_CONFIG.POLL_MS || 4000));
 }
 U.demoBanner();

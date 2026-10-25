@@ -56,6 +56,8 @@
     if (/Failed to fetch|NetworkError/.test(m)) return 'Sin conexión. Intente de nuevo.';
     if (/OP_DESCONOCIDA/.test(m)) return 'Falta actualizar la base de datos (supabase/002_resultados_en_muro.sql).';
     if (/FALTA_GRABACION/.test(m)) return 'Elija si autoriza o no la grabación de la sesión.';
+    if (/iaab_grupos_admin|iaab_grupos_guardar|iaab_mi_grupo|iaab_grupos/.test(m)) return 'Falta actualizar la base de datos (supabase/005_grupos.sql).';
+    if (/GRUPOS_INVALIDOS/.test(m)) return 'Los grupos no se pudieron guardar. Vuelva a formarlos.';
     if (/iaab_yo|iaab_lista_participantes|iaab_recuperar|iaab_mis_publicaciones/.test(m)) return 'Falta actualizar la base de datos (supabase/004_identidad.sql).';
     if (/PARTICIPANTE_INVALIDO/.test(m)) return 'No encontramos ese registro. Regístrese de nuevo.';
     if (/iaab_registrar_v2|iaab_consentir|iaab_grabacion/.test(m)) return 'Falta actualizar la base de datos (supabase/003_consentimiento_grabacion.sql).';

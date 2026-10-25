@@ -30,6 +30,7 @@
 <script src="js/db.js"></script>
 <script src="js/contenido.js"></script>
 <script src="js/common.js"></script>
+<script src="js/grupos.js"></script>
 <script>
 const { $, v, esc, store } = U;
 const AREAS = { mp: ['Mercadeo y catálogo', 'Comercial', 'Diseño y contenido', 'Demanda y pronóstico', 'Dirección y servicio', 'Otra'],
@@ -41,6 +42,22 @@ const NOMBRE_REAL = U.C === 'pco';
    Sin «Ahora en la sala» (antes y después de la sesión) siempre es la biblioteca. */
 let S = null, YO = null, TAB = null, MODO = 'ahora', firma = '', pendiente = false, recien = false;
 try { YO = JSON.parse(store.get('yo') || 'null'); } catch (e) {}
+/* Grupo de la persona (migración 005). GRUPOS_OFF: la base aún no tiene la migración; no se vuelve a preguntar. */
+let GRUPO = null, GRUPOS_OFF = false;
+
+/* MESA: la del grupo; si no tiene, la que eligió a mano («Trabajar con esta mesa»); si no, la de su área.
+   Al cambiar de grupo se olvida la elección a mano: manda la mesa del grupo. */
+const MESAS = AREAS.filter(a => a !== 'Otra');
+function miMesa(){
+  const m = store.get('mesa');
+  if (GRUPO && GRUPO.mesa) return GRUPO.mesa;
+  if (m && MESAS.includes(m)) return m;
+  return YO && MESAS.includes(YO.area) ? YO.area : null;
+}
+const mesaCorta = m => String(m || '').split(' ')[0];
+const btnMesa = m => `<button class="mini" type="button" data-mesa="${esc(m)}" style="margin-top:8px">Trabajar con esta mesa</button>`;
+/* Elige de un mapa {área: x, '*': y} lo de la mesa de la persona */
+const deMesa = (map, mesa) => map ? (mesa && map[mesa] != null ? map[mesa] : map['*']) : undefined;
 
 const pasosHtml = p => p ? `<ol class="steps">${p.map(x => `<li><span>${v(x)}</span></li>`).join('')}</ol>` : '';
 const visible = (t, hab) => hab.has(t.id) && t.tipo !== 'encuesta';   // las tarjetas de encuesta las reemplaza la hoja
@@ -64,13 +81,24 @@ function cardBody(c){
   let h = c.intro ? `<p>${v(c.intro)}</p>` : '';
   h += pasosHtml(c.pasos);
   if (c.prompts) h += c.prompts.map(([l, t]) => U.promptBox(v(t), l)).join('');
+  const mesa = miMesa(), pm = v(c.promptMesa), pM = v(c.porMesa);
   switch (c.tipo){
-    case 'prompt': h += U.promptBox(v(c.prompt)); break;
+    case 'prompt':
+      if (pm){
+        h += U.promptBox(deMesa(pm, mesa), mesa ? 'Su mesa · ' + mesaCorta(mesa) : null);
+        const otras = MESAS.filter(m => m !== mesa && deMesa(pm, m) !== deMesa(pm, mesa));
+        if (otras.length) h += `<details class="otras"><summary>${mesa ? 'Ver el prompt de las otras mesas' : 'Ver el prompt de cada mesa'}</summary>${[...new Set(otras.map(m => deMesa(pm, m)))].map(t => U.promptBox(t, otras.filter(m => deMesa(pm, m) === t).map(mesaCorta).join(' · '))).join('')}</details>`;
+      } else h += U.promptBox(v(c.prompt));
+      break;
     case 'comparar': h += `<div class="compare"><div class="bad">${U.promptBox(v(c.antes), '1 · Sin estructura')}</div><div>${U.promptBox(v(c.despues), '2 · Con la guía')}</div></div>` + (c.nota ? `<p><b>Qué notar:</b> ${esc(c.nota)}</p>` : ''); break;
-    case 'datasets':
-      h += `<ul class="files">${v(c.archivos).map(([f, d]) => `<li><a href="${esc(U.DATASETS + f)}" download>${esc(f)}</a><p>${esc(d)}</p>
-        <a class="btn alt dl" href="${esc(U.DATASETS + f)}" download>${U.ICON_DL}Descargar archivo</a></li>`).join('')}</ul>`;
+    case 'datasets': {
+      const li = ([f, d, m], mia) => `<li class="${mia ? 'mia' : ''}">${mia ? `<span class="mesa-tag">Su mesa${GRUPO && GRUPO.mesa === m ? ' · la de su grupo' : ''}</span><br>` : ''}<a href="${esc(U.DATASETS + f)}" download>${esc(f)}</a><p>${esc(d)}</p>
+        <a class="btn alt dl" href="${esc(U.DATASETS + f)}" download>${U.ICON_DL}Descargar archivo</a>${!mia && m ? '<br>' + btnMesa(m) : ''}</li>`;
+      const A = v(c.archivos), mio = A.filter(x => x[2] && x[2] === mesa), resto = A.filter(x => !mio.includes(x));
+      if (mio.length) h += `<ul class="files">${mio.map(x => li(x, true)).join('')}</ul><details class="otras"><summary>Ver las otras mesas (${resto.length})</summary><ul class="files">${resto.map(x => li(x, false)).join('')}</ul></details>`;
+      else h += (A.some(x => x[2]) ? '<p class="hint">Toque «Trabajar con esta mesa» en la de su grupo.</p>' : '') + `<ul class="files">${A.map(x => li(x, false)).join('')}</ul>`;
       if (c.prompt) h += U.promptBox(v(c.prompt)); break;
+    }
     case 'checklist': h += `<ul class="checks">${c.checklist.map((x, j) => `<li><label><input type="checkbox" data-chk="${c.id}-${j}" ${store.get('chk-' + c.id + '-' + j) === '1' ? 'checked' : ''}>${esc(x)}</label></li>`).join('')}</ul>`; break;
     case 'escalera-ref': h += `<ul class="map">${ESCALERA.map(e => `<li><span class="k">${e.k}</span><span><span class="t">${e.t}</span><div class="d">${e.d}</div><div class="w">${e.w}</div></span></li>`).join('')}</ul>`; break;
     case 'semaforo-ref':
@@ -78,7 +106,10 @@ function cardBody(c){
         <div class="light a"><b>● Amarillo · solo con la cuenta de la empresa</b>Interno, sin identificar a nadie; agregados de 5 o más personas.</div>
         <div class="light r"><b>● Rojo · no va en un chat</b>Datos que identifican a una persona, o conectar la IA con sistemas. Anonimice primero o pase por TI.</div></div>
         <ul class="cases">${SEMAFORO[U.C].map(([t, col, por], j) => `<li class="case" style="grid-template-columns:1fr"><span><b>${j + 1}. ${COLOR[col]}.</b> ${esc(t)}<br><span class="hint">${esc(por)}</span></span></li>`).join('')}</ul>`; break;
-    case 'texto': h += v(c.html); break;
+    case 'texto':
+      if (pM && mesa && pM[mesa]) h += `<div class="card-box" style="margin-top:12px;background:var(--tint);border-color:var(--accdk)"><span class="mesa-tag">Su mesa · ${esc(mesaCorta(mesa))}</span><p>${esc(pM[mesa])}</p></div><details class="otras"><summary>Ver todas las mesas</summary>${v(c.html)}</details>`;
+      else h += v(c.html);
+      break;
     case 'enlace': h += `<div class="prompt-a" style="padding:12px 0 0"><a class="btn" href="${esc(v(c.url))}" target="_blank" rel="noopener" style="text-decoration:none">${esc(c.label)}</a></div>`; break;
     case 'encuesta':
       h += S && S.encuesta === c.encuesta
@@ -211,6 +242,26 @@ function ahora(){
   return `<button class="now" data-modo="ahora"><span class="pulse"></span><span><span class="l">Ahora en la sala</span><br><span class="t">${esc(F.tarjeta ? F.tarjeta.id + ' · ' + F.tarjeta.t : F.cap.t)}</span></span></button>`;
 }
 
+/* «Su grupo»: grupo, mesa, rol, compañeros y las reglas del coordinador. No aparece si no hay grupos. */
+function grupoCard(){
+  if (!GRUPO) return '';
+  const R = GRUPOS.ROLES[GRUPO.rol] || { t: GRUPO.rol, d: '' }, c = GRUPO.companeros || [];
+  return `<section class="grupo-c" aria-label="Su grupo"><div class="kick">Grupo ${GRUPO.grupo} · ${esc(GRUPO.mesa || 'Mesa mixta')}</div>
+    <h2>Usted es ${esc(R.t.toLowerCase())}</h2><p class="rol-d">${esc(R.d)}</p>
+    ${c.length ? `<p class="con">Con: ${c.map(x => `<b>${esc(x.corto)}</b> (${esc((GRUPOS.ROLES[x.rol] || { t: x.rol }).t.toLowerCase())})`).join(', ')}</p>` : ''}
+    <details id="g-reglas"><summary>Reglas del grupo</summary><ol>${GRUPOS.REGLAS.map(r => `<li>${esc(r)}</li>`).join('')}</ol></details></section>`;
+}
+async function miGrupo(){
+  if (GRUPOS_OFF || !YO || !DB.miGrupo) return;
+  let g;
+  try { g = await DB.miGrupo(YO.id); } catch (x) { if (/iaab_mi_grupo|function|404|PGRST/.test(String(x && x.message || x))) GRUPOS_OFF = true; return; }
+  const f = JSON.stringify(g || null);
+  if (f === JSON.stringify(GRUPO)) return;
+  const antes = GRUPO; GRUPO = g || null;
+  if (GRUPO && (!antes || antes.grupo !== GRUPO.grupo || antes.mesa !== GRUPO.mesa)) store.set('mesa', '');   // grupo nuevo: manda su mesa
+  if (escribiendo()) pendiente = true; else render();
+}
+
 /* Encuesta abierta que esta persona ya respondió (o dejó para después) */
 function encBar(){
   if (!S || !S.encuesta) return '';
@@ -222,7 +273,7 @@ function encBar(){
 
 function render(){
   U.PROMPTS.length = 0;
-  const abiertos = [...document.querySelectorAll('details.act[open]')].map(d => d.id);
+  const abiertos = [...document.querySelectorAll('details.act[open], details.otras[open], #g-reglas[open]')].map(d => d.id).filter(Boolean);
   tabs();
   const F = U.foco(S);
   if (F && MODO === 'ahora') vivo(F); else biblioteca();
@@ -235,7 +286,7 @@ function vivo(F){
   const hab = new Set(S.habilitadas || []);
   const c = F.cap, N = NIVELES.find(n => n.id === c.nivel), ci = N.capitulos.findIndex(x => x.id === c.id);
   const ref = F.tarjeta ? U.orden(F.tarjeta.id) : -1;
-  let h = encBar();
+  let h = encBar() + grupoCard();
   if (recien && ci > 0) h += `<p class="hint llego">La sala va en el capítulo ${ci}. Lo anterior está abajo, en «Lo que ya vimos».</p>`;
   h += `<div class="kick" style="margin-top:14px">Ahora en la sala · Capítulo ${ci} · ${esc(c.t)}</div>`;
   let antes = [];
@@ -271,19 +322,19 @@ function vivo(F){
 /* BIBLIOTECA: el mapa o un nivel completo, con todo lo abierto */
 function biblioteca(){
   if (TAB === 'mios'){
-    $('#main').innerHTML = `${encBar()}${ahora()}<div class="kick" style="margin-top:18px">Lo suyo</div><h1>Mis prompts</h1>
+    $('#main').innerHTML = `${encBar()}${grupoCard()}${ahora()}<div class="kick" style="margin-top:18px">Lo suyo</div><h1>Mis prompts</h1>
       <p class="lede">Todo lo que ha publicado en el muro, en todos los niveles. Cópielo, péguelo en su asistente y siga mejorándolo.</p><div id="mios"></div>`;
     misPrompts($('#mios')); return;
   }
   if (TAB === 'mapa'){
-    $('#main').innerHTML = `${encBar()}${ahora()}<div class="kick" style="margin-top:18px">El mapa</div><h1>El piso y siete escalones</h1>
+    $('#main').innerHTML = `${encBar()}${grupoCard()}${ahora()}<div class="kick" style="margin-top:18px">El mapa</div><h1>El piso y siete escalones</h1>
       <p class="lede">Todo lo que vamos a ver cabe aquí. Inspirada en los niveles de uso de Juan Gabriel Gomila, traducida al trabajo de su equipo. La idea es subir un escalón cada vez.</p>
       <ul class="map">${ESCALERA.map(e => `<li><span class="k">${e.k}</span><span><span class="t">${e.t}</span><div class="d">${e.d}</div><div class="w">${e.w}</div></span></li>`).join('')}</ul>`;
     return;
   }
   const N = NIVELES.find(x => String(x.id) === TAB);
   const hab = new Set(S.habilitadas || []);
-  let h = `${encBar()}${ahora()}<div class="kick" style="margin-top:18px">Nivel 0${N.id}</div><h1>${N.verbo}</h1><p class="lede">${N.lede}</p>${U.ladder(N)}`;
+  let h = `${encBar()}${grupoCard()}${ahora()}<div class="kick" style="margin-top:18px">Nivel 0${N.id}</div><h1>${N.verbo}</h1><p class="lede">${N.lede}</p>${U.ladder(N)}`;
   if (!N.capitulos){ $('#main').innerHTML = h + `<div class="soon"><div class="kick">Próximamente</div><p>${N.pronto}</p></div>`; return; }
   N.capitulos.forEach((c, ci) => {
     const abiertas = c.tarjetas.filter(t => hab.has(t.id));
@@ -343,6 +394,7 @@ async function refrescar(){
     else { render(); if (nuevoFoco) window.scrollTo(0, 0); }
   }
   encuesta();
+  miGrupo();
 }
 
 async function responder(valor){
@@ -357,6 +409,7 @@ async function responder(valor){
 
 document.addEventListener('click', async e => {
   const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.mesa){ store.set('mesa', b.dataset.mesa); U.toast('<i>✓</i> Mesa: ' + esc(b.dataset.mesa)); render(); return; }
   if (b.dataset.ya) return yaRegistrado();
   if (b.dataset.volver) return registro();
   if (b.dataset.soy) return confirmarSoy(b);

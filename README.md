@@ -50,3 +50,14 @@ Correr `supabase/004_identidad.sql` una vez en el SQL Editor (es idempotente). S
 - **Usuario huérfano:** si el perfil guardado en el celular ya no existe (tras «Reiniciar»), se limpia y se pide registro.
 - **Una sesión por programa:** use la misma sesión en todas las sesiones de un cliente y no la reinicie entre ellas (se pierden los prompts).
 - **Panel:** «Descargar publicaciones (CSV)» en la pestaña Sesión.
+
+## Grupos con roles y mesa propia (migración 005, 25-oct-2026)
+
+Correr `supabase/005_grupos.sql` una vez en el SQL Editor (idempotente; después de la 004). Sin ella el tablero sigue igual y la pestaña Grupos del panel muestra «Falta actualizar la base de datos».
+
+- **Panel › Grupos:** «Por área» (por defecto) o «Mezclados», tamaño 3–5 (objetivo 4). Toma solo a las personas **activas** (ping en los últimos 3 minutos; `G_VENTANA_MIN` en `admin.html`). «Formar grupos» muestra una vista previa; se puede mover a cualquiera con «Mover a…» y luego «Publicar grupos». Publicados: «Rotar roles», «Borrar grupos» (doble toque), mover a mano y agregar a quien llegó tarde («Sin grupo»).
+- **Algoritmo (`js/grupos.js`, funciones puras):** por área, cada área con 3 o más arma sus grupos (los escalones de la encuesta `escalon-inicio` se reparten en serpentina); quien queda solo en su área (1–2, o «Otra») se suma al grupo más pequeño, y si son 3 o más forman una mesa mixta. Mezclados: turnos por área y escalón.
+- **Roles:** Coordinador (modera, da la palabra, no escribe en la IA), Piloto (escribe con su cuenta), Revisor (criterios y semáforo), Relator (publica en el muro); grupo de 3: Coordinador y relator en una persona; de 5: Apoyo. «Rotar roles» pasa a cada persona el rol de la anterior: cambia el piloto y se reparte el consumo de las cuentas gratuitas.
+- **Celular:** tarjeta «Su grupo» arriba (grupo, mesa, rol, compañeros y las 3 reglas del coordinador). Si no hay grupos, no aparece.
+- **Mesa propia:** el archivo (N2-03), los prompts por mesa (`promptMesa`, N2-04 y N2-05) y los criterios (`porMesa`, N2-14) muestran primero la mesa de la persona: la de su grupo; si no tiene, la que eligió con «Trabajar con esta mesa»; si no, la de su área. Las otras mesas quedan en «Ver las otras mesas».
+- **Reiniciar** borra también los grupos (cascada).

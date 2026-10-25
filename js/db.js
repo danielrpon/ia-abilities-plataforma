@@ -36,6 +36,10 @@
     DB.listaParticipantes = async () => ok(await sb.rpc('iaab_lista_participantes', { p_sesion: SES })) || [];
     DB.recuperar = async (pid) => ok(await sb.rpc('iaab_recuperar', { p_sesion: SES, p_part: pid }));
     DB.misPublicaciones = async (pid) => ok(await sb.rpc('iaab_mis_publicaciones', { p_sesion: SES, p_part: pid })) || [];
+    /* Grupos con roles (migración 005) */
+    DB.gruposAdmin = async (minutos) => ok(await sb.rpc('iaab_grupos_admin', { p_sesion: SES, p_clave: DB.clave, p_minutos: minutos || 3 })) || [];
+    DB.gruposGuardar = async (filas) => ok(await sb.rpc('iaab_grupos_guardar', { p_sesion: SES, p_clave: DB.clave, p_filas: filas || [] }));
+    DB.miGrupo = async (pid) => ok(await sb.rpc('iaab_mi_grupo', { p_sesion: SES, p_part: pid }));
     DB.onChange = null; // las pantallas refrescan cada POLL_MS
   }
 
@@ -113,7 +117,7 @@
         case 'publicaciones': r.rows = vPubs(s); break;
         case 'participantes': r.rows = s.participantes; break;
         case 'respuestas': r.rows = s.respuestas.filter(x => x.encuesta_id === payload.encuesta_id).map(({ participante_id, ...x }) => x); break;
-        case 'borrar_todo': Object.assign(s, { participantes: [], publicaciones: [], votos: [], respuestas: [] }); Object.assign(s.sesion, { habilitadas: [], actual: null, encuesta: null, muestra: null }); break;
+        case 'borrar_todo': Object.assign(s, { participantes: [], publicaciones: [], votos: [], respuestas: [], grupos: [] }); Object.assign(s.sesion, { habilitadas: [], actual: null, encuesta: null, muestra: null }); break;
         default: throw new Error('OP_DESCONOCIDA: ' + op);
       }
       save(s); return r;
@@ -125,6 +129,28 @@
     DB.recuperar = async (pid) => { const s = load(); const p = s.participantes.find(p => p.id === pid); if (!p) throw new Error('PARTICIPANTE_INVALIDO'); p.last_seen = nowIso(); save(s); return perfil(p); };
     DB.misPublicaciones = async (pid) => load().publicaciones.filter(p => p.participante_id === pid).sort((a, b) => b.created_at.localeCompare(a.created_at))
       .map(({ id, act_id, tipo, texto, estado, created_at }) => ({ id, act_id, tipo, texto, estado, created_at }));
+    DB.gruposAdmin = async (minutos) => {
+      const s = load(); if (DB.clave !== s.sesion.clave_admin) throw new Error('CLAVE_INVALIDA');
+      const lim = Date.now() - (minutos || 3) * 60000, gs = s.grupos || [];
+      return s.participantes.slice().sort((a, b) => a.nombre.toLowerCase().localeCompare(b.nombre.toLowerCase())).map(p => {
+        const g = gs.find(x => x.pid === p.id) || {};
+        const r = s.respuestas.find(x => x.encuesta_id === 'escalon-inicio' && x.participante_id === p.id);
+        return { id: p.id, corto: corto(p.nombre), area: p.area, activo: Date.parse(p.last_seen) > lim,
+          escalon: r && r.valor && Number.isInteger(r.valor.escalon) ? r.valor.escalon : null,
+          grupo: g.grupo ?? null, rol: g.rol ?? null, mesa: g.mesa ?? null, orden: g.orden ?? null };
+      });
+    };
+    DB.gruposGuardar = async (filas) => {
+      const s = load(); if (DB.clave !== s.sesion.clave_admin) throw new Error('CLAVE_INVALIDA');
+      const ids = new Set(s.participantes.map(p => p.id));
+      s.grupos = (filas || []).filter(f => ids.has(f.pid)).map(f => ({ pid: f.pid, grupo: Number(f.grupo), rol: f.rol, mesa: f.mesa || null, orden: Number(f.orden) || 0 }));
+      save(s); return { ok: true, n: s.grupos.length };
+    };
+    DB.miGrupo = async (pid) => {
+      const s = load(), gs = s.grupos || [], g = gs.find(x => x.pid === pid); if (!g) return null;
+      const nom = id => { const p = s.participantes.find(p => p.id === id); return p ? corto(p.nombre) : '?'; };
+      return { grupo: g.grupo, rol: g.rol, mesa: g.mesa, companeros: gs.filter(x => x.grupo === g.grupo && x.pid !== pid).sort((a, b) => a.orden - b.orden).map(x => ({ corto: nom(x.pid), rol: x.rol })) };
+    };
     DB.onChange = (fn) => { if (chan) chan.onmessage = fn; window.addEventListener('storage', (e) => { if (e.key === KEY) fn(); }); };
   }
 

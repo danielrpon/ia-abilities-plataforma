@@ -315,3 +315,22 @@ details.notas>summary{grid-template-columns:auto 1fr auto;}
 .files a.dl:after{content:none;}
 /* «Ya me registré»: lista de una columna, sin el hueco del número */
 .pick.lista button{grid-template-columns:1fr;}
+/* Grupos con roles (25-oct): panel y tarjeta «Su grupo» en el celular */
+.g-opc{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.grp-row{grid-template-columns:1fr auto;}
+.grp-row select.mini{width:auto;max-width:140px;padding:6px 8px;font-size:12px;border-radius:8px;}
+.card-box.previa{border-color:var(--accdk);background:var(--tint);}
+.grupo-c{background:var(--bg);color:var(--white);border-radius:var(--r);padding:16px;margin-top:16px;}
+.grupo-c .kick{color:var(--acc);}
+.grupo-c h2{font-weight:900;font-size:21px;line-height:1.15;margin-top:4px;color:var(--white);}
+.grupo-c .rol-d{font-size:14px;color:#C9D0CB;margin-top:4px;}
+.grupo-c .con{font-size:13px;color:#C9D0CB;margin-top:10px;}
+.grupo-c .con b{color:var(--white);}
+.grupo-c ol{margin:10px 0 0 18px;font-size:13px;color:#C9D0CB;display:grid;gap:4px;}
+.grupo-c details summary{cursor:pointer;font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--acc);margin-top:12px;list-style:none;}
+.grupo-c details summary::-webkit-details-marker{display:none;}
+/* Mesa propia destacada; las otras, plegadas */
+.files li.mia{border-color:var(--accdk);background:var(--tint);}
+.mesa-tag{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--accdk);margin-bottom:4px;}
+details.otras{margin-top:12px;}
+details.otras summary{cursor:pointer;font-weight:700;font-size:13.5px;color:var(--accdk);padding:6px 0;}
