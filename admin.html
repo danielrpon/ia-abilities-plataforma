@@ -199,11 +199,23 @@ async function vGrupos(){
     ${PREV ? `<div class="card-box previa"><div class="kick">Vista previa · aún no la ven los celulares</div><p class="hint">Mueva a quien haga falta y publique.</p>
         <div class="prompt-a" style="padding:12px 0 0"><button class="btn" data-gpublicar="1">Publicar grupos</button><button class="btn alt" data-gdescartar="1">Descartar</button></div></div>${tablaGrupos(PREV, true)}` : ''}
     ${!PREV && pub.length ? `<div class="card-box"><div class="kick">Publicados</div>${sinGrupo.length ? `<p class="hint"><b>${sinGrupo.length} ${sinGrupo.length === 1 ? 'persona activa sin grupo' : 'personas activas sin grupo'}:</b> ${esc(sinGrupo.map(p => p.corto).join(', '))} · vuelva a formar o agréguelas a mano.</p>` : ''}
-        <div class="prompt-a" style="padding:12px 0 0"><button class="btn" data-grotar="1">Rotar roles</button><button class="btn alt" data-gborrar="1">${armadoGrupos ? 'Toque otra vez para borrar' : 'Borrar grupos'}</button></div></div>
+        <div class="prompt-a" style="padding:12px 0 0"><button class="btn" data-grotar="1">Rotar roles</button><button class="btn alt" data-gcopiar="1">Copiar grupos</button><button class="btn alt" data-gborrar="1">${armadoGrupos ? 'Toque otra vez para borrar' : 'Borrar grupos'}</button></div></div>
       ${tablaGrupos(pub, false)}
       ${sinGrupo.length ? `<div class="card-box"><div class="kick">Sin grupo</div>${sinGrupo.map(p => `<div class="adm-row grp-row"><span><span class="t">${esc(p.corto)}</span><br><span class="m">${esc(p.area || '')}</span></span>
         <select class="mini" aria-label="Agregar a ${esc(p.corto)}" data-agregar="${esc(p.id)}"><option value="">Agregar a…</option>${[...new Set(pub.map(f => f.grupo))].sort((a, b) => a - b).map(n => `<option value="${n}">Grupo ${n}</option>`).join('')}<option value="nuevo">Grupo nuevo</option></select></div>`).join('')}</div>` : ''}` : ''}
     ${!PREV && !pub.length ? '<p class="hint" style="margin-top:14px">No hay grupos publicados.</p>' : ''}`;
+}
+/* Texto plano de los grupos publicados: para armar las salas de Teams y pegarlo en el chat de la reunión */
+function textoGrupos(filas){
+  const por = {}; filas.forEach(f => (por[f.grupo] = por[f.grupo] || []).push(f));
+  const P = id => PART.find(p => p.id === id) || {};
+  const rol = r => GRUPOS.ROLES[r] ? GRUPOS.ROLES[r].t : r;
+  return ['Grupos de hoy · cada grupo va a su sala con el mismo número', '']
+    .concat(Object.keys(por).sort((a, b) => a - b).flatMap(g => {
+      const m = por[g].sort((a, b) => a.orden - b.orden);
+      return [`Grupo ${g} · ${m[0].mesa || 'Mesa mixta'}`].concat(m.map(f => `- ${P(f.pid).corto || '?'} · ${rol(f.rol)}`), ['']);
+    }))
+    .concat([`Su grupo, su rol y las reglas también están en el tablero: ${linkPart()}`]).join('\n');
 }
 async function guardarGrupos(filas, msg){
   try { await DB.gruposGuardar(filas); if (msg) U.toast(msg); } catch (x) { U.toast(U.errMsg(x)); }
@@ -237,6 +249,7 @@ document.addEventListener('click', async e => {
   if (b.dataset.gdescartar){ PREV = null; return vGrupos(); }
   if (b.dataset.gpublicar){ const f = PREV; PREV = null; return guardarGrupos(f, '<i>✓</i> Grupos publicados.'); }
   if (b.dataset.grefrescar) return vGrupos();
+  if (b.dataset.gcopiar) return U.copiar(textoGrupos(filasDe(PART)));
   if (b.dataset.grotar) return guardarGrupos(GRUPOS.rotar(filasDe(PART)), '<i>✓</i> Roles rotados.');
   if (b.dataset.gborrar){ if (!armadoGrupos) { armadoGrupos = true; return vGrupos(); } armadoGrupos = false; return guardarGrupos([], 'Grupos borrados.'); }
   if (b.dataset.borrar){ if (!armadoBorrar) { armadoBorrar = true; return render(); } armadoBorrar = false; return op('borrar_todo'); }
