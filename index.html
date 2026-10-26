@@ -20,7 +20,7 @@
 <div class="offline" id="off" role="status" hidden>Sin conexión · mostrando lo último</div>
 <div class="rec" id="rec" hidden></div>
 <main id="main"></main>
-<footer>IA-abilities · Coknow · Sus notas y borradores se guardan solo en este dispositivo; lo que publique en el muro lo ve su grupo.</footer>
+<footer><div class="rec-pie" id="rec-pie" hidden></div>IA-abilities · Coknow · Sus notas y borradores se guardan solo en este dispositivo; lo que publique en el muro lo ve su grupo.</footer>
 
 <div class="modal-bg" id="rec-m" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="rec-t"><div class="kick">Grabación de la sesión</div><h2 id="rec-t" style="margin-top:6px">¿Autoriza que se grabe el audio?</h2><div id="rec-b"></div></div></div>
 <div class="modal-bg" id="enc" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="enc-t"><div class="kick">Encuesta</div><h2 id="enc-t" style="margin-top:6px"></h2><div id="enc-b"></div></div></div>
@@ -194,13 +194,16 @@ async function misPrompts(el){
   el.innerHTML = L.map(p => U.promptBox(p.texto, `${U.actLabel(p.act_id)} · ${U.TIPOS[p.tipo] || ''} · ${U.dia(p.created_at)}${p.estado === 'oculta' ? ' · oculto por el facilitador' : ''}`)).join('');
 }
 
-/* Grabación: la decisión vigente siempre a la vista, con «Cambiar» (retirarla es un derecho) */
+/* Grabación: si falta la respuesta o no autorizó, la barra va arriba (el facilitador debe verlo).
+   Si ya autorizó, sale de arriba y queda al pie, discreta: retirarla sigue siendo un derecho (25-oct, Daniel). */
 function pintarRec(){
-  const g = YO && YO.graba, el = $('#rec');
-  el.hidden = false;
-  el.className = 'rec' + (g === false ? ' no' : g === true ? '' : ' sin');
-  el.innerHTML = (g === true ? '<span><b>●</b> Grabación: usted la autorizó</span>'
-    : g === false ? '<span><b>■</b> Usted no autorizó la grabación: la sesión no debe grabarse</span>'
+  const g = YO && YO.graba, el = $('#rec'), pie = $('#rec-pie');
+  pie.hidden = g !== true;
+  pie.innerHTML = g === true ? 'Grabación: usted la autorizó · <button type="button" data-rec="1">cambiar</button>' : '';
+  el.hidden = g === true;
+  if (g === true) { el.innerHTML = ''; return; }
+  el.className = 'rec' + (g === false ? ' no' : ' sin');
+  el.innerHTML = (g === false ? '<span><b>■</b> Usted no autorizó la grabación: la sesión no debe grabarse</span>'
     : '<span><b>?</b> Falta su respuesta sobre la grabación</span>') + '<button type="button" data-rec="1">' + (g == null ? 'Responder' : 'Cambiar') + '</button>';
 }
 function abrirRec(){
@@ -218,6 +221,7 @@ $('#rec-m').addEventListener('click', async e => {
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#rec-m').hidden) $('#rec-m').hidden = true; });
 $('#rec').addEventListener('click', e => { if (e.target.closest('[data-rec]')) abrirRec(); });
+$('#rec-pie').addEventListener('click', e => { if (e.target.closest('[data-rec]')) abrirRec(); });
 
 /* Niveles que se muestran en la biblioteca: el mapa, los que ya tienen tarjetas abiertas y el muro */
 function nivelesAbiertos(){

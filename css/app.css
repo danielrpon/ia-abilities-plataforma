@@ -304,6 +304,8 @@ details.notas>summary{grid-template-columns:auto 1fr auto;}
 .rec.sin{background:var(--warnbg);color:var(--warn);} .rec.sin b{color:var(--warn);}
 .rec button{flex:0 0 auto;font-weight:700;text-decoration:underline;text-underline-offset:3px;padding:4px 0;}
 .rec[hidden],.rec-alert[hidden]{display:none;}
+.rec-pie{margin-bottom:8px;} .rec-pie[hidden]{display:none;}
+.rec-pie button{font:inherit;color:inherit;text-decoration:underline;text-underline-offset:3px;padding:0;background:none;border:0;cursor:pointer;}
 .rec-alert{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;margin:0 -16px;padding:12px max(16px, calc((100vw - 760px) / 2));font-size:13.5px;}
 .rec-alert b{font-weight:800;}
 .rec-alert.no{background:var(--no);color:#fff;font-size:15px;}

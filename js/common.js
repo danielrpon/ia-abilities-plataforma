@@ -75,7 +75,7 @@
       ['Para qué', 'Transcribir y resumir la sesión para elaborar las memorias, ajustar el programa y preparar el material de seguimiento de su equipo. No se publica ni se usa para otros fines.'],
       ['Con qué herramienta', 'Plaud. El audio se procesa con proveedores de IA (OpenAI, Google o Microsoft) fuera de Colombia, bajo contratos que les impiden conservarlo o usarlo para entrenar modelos de inteligencia artificial.'],
       ['Por cuánto tiempo', 'Hasta tres meses después de terminar el programa. Luego se borran el audio y la transcripción.'],
-      ['Sus derechos', 'Conocer, actualizar, rectificar y suprimir sus datos, y retirar esta autorización cuando quiera, desde este tablero («Grabación · Cambiar») o escribiendo a contacto@freaknerd.co.'],
+      ['Sus derechos', 'Conocer, actualizar, rectificar y suprimir sus datos, y retirar esta autorización cuando quiera, desde este tablero (al pie: «Grabación · cambiar») o escribiendo a contacto@freaknerd.co.'],
       ['Es voluntaria', 'No está obligado a autorizar y no autorizar no afecta su participación. Si una persona no autoriza, el facilitador detiene la grabación.']
     ]
   };
