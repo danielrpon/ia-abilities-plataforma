@@ -96,7 +96,7 @@ window.NIVELES = [
     habilita:['<b>El prompt de entrevista,</b> la plantilla mínima, la lista de verificación y el selector de modelo.'],
     tarjetas:[
       {id:'N1-09', m:'4d', t:'Paso 1 · Pídalo como lo haría hoy', tipo:'pasos',
-       pasos:['Escoja una tarea de su semana (la del formulario o una de la tarjeta N1-13).', 'Pídasela a la IA <b>como lo haría hoy, en una sola frase</b>.', 'Corra el prompt. <b>No borre la respuesta:</b> la vamos a comparar.']},
+       pasos:['Escoja una tarea de su semana (la del formulario o una de la tarjeta «Ideas de tareas»).', 'Pídasela a la IA <b>como lo haría hoy, en una sola frase</b>.', 'Corra el prompt. <b>No borre la respuesta:</b> la vamos a comparar.']},
       {id:'N1-10', m:'4c', t:'Paso 2 · El atajo de la entrevista', tipo:'prompt',
        intro:'En un chat nuevo. Responda las preguntas, copie el prompt final y córralo.',
        prompt:'Quiero que me ayudes a escribir un prompt para [tarea]. Antes de escribirlo, hazme una por una las preguntas que necesites sobre el objetivo, el contexto, el formato y las restricciones. Cuando tengas todo, entrégame el prompt final, listo para copiar, y dime qué parte podría mejorar.'},
