@@ -124,9 +124,9 @@ function cardBody(c){
 }
 
 /* Una tarjeta plegada: el código (N1-10) es lo que dicta el facilitador */
-const fila = t => `<details class="act" id="${t.id}"><summary><span class="num">${t.id}</span><span><span class="act-t">${esc(t.t)}</span>${t.muro ? '<br><span class="act-m">con muro</span>' : ''}</span><span class="chev" aria-hidden="true"></span></summary>
+const fila = t => `<details class="act" id="${t.id}"><summary><span class="num">${esc(U.cod(t))}</span><span><span class="act-t">${esc(t.t)}</span>${t.muro ? '<br><span class="act-m">con muro</span>' : ''}</span><span class="chev" aria-hidden="true"></span></summary>
   <div class="act-b">${cardBody(t)}</div></details>`;
-const bloqueada = t => `<div class="locked-act"><span class="num">${t.id}</span><span><span class="act-t">${esc(t.t)}</span><br><span class="act-m">se abre en un momento</span></span></div>`;
+const bloqueada = t => `<div class="locked-act"><span class="num">${esc(U.cod(t))}</span><span><span class="act-t">${esc(t.t)}</span><br><span class="act-m">se abre en un momento</span></span></div>`;
 
 function registro(){
   $('#tabs').innerHTML = '';
@@ -302,12 +302,12 @@ function vivo(F){
   const c = F.cap, N = NIVELES.find(n => n.id === c.nivel), ci = N.capitulos.findIndex(x => x.id === c.id);
   const ref = F.tarjeta ? U.orden(F.tarjeta.id) : -1;
   let h = encBar() + grupoCard();
-  if (recien && ci > 0) h += `<p class="hint llego">La sala va en el capítulo ${ci}. Lo anterior está abajo, en «Lo que ya vimos».</p>`;
-  h += `<div class="kick" style="margin-top:14px">Ahora en la sala · Capítulo ${ci} · ${esc(c.t)}</div>`;
+  if (recien && ci > 0) h += `<p class="hint llego">La sala va en ${c.m ? "«" + esc(c.m) + " · " + esc(c.t) + "»" : "el capítulo " + ci}. Lo anterior está abajo, en «Lo que ya vimos».</p>`;
+  h += `<div class="kick" style="margin-top:14px">Ahora en la sala · ${c.m ? esc(c.m) : "Capítulo " + ci} · ${esc(c.t)}</div>`;
   let antes = [];
   if (F.tarjeta){
     const t = F.tarjeta;
-    h += `<article class="foco" id="f-${t.id}"><div class="foco-h"><span class="num">${t.id}</span><h1>${esc(t.t)}</h1></div><div class="act-b">${cardBody(t)}</div></article>`;
+    h += `<article class="foco" id="f-${t.id}"><div class="foco-h"><span class="num">${esc(U.cod(t))}</span><h1>${esc(t.t)}</h1></div><div class="act-b">${cardBody(t)}</div></article>`;
     const resto = c.tarjetas.filter(x => x.id !== t.id);
     antes = resto.filter(x => U.orden(x.id) < ref && visible(x, hab));
     const sig = resto.filter(x => U.orden(x.id) > ref && visible(x, hab));
@@ -324,7 +324,7 @@ function vivo(F){
   }
   const previos = N.capitulos.slice(0, ci).map((x, k) => ({ x, k, ts: x.tarjetas.filter(t => visible(t, hab)) })).filter(g => g.ts.length).reverse();
   if (antes.length || previos.length){
-    h += `<h2>Lo que ya vimos</h2><div class="acts">${antes.reverse().map(fila).join('')}${previos.map(g => `<details class="act grupo" id="g-${g.x.id}"><summary><span class="num">C${g.k}</span><span><span class="act-t">${esc(g.x.t)}</span><br><span class="act-m">${g.ts.length} ${g.ts.length === 1 ? 'tarjeta' : 'tarjetas'}</span></span><span class="chev" aria-hidden="true"></span></summary>
+    h += `<h2>Lo que ya vimos</h2><div class="acts">${antes.reverse().map(fila).join('')}${previos.map(g => `<details class="act grupo" id="g-${g.x.id}"><summary><span class="num">${esc(g.x.m || "C" + g.k)}</span><span><span class="act-t">${esc(g.x.t)}</span><br><span class="act-m">${g.ts.length} ${g.ts.length === 1 ? 'tarjeta' : 'tarjetas'}</span></span><span class="chev" aria-hidden="true"></span></summary>
       <div class="act-b"><div class="acts" style="margin-top:12px">${g.ts.map(fila).join('')}</div></div></details>`).join('')}</div>`;
   }
   h += `<details class="act notas" id="g-mios"><summary><span class="num">✎</span><span><span class="act-t">Mis prompts</span><br><span class="act-m">lo que ha publicado en todos los niveles</span></span><span class="chev" aria-hidden="true"></span></summary>
@@ -354,10 +354,10 @@ function biblioteca(){
   N.capitulos.forEach((c, ci) => {
     const abiertas = c.tarjetas.filter(t => hab.has(t.id));
     if (!abiertas.length){
-      h += `<div class="locked-act" style="margin-top:12px"><span class="num">C${ci}</span><span><span class="act-t">${esc(c.t)}</span><br><span class="act-m">${c.min} · se abre durante la sesión</span></span></div>`;
+      h += `<div class="locked-act" style="margin-top:12px"><span class="num">${esc(c.m || "C" + ci)}</span><span><span class="act-t">${esc(c.t)}</span><br><span class="act-m">${c.min} · se abre durante la sesión</span></span></div>`;
       return;
     }
-    h += `<section id="${c.id}" style="margin-top:26px"><div class="kick">Capítulo ${ci} · ${c.min}</div><h2 style="margin-top:4px">${esc(c.t)}</h2>
+    h += `<section id="${c.id}" style="margin-top:26px"><div class="kick">${c.m ? esc(c.m) : "Capítulo " + ci} · ${c.min}</div><h2 style="margin-top:4px">${esc(c.t)}</h2>
       <div class="layers" style="margin-top:10px">
         <div class="layer"><div class="n">1 · Dónde estamos</div><h3>${c.donde}</h3></div>
         <div class="layer"><div class="n">2 · Lo nuevo</div><ul>${c.nuevo.map(x => `<li>${v(x)}</li>`).join('')}</ul></div>

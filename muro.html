@@ -46,7 +46,7 @@ $('#tabs').innerHTML = `<a class="tab" href="index.html?s=${encodeURIComponent(D
 function chips(){
   const acts = TARJETAS.filter(a => a.muro);
   $('#chips').innerHTML = [`<button class="chip" data-f="todas" aria-pressed="${FILTRO === 'todas'}">Todas</button>`]
-    .concat(acts.map(a => `<button class="chip" data-f="${a.id}" aria-pressed="${FILTRO === a.id}">${a.id} · ${esc(a.t)}</button>`)).join('');
+    .concat(acts.map(a => `<button class="chip" data-f="${a.id}" aria-pressed="${FILTRO === a.id}">${esc(U.cod(a))} · ${esc(a.t)}</button>`)).join('');
 }
 
 /* Resultados de la encuesta que el facilitador mandó al muro (en agregado). Proyectado, reemplazan las publicaciones. */

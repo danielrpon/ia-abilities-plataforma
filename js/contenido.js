@@ -2,7 +2,8 @@
    CONTENIDO del programa IA-abilities (fuente única, dos equipos).
    Textos con {mp:'…', pco:'…'}: «mp» = equipo de mercadeo, «pco» = equipo de talento humano.
    Estructura: nivel → capítulos (cada uno con sus 3 capas) → tarjetas.
-   Ids de tarjeta «N1-00»…; ids de capítulo «n1-c0»….
+   Ids de tarjeta «N1-00»…; ids de capítulo «n1-c0»…. Campo m: el código que ve la gente, igual a la miga de pan del deck
+   (p. ej. «4d» = hito 4, subpaso d). El id sigue siendo la llave interna (26-oct).
    v0.2 · 2026-10-18 · según «00 Diseño del programa - estructura y contenido - v2.0» (§3 y §4).
    ============================================================ */
 
@@ -28,25 +29,25 @@ window.NIVELES = [
   id:1, verbo:'Entender', escalones:[0,1],
   lede:'Qué es la IA, qué datos sí y qué datos no, y cómo pedirle bien las cosas. Hoy subimos del piso al escalón 1.',
   capitulos:[
-  { id:'n1-c0', t:'La escalera', min:'12 min',
+  { id:'n1-c0', m:'Inicio', t:'La escalera', min:'12 min',
     donde:'En el piso, mirando la escalera completa.',
     nuevo:['<b>La IA no es una herramienta: es una escalera de formas de trabajar.</b> Cada escalón contiene al anterior; nada se reemplaza, se acumula.',
            '<b>Como aprender a conducir:</b> primero el carro parqueado, luego la ruta planeada… y al final el piloto automático con usted mirando. Las marcas cambian; la forma de conducir no.'],
     habilita:['<b>Este tablero:</b> su cuaderno de hoy y de todo el programa.'],
     tarjetas:[
-      {id:'N1-00', t:'Bienvenida y cinco acuerdos', tipo:'texto',
+      {id:'N1-00', m:'Inicio', t:'Bienvenida y cinco acuerdos', tipo:'texto',
        html:`<ol class="steps">
         <li><span><b>Computador abierto.</b> La mitad de cada sesión es práctica. Tenga su sesión iniciada en la cuenta de trabajo.</span></li>
         <li><span><b>Cero datos reales.</b> En clase, solo datos de ejemplo.</span></li>
         <li><span><b>No hay preguntas tontas.</b> Si una palabra no se entiende, se pregunta.</span></li>
         <li><span><b>Usted firma.</b> La IA propone, usted decide. Todo se revisa antes de usarse.</span></li>
         <li><span><b>La tarea cuenta.</b> Cada sesión arranca con lo que pasó cuando lo usó en su trabajo real.</span></li></ol>`},
-      {id:'N1-01', t:'¿En qué escalón está usted hoy?', tipo:'encuesta', encuesta:'escalon-inicio',
+      {id:'N1-01', m:'Inicio', t:'¿En qué escalón está usted hoy?', tipo:'encuesta', encuesta:'escalon-inicio',
        intro:'Responda cuando el facilitador abra la encuesta: le aparece en pantalla. Es anónima y se ve solo en conjunto.'},
-      {id:'N1-02', t:'La escalera: el piso y siete escalones', tipo:'escalera-ref',
+      {id:'N1-02', m:'Inicio', t:'La escalera: el piso y siete escalones', tipo:'escalera-ref',
        intro:'Todo lo que vamos a ver cabe aquí. Inspirada en los niveles de uso de Juan Gabriel Gomila, traducida al trabajo de su equipo.'}
     ]},
-  { id:'n1-c1', t:'Qué es el caballo', min:'30 min',
+  { id:'n1-c1', m:'1–2', t:'¿Qué es y cómo «piensa»?', min:'30 min',
     donde:'El piso: antes de subir, sepa qué está pisando.',
     nuevo:['<b>Predice, no sabe:</b> escoge la continuación más probable, como el teclado del celular. Lo probable no siempre es lo verdadero.',
            '<b>Lo que no está en la ventana no existe,</b> y más contexto no es mejor contexto: rinde peor mucho antes de llenarse.',
@@ -54,22 +55,22 @@ window.NIVELES = [
            '<b>Sesgos:</b> hereda los de los textos con que aprendió.'],
     habilita:['<b>El chat,</b> y la primera regla: pida fuentes y dele permiso de no saber.'],
     tarjetas:[
-      {id:'N1-03', t:'Demo: la siguiente palabra', tipo:'prompt',
+      {id:'N1-03', m:'1b', t:'Demo: la siguiente palabra', tipo:'prompt',
        intro:'Córralo dos veces, en dos chats nuevos. ¿Salió igual? Por qué no: escoge lo probable, no lo único.',
        prompt:{mp:'Escribe en una frase por qué una clienta debería comprar por catálogo.', pco:'Escribe en una frase por qué es importante la inducción de un nuevo colaborador.'}},
-      {id:'N1-04', t:'Pregúntele por el artículo', tipo:'comparar',
+      {id:'N1-04', m:'2c', t:'Pregúntele por el artículo', tipo:'comparar',
        intro:'Primero como lo haría hoy; después, en un chat nuevo, con permiso de no saber. Compare: ¿inventó contenido, número o fecha en la primera?',
        antes:{mp:'¿Qué dice el artículo 46-B del Estatuto del Consumidor (Ley 1480 de 2011) sobre las ventas por catálogo?', pco:'¿Qué dice el artículo 489-B del Código Sustantivo del Trabajo sobre el trabajo en casa?'},
        despues:{mp:'Responde solo si estás seguro y cita la fuente oficial. Si el artículo no existe o no lo sabes, dilo.\n¿Qué dice el artículo 46-B del Estatuto del Consumidor (Ley 1480 de 2011) sobre las ventas por catálogo?', pco:'Responde solo si estás seguro y cita la fuente oficial. Si el artículo no existe o no lo sabes, dilo.\n¿Qué dice el artículo 489-B del Código Sustantivo del Trabajo sobre el trabajo en casa?'},
        nota:'La pregunta cambia la respuesta: el permiso de no saber es parte del prompt.',
        muro:{tipo:'hallazgo', guia:'En una línea: lo que inventó la IA (o no) cuando le preguntó por el artículo.'}},
-      {id:'N1-05', t:'Más contexto no es mejor contexto', tipo:'datasets',
+      {id:'N1-05', m:'2b', t:'Más contexto no es mejor contexto', tipo:'datasets',
        intro:'La demo del facilitador, para repetirla después: la misma pregunta con el compendio largo y con la circular corta.',
        archivos:{mp:[['demo 01 Compendio de condiciones comerciales de asesoras 2023-2026 (largo).docx','El documento largo'],['demo 02 Circular vigente de ganancia (corto).docx','La circular vigente']],
                  pco:[['demo 01 Compendio de políticas 2022-2026 (largo).docx','El documento largo'],['demo 02 Circular vigente de teletrabajo (corto).docx','La circular vigente']]},
        prompt:{mp:'Con base en el documento adjunto, ¿cuál es hoy el porcentaje de ganancia de una asesora en la categoría Básicos? Cita la sección de donde lo sacas.', pco:'Con base en el documento adjunto, ¿cuántos días de teletrabajo por semana permite hoy la política? Cita la sección de donde lo sacas.'}}
     ]},
-  { id:'n1-c2', t:'La baranda: ¿qué datos sí?', min:'20 min',
+  { id:'n1-c2', m:'3', t:'¿Qué datos sí?', min:'20 min',
     donde:'No es un escalón: es la baranda que acompaña toda la escalera.',
     nuevo:['<b>El semáforo:</b> público, interno, sensible.',
            '<b>Habeas Data</b> (Ley 1581 de 2012): el nombre y la imagen de una persona son datos personales.',
@@ -77,52 +78,52 @@ window.NIVELES = [
            '<b>La baranda no le impide subir:</b> le impide caerse.'],
     habilita:[{mp:'<b>La cuenta de la empresa</b> (nunca la personal para datos de la empresa) y las tres técnicas de anonimización.', pco:'<b>La cuenta de la empresa</b> (la regla oficial es la de TI) y las tres técnicas de anonimización.'}],
     tarjetas:[
-      {id:'N1-06', t:'¿Verde, amarillo o rojo? Ocho casos', tipo:'encuesta', encuesta:'semaforo',
+      {id:'N1-06', m:'3c', t:'¿Verde, amarillo o rojo? Ocho casos', tipo:'encuesta', encuesta:'semaforo',
        intro:'Vote los ocho casos por intuición cuando el facilitador abra la votación. Después vemos la regla y discutimos solo donde no hubo acuerdo.'},
-      {id:'N1-07', t:'Anonimice en un minuto', tipo:'pasos',
+      {id:'N1-07', m:'3b', t:'Anonimice en un minuto', tipo:'pasos',
        pasos:[{mp:'<b>Nombres → códigos</b> (A-01, A-02…).', pco:'<b>Nombres → códigos</b> (P-01, P-02…).'},
               '<b>Quite</b> cédulas, celulares y correos.',
               {mp:'<b>Ventas → rangos o promedios</b> por zona; nunca grupos de menos de 5.', pco:'<b>Salarios → rangos o promedios</b>; nunca grupos de menos de 5.'},
               '<b>Pregunta de control:</b> ¿alguien podría saber de quién se trata? Si la respuesta es sí, sigue en rojo.']},
-      {id:'N1-08', t:'El semáforo de datos', tipo:'semaforo-ref',
+      {id:'N1-08', m:'3a', t:'El semáforo de datos', tipo:'semaforo-ref',
        intro:'La regla, y por qué cada caso tiene su color.'}
     ]},
-  { id:'n1-c3', t:'Planear antes de pedir', min:'40 min',
+  { id:'n1-c3', m:'4', t:'Manos a la obra', min:'40 min',
     donde:'Escalón 1: no es pedir más rápido, es tener intención.',
     nuevo:['<b>Anatomía del prompt:</b> tres obligatorias (tarea, contexto, formato) y tres que lo suben de nivel (rol, ejemplos, restricciones). Como un colega brillante que llegó ayer.',
            '<b>El atajo de la entrevista:</b> deje que la IA le pregunte antes de ejecutar.',
            '<b>Planee y revise con un modelo de razonamiento; produzca con uno rápido.</b> El jefe de cocina no pone al chef estrella a pelar papas: lo pone a planear la receta.'],
     habilita:['<b>El prompt de entrevista,</b> la plantilla mínima, la lista de verificación y el selector de modelo.'],
     tarjetas:[
-      {id:'N1-09', t:'Paso 1 · Pídalo como lo haría hoy', tipo:'pasos',
+      {id:'N1-09', m:'4d', t:'Paso 1 · Pídalo como lo haría hoy', tipo:'pasos',
        pasos:['Escoja una tarea de su semana (la del formulario o una de la tarjeta N1-13).', 'Pídasela a la IA <b>como lo haría hoy, en una sola frase</b>.', 'Corra el prompt. <b>No borre la respuesta:</b> la vamos a comparar.']},
-      {id:'N1-10', t:'Paso 2 · El atajo de la entrevista', tipo:'prompt',
+      {id:'N1-10', m:'4c', t:'Paso 2 · El atajo de la entrevista', tipo:'prompt',
        intro:'En un chat nuevo. Responda las preguntas, copie el prompt final y córralo.',
        prompt:'Quiero que me ayudes a escribir un prompt para [tarea]. Antes de escribirlo, hazme una por una las preguntas que necesites sobre el objetivo, el contexto, el formato y las restricciones. Cuando tengas todo, entrégame el prompt final, listo para copiar, y dime qué parte podría mejorar.'},
-      {id:'N1-11', t:'Plantilla mínima', tipo:'prompt',
+      {id:'N1-11', m:'4d', t:'Plantilla mínima', tipo:'prompt',
        intro:'Si prefiere escribirlo directo.',
        prompt:'Actúa como [rol]. [Verbo + tarea]. Contexto: [para quién, para qué, qué datos hay]. Entrégamelo en [formato y extensión]. No [restricción]; si te falta información, pregúntame.'},
-      {id:'N1-12', t:'Paso 3 · Compare con la lista', tipo:'checklist',
+      {id:'N1-12', m:'4e', t:'Paso 3 · Compare con la lista', tipo:'checklist',
        intro:'Ponga las dos respuestas lado a lado y pase la lista por su primer prompt. ¿Qué le preguntó la IA que usted no había pensado?',
        checklist:['Empieza con un verbo claro.','Tiene el contexto que un colega nuevo necesitaría.','Dice el formato, la extensión y el tono.','Le da un rol.','Tiene un ejemplo o un criterio de calidad.','Dice qué no hacer: no inventar, preguntar si falta algo.','Está en verde o amarillo.']},
-      {id:'N1-13', t:'Ideas de tareas (y cómo arreglar una roja)', tipo:'texto',
+      {id:'N1-13', m:'4d', t:'Ideas de tareas (y cómo arreglar una roja)', tipo:'texto',
        html:{mp:'<p><b>Ideas:</b> textos de producto, brief de una pieza para diseño, resumen de ventas de una campaña para el comité, guion de mensaje para asesoras, preguntas de una encuesta a clientas.</p><p><b>Tarea roja → reformúlela:</b> en vez de «analiza los pedidos de María», pida «una lista de señales para detectar asesoras que bajan su orden promedio».</p><p><b>Ejemplo resuelto:</b> «Hazme el texto de este producto para el catálogo» frente a: «Actúa como redactora de catálogo de una empresa colombiana de venta directa. Escribe el texto de producto para [referencia]… Dame un título de máximo 6 palabras… No inventes materiales ni precios y, si te falta información, pregúntame».</p>',
              pco:'<p><b>Ideas:</b> convocatoria interna, preguntas de entrevista por competencias, resumen de una política, plan de bienestar del mes.</p><p><b>Tarea roja → reformúlela:</b> en vez de «revisa la nómina de Pedro», pida «una lista de validaciones para las novedades de nómina».</p><p><b>Ejemplo resuelto:</b> «Hazme un correo para el reto de bienestar» frente a: «Actúa como analista de comunicaciones internas de una empresa colombiana. Redacta un correo que invite a inscribirse al reto de pausas activas de noviembre… Dame un asunto de máximo 8 palabras… No inventes premios y, si te falta información, pregúntame».</p>'}},
-      {id:'N1-14', t:'Qué modelo para qué (opcional)', tipo:'pasos',
+      {id:'N1-14', m:'2f', t:'Qué modelo para qué (opcional)', tipo:'pasos',
        pasos:['Corra su prompt final con el <b>modelo rápido</b> y con el <b>de razonamiento</b>.', 'Compare solo la estructura: ¿cuál planeó mejor?', 'Regla: planee y revise con el de razonamiento; produzca con el rápido.']},
-      {id:'N1-15', t:'Paso 4 · Al muro: su par y sus tres prompts', tipo:'muro-card',
+      {id:'N1-15', m:'4d', t:'Paso 4 · Al muro: su par y sus tres prompts', tipo:'muro-card',
        intro:'Publique su par «sin estructura / con la guía» y sus tres prompts. Es la evidencia del nivel.',
        muro:{tipo:'par', guia:'Su prompt de una frase, el prompt final de la entrevista y una línea: lo que le preguntó la IA que usted no había pensado.'},
        muro2:{tipo:'prompt', guia:'Sus tres prompts (el de la entrevista y dos más de su semana, con la plantilla).'}}
     ]},
-  { id:'n1-c4', t:'Cierre', min:'8 min',
+  { id:'n1-c4', m:'Cierre', t:'Cierre', min:'8 min',
     donde:'Hoy subimos del piso al escalón 1.',
     nuevo:['<b>El caballo y el arnés:</b> hoy supimos qué es el caballo; en cada nivel le ponemos una pieza del arnés para subir.'],
     habilita:['<b>La tarea</b> y el cuestionario de salida.'],
     tarjetas:[
-      {id:'N1-16', t:'Tarea: úselo en trabajo real', tipo:'texto',
+      {id:'N1-16', m:'Cierre', t:'Tarea: úselo en trabajo real', tipo:'texto',
        html:'<p>Use uno de sus tres prompts en una <b>tarea real</b> esta semana y anote <b>qué pidió, qué salió y qué tuvo que corregir</b>. Con eso arrancamos el nivel 02.</p>'},
-      {id:'N1-17', t:'¿Qué nos llevamos? Cuestionario de salida', tipo:'enlace',
+      {id:'N1-17', m:'Cierre', t:'¿Qué nos llevamos? Cuestionario de salida', tipo:'enlace',
        intro:'Cinco minutos, anónimo.',
        url:{mp:'https://docs.google.com/forms/d/e/1FAIpQLScWOPPwLxiEZy4XrXUEoOuLRsRlMF_AzT6-p-UheOVnYfOi4w/viewform', pco:'https://docs.google.com/forms/d/e/1FAIpQLScxBWzEuw34wVQnCD9TaUgsfQNZQevHTxIMuDm67QsZegGfDQ/viewform'},
        label:'Abrir el cuestionario'}

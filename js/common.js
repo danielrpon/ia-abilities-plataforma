@@ -24,7 +24,9 @@
     const t = U.tarjeta(a); if (t) return { cap: U.cap(t.capitulo), tarjeta: t };
     const c = U.cap(a); return c ? { cap: c, tarjeta: null } : null;
   };
-  U.actLabel = id => { const a = U.tarjeta(id) || U.cap(id); return a ? (a.id.startsWith('N') ? a.id + ' · ' : 'Nivel 0' + a.nivel + ' · ') + a.t : id; };
+  /* Código visible = el de la miga de pan del deck (campo m); si no tiene, el id */
+  U.cod = a => (a && a.m) || (a && a.id) || '';
+  U.actLabel = id => { const a = U.tarjeta(id) || U.cap(id); return a ? (a.id.startsWith('N') ? U.cod(a) + ' · ' : 'Nivel 0' + a.nivel + ' · ') + a.t : id; };
   U.TIPOS = { hallazgo: 'Hallazgo', par: 'Sin estructura / con la guía', prompt: 'Prompt', loop: 'Loop' };
   U.dia = iso => { try { const d = new Date(iso); return d.toLocaleDateString('es-CO', { weekday: 'short', day: 'numeric', month: 'short' }) + ' · ' + U.hora(iso); } catch (e) { return ''; } };
   U.hora = iso => { try { return new Date(iso).toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit' }); } catch (e) { return ''; } };
