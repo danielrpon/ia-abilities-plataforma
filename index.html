@@ -191,7 +191,18 @@ async function misPrompts(el){
   try { L = await DB.misPublicaciones(YO.id); }
   catch (x) { el.innerHTML = `<p class="err">${esc(U.errMsg(x))}</p>`; return; }
   if (!L.length) { el.innerHTML = '<p class="hint">Todavía no ha publicado nada. Lo que publique en el muro aparece aquí, nivel por nivel, para retomarlo en la siguiente sesión.</p>'; return; }
-  el.innerHTML = L.map(p => U.promptBox(p.texto, `${U.actLabel(p.act_id)} · ${U.TIPOS[p.tipo] || ''} · ${U.dia(p.created_at)}${p.estado === 'oculta' ? ' · oculto por el facilitador' : ''}`)).join('');
+  const lab = p => `${U.actLabel(p.act_id)} · ${U.TIPOS[p.tipo] || ''} · ${U.dia(p.created_at)}${p.estado === 'oculta' ? ' · oculto por el facilitador' : ''}`;
+  el.innerHTML = `<div class="prompt-a" style="padding:0 0 12px"><button class="btn alt dl" type="button" data-bajar-mios="1">${U.ICON_DL}Descargar mis prompts (.txt)</button></div>`
+    + L.map(p => U.promptBox(p.texto, lab(p))).join('');
+  /* 26-oct (Daniel): cada persona se lleva sus prompts en un archivo de texto al cerrar la sesión */
+  el.querySelector('[data-bajar-mios]').addEventListener('click', () => {
+    const txt = `IA-abilities · Mis prompts · ${YO.nombre || ''}\n\n` + L.map(p => `── ${lab(p)}\n\n${p.texto}\n`).join('\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([txt], { type: 'text/plain;charset=utf-8' }));
+    a.download = 'mis-prompts-ia-abilities.txt';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  });
 }
 
 /* Grabación: si falta la respuesta o no autorizó, la barra va arriba (el facilitador debe verlo).
