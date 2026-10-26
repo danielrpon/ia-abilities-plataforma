@@ -77,8 +77,13 @@ function postForm(c, m, n){
     <div class="err" id="err-${k}"></div></div>`;
 }
 
+/* «Mis tres tareas» (26-oct): las del formulario previo o tres de su semana; se guardan solo en este celular y siguen en los otros niveles */
+const misTareas = id => `<div class="tareas"><label class="lbl" for="tareas-${id}">Mis tres tareas</label>
+  <p class="hint" style="margin-top:2px">Las que nos contó en el formulario, o tres de su semana. Se guardan solo en este celular.</p>
+  <textarea id="tareas-${id}" data-k="mis-tareas" maxlength="1200" style="min-height:96px" placeholder="1. …&#10;2. …&#10;3. …"></textarea></div>`;
 function cardBody(c){
-  let h = c.intro ? `<p>${v(c.intro)}</p>` : '';
+  let h = c.tareas ? misTareas(c.id) : '';
+  h += c.intro ? `<p>${v(c.intro)}</p>` : '';
   h += pasosHtml(c.pasos);
   if (c.prompts) h += c.prompts.map(([l, t]) => U.promptBox(v(t), l)).join('');
   const mesa = miMesa(), pm = v(c.promptMesa), pM = v(c.porMesa);
@@ -338,7 +343,8 @@ function vivo(F){
 function biblioteca(){
   if (TAB === 'mios'){
     $('#main').innerHTML = `${encBar()}${grupoCard()}${ahora()}<div class="kick" style="margin-top:18px">Lo suyo</div><h1>Mis prompts</h1>
-      <p class="lede">Todo lo que ha publicado en el muro, en todos los niveles. Cópielo, péguelo en su asistente y siga mejorándolo.</p><div id="mios"></div>`;
+      <p class="lede">Todo lo que ha publicado en el muro, en todos los niveles. Cópielo, péguelo en su asistente y siga mejorándolo.</p>${misTareas('mios')}<div id="mios" style="margin-top:16px"></div>`;
+    document.querySelectorAll('textarea[data-k]').forEach(t => { t.value = store.get(t.dataset.k) || ''; });
     misPrompts($('#mios')); return;
   }
   if (TAB === 'mapa'){
