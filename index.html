@@ -72,14 +72,14 @@ function postForm(c, m, n){
     : `<textarea id="p1-${k}" data-k="p1-${k}" maxlength="4000" ${m.tipo === 'hallazgo' ? 'style="min-height:56px"' : ''} placeholder="${m.tipo === 'hallazgo' ? 'Una línea…' : 'Pegue aquí su texto…'}"></textarea>`;
   return `<div class="post-form"><span class="tag">Al muro · ${esc(U.TIPOS[m.tipo] || m.tipo)}</span><p class="hint">${esc(m.guia)}</p>${campos}
     <ul class="checks"><li><label><input type="checkbox" id="ok-${k}">Revisé que no hay datos que identifiquen personas ni información roja del semáforo.</label></li></ul>
-    <div class="prompt-a" style="padding:10px 0 0"><button class="btn" data-pub="${k}" data-card="${c.id}" data-tipo="${m.tipo}">Publicar en el muro</button>
+    <div class="prompt-a" style="padding:10px 0 0"><button class="btn" data-pub="${k}" data-card="${c.id}" data-tipo="${m.tipo}">${n === 'mio' ? 'Guardar en mis prompts' : 'Publicar en el muro'}</button>
     <a class="btn alt" href="muro.html?s=${encodeURIComponent(DB.SES)}&a=${c.id}" style="text-decoration:none">Ver el muro</a></div>
     <div class="err" id="err-${k}"></div></div>`;
 }
 
 /* «Mis tres tareas» (26-oct): las del formulario previo o tres de su semana; se guardan solo en este celular y siguen en los otros niveles */
 const misTareas = id => `<div class="tareas"><label class="lbl" for="tareas-${id}">Mis tres tareas</label>
-  <p class="hint" style="margin-top:2px">Las que nos contó en el formulario, o tres de su semana. Se guardan solo en este celular.</p>
+  <p class="hint" style="margin-top:2px">Las que nos contó en el formulario, o tres de su semana. Es una nota que se guarda solo en este celular: no se publica ni aparece en «Mis prompts». Para guardar un prompt, use «Agregar a mis prompts».</p>
   <textarea id="tareas-${id}" data-k="mis-tareas" maxlength="1200" style="min-height:96px" placeholder="1. …&#10;2. …&#10;3. …"></textarea></div>`;
 function cardBody(c){
   let h = c.tareas ? misTareas(c.id) : '';
@@ -187,6 +187,15 @@ function confirmarSoy(b){
 async function entrarComo(pid){
   try { YO = await DB.recuperar(pid); store.set('yo', JSON.stringify(YO)); recien = true; U.toast('<i>✓</i> Bienvenido de nuevo.'); arrancar(); }
   catch (x) { const e = $('#ya-err'); if (e) e.textContent = U.errMsg(x); }
+}
+
+/* «Agregar a mis prompts» (28-oct, Daniel): en la pestaña solo había la nota local «Mis tres tareas» y la gente pegaba ahí sus prompts,
+   que nunca llegaban a la base. Publica en la última tarjeta abierta que tenga muro (la base exige una tarjeta habilitada). */
+function agregarMio(){
+  const hab = new Set((S && S.habilitadas) || []); let c = null;
+  NIVELES.forEach(n => (n.capitulos || []).forEach(x => x.tarjetas.forEach(t => { if (t.muro && hab.has(t.id)) c = t; })));
+  if (!c) return '<p class="hint" style="margin-top:14px">«Agregar a mis prompts» se abre durante la sesión.</p>';
+  return `<div class="tareas" style="margin-top:14px"><label class="lbl">Agregar a mis prompts</label>${postForm(c, { tipo: 'prompt', guia: 'Pegue el prompt que quiere guardar. Queda aquí abajo y en el muro, para retomarlo en la siguiente sesión.' }, 'mio')}</div>`;
 }
 
 /* «Mis prompts»: todo lo que esta persona publicó en la sesión, en cualquier nivel, para copiarlo y seguir */
@@ -343,7 +352,7 @@ function vivo(F){
 function biblioteca(){
   if (TAB === 'mios'){
     $('#main').innerHTML = `${encBar()}${grupoCard()}${ahora()}<div class="kick" style="margin-top:18px">Lo suyo</div><h1>Mis prompts</h1>
-      <p class="lede">Todo lo que ha publicado en el muro, en todos los niveles. Cópielo, péguelo en su asistente y siga mejorándolo.</p>${misTareas('mios')}<div id="mios" style="margin-top:16px"></div>`;
+      <p class="lede">Todo lo que ha publicado en el muro, en todos los niveles. Cópielo, péguelo en su asistente y siga mejorándolo.</p>${agregarMio()}<div id="mios" style="margin-top:16px"></div>${misTareas('mios')}`;
     document.querySelectorAll('textarea[data-k]').forEach(t => { t.value = store.get(t.dataset.k) || ''; });
     misPrompts($('#mios')); return;
   }
@@ -458,7 +467,8 @@ document.addEventListener('click', async e => {
     try {
       await DB.publicar(YO.id, YO.nombre, b.dataset.card, txt, tipo);
       ['p1', 'p2', 'p3'].forEach(p => { const el = $('#' + p + '-' + k); if (el) { el.value = ''; store.set(p + '-' + k, ''); } });
-      $('#ok-' + k).checked = false; err.textContent = ''; U.toast('<i>✓</i> Publicado en el muro.');
+      $('#ok-' + k).checked = false; err.textContent = ''; U.toast('<i>✓</i> Publicado. Ya está en «Mis prompts».');
+      if ($('#mios')) misPrompts($('#mios')); if ($('#mios-v') && $('#g-mios').open) misPrompts($('#mios-v'));
     } catch (x) { err.textContent = U.errMsg(x); }
     b.disabled = false; return;
   }
