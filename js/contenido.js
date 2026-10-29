@@ -209,7 +209,7 @@ window.NIVELES = [
       {id:'N2-08', t:'Paso 5 · Verifique tres cifras', tmp:'Paso 3 · Verifique y publique las trampas', tipo:'prompt',
        intro:'Compruebe a mano las tres. Después compare con la respuesta «de una» del paso 1: ¿vio los datos raros?',
        prompt:'Dame tres cifras o afirmaciones de tu respuesta y dime exactamente de qué hoja, columnas y filas salen, para que yo las compruebe. Si alguna la estimaste o la supusiste, dilo.',
-       muro:{tipo:'prompt', guia:'Relator: el prompt que funcionó y, en una lista, los errores y trampas que encontraron en el archivo. Con eso se elige al grupo ganador.'}},
+       muro:{tipo:'prompt', guia:'Relator: el prompt que funcionó y, en una lista, los errores y trampas que encontraron en el archivo. Los comentamos al final.'}},
       {id:'N2-09', t:'Cinco hábitos de verificación', tipo:'pasos',
        pasos:['Pida que describa antes de concluir.', 'Pida de dónde sale cada cifra.', 'Compruebe dos cifras a mano.', 'Pregunte qué no puede saber con ese archivo.', 'Desconfíe de lo que suena demasiado redondo.']},
       {id:'N2-10', t:'Semáforo antes de subir un archivo', tipo:'texto',
