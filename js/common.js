@@ -9,6 +9,10 @@
   /* 29-oct (Daniel): textos propios de MP (tmp, intromp, promptsmp, muromp) donde la práctica cambió de forma; PCO conserva los suyos */
   if (C === 'mp') [].concat(...(window.NIVELES || []).map(n => (n.capitulos || []).map(c => c.tarjetas)), window.TARJETAS || [])
     .flat().forEach(x => { if (!x) return; if (x.tmp) x.t = x.tmp; if (x.intromp) x.intro = x.intromp; if (x.promptsmp) x.prompts = x.promptsmp; if (x.muromp) x.muro = x.muromp; if (x.sinmuromp) delete x.muro; if (x.tipomp) x.tipo = x.tipomp; });
+  /* Capítulos con textos propios de MP (dondemp, nuevomp, habilitamp), en NIVELES y en su copia CAPITULOS */
+  if (C === 'mp') [].concat(...(window.NIVELES || []).map(n => n.capitulos || []), window.CAPITULOS || []).forEach(x => {
+    if (!x) return; if (x.dondemp) x.donde = x.dondemp; if (x.nuevomp) x.nuevo = x.nuevomp; if (x.habilitamp) x.habilita = x.habilitamp;
+  });
   /* 29-oct (Daniel): en MP la práctica 1 va en un solo capítulo: el archivo y los pasos 1 y 2a (N2-03, N2-04, N2-05) pasan al inicio de «Un archivo real»,
      para que en «Ahora» se vean todos los pasos juntos y en orden */
   if (C === 'mp' && window.NIVELES) {
@@ -18,6 +22,9 @@
       /* en el mismo arreglo (lo comparten NIVELES y CAPITULOS) */
       for (let i = c2.tarjetas.length - 1; i >= 0; i--) if (mov.includes(c2.tarjetas[i].id)) c2.tarjetas.splice(i, 1);
       c3.tarjetas.unshift(...van);
+      /* tarjetas del loop que MP ya no usa (la práctica 2 va en «El loop de su caso», N2-13) */
+      const c4 = caps.find(c => c.id === 'n2-c4');
+      if (c4) for (let i = c4.tarjetas.length - 1; i >= 0; i--) if (['N2-11', 'N2-12', 'N2-14'].includes(c4.tarjetas[i].id)) c4.tarjetas.splice(i, 1);
       (window.TARJETAS || []).forEach(x => { if (mov.includes(x.id)) x.capitulo = 'n2-c3'; });
     }
   }
