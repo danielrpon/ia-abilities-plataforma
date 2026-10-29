@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>IA-abilities · Panel del facilitador</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%230A0B0D%22/%3E%3Cpath d=%22M8 22h10%22 stroke=%22%2326E57C%22 stroke-width=%223%22/%3E%3C/svg%3E">
-<link rel="stylesheet" href="css/app.css?v=2026-10-28c">
+<link rel="stylesheet" href="css/app.css?v=2026-10-29a">
 </head>
 <body>
 <header class="top">
@@ -21,11 +21,11 @@
 <main id="main"></main>
 <script src="vendor/supabase.min.js"></script>
 <script src="vendor/qrcode.min.js"></script>
-<script src="js/config.js?v=2026-10-28c"></script>
-<script src="js/db.js?v=2026-10-28c"></script>
-<script src="js/contenido.js?v=2026-10-28c"></script>
-<script src="js/common.js?v=2026-10-28c"></script>
-<script src="js/grupos.js?v=2026-10-28c"></script>
+<script src="js/config.js?v=2026-10-29a"></script>
+<script src="js/db.js?v=2026-10-29a"></script>
+<script src="js/contenido.js?v=2026-10-29a"></script>
+<script src="js/common.js?v=2026-10-29a"></script>
+<script src="js/grupos.js?v=2026-10-29a"></script>
 <script>
 const { $, esc } = U;
 let S = null, TAB = 'sesion', ENC_VER = null, firma = '', armadoBorrar = false, GRAB = null;
@@ -34,6 +34,10 @@ let PART = null, PREV = null, G_OPC = { modo: 'area', tam: 4 }, armadoGrupos = f
 const G_VENTANA_MIN = 3;   // activo = hizo ping (cada 60 s) en los últimos 3 minutos
 const G_AREAS = { mp: ['Mercadeo y catálogo', 'Comercial', 'Diseño y contenido', 'Demanda y pronóstico', 'Dirección y servicio', 'Otra'],
                   pco: ['Compensación', 'Selección', 'Nómina', 'Talento y bienestar', 'Plataformas core', 'Otra'] }[U.C];
+/* 29-oct (Daniel): con grupos mezclados en MP, cada grupo recibe su caso al formar (grupo 1 → pedidos, 2 → ventas, 3 → demanda, 4 → comentarios, y vuelve a empezar).
+   El brief (Diseño y contenido) no entra: ya se vio en la demo. En PCO no se asigna nada (su N2 es de Juan). */
+const G_CASOS = { mp: ['Comercial', 'Mercadeo y catálogo', 'Demanda y pronóstico', 'Dirección y servicio'] }[U.C] || null;
+const conCasos = filas => (G_OPC.modo === 'mezclados' && G_CASOS) ? filas.map(f => Object.assign({}, f, { mesa: G_CASOS[(f.grupo - 1) % G_CASOS.length] })) : filas;
 $('#ses').textContent = DB.SES;
 
 function login(){
@@ -243,7 +247,7 @@ document.addEventListener('click', async e => {
     G_OPC = { modo: $('#g-modo').value, tam: Number($('#g-tam').value) };
     try { await cargarPart(); } catch (x) { return U.toast(U.errMsg(x)); }
     const act = PART.filter(p => p.activo);
-    PREV = GRUPOS.asignar(GRUPOS.formar(act, { modo: G_OPC.modo, tam: G_OPC.tam, areas: G_AREAS }));
+    PREV = conCasos(GRUPOS.asignar(GRUPOS.formar(act, { modo: G_OPC.modo, tam: G_OPC.tam, areas: G_AREAS })));
     return vGrupos();
   }
   if (b.dataset.gdescartar){ PREV = null; return vGrupos(); }
