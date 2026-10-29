@@ -181,7 +181,7 @@ window.NIVELES = [
        intro:'Con el archivo de su mesa adjunto. Guarde la respuesta.',
        prompt:{mp:'Hazme las piezas de la campaña con este brief. (Mesa de diseño.) / Dime qué pasó con las ventas. (Las demás mesas.)', pco:'Hazme el informe para el comité con este archivo.'},
        /* Por mesa: el celular muestra el de la mesa de la persona (su grupo o su área); «*» = las demás mesas */
-       intromp:'Adjunte el archivo de su grupo y pegue la pregunta tal cual, sin más instrucciones. Guarde la respuesta: es para comparar.',
+       intromp:'En un chat nuevo, suba el archivo de su grupo y pegue esta pregunta tal cual, como lo haría hoy. Lea la respuesta por encima y no cierre esa ventana: en el paso 3 la compara con la versión de modo plan.',
        promptMesa:{mp:{'Comercial':'¿Cada zona crece por asesoras, actividad u orden promedio?', 'Mercadeo y catálogo':'¿Qué explica la venta y dónde están las devoluciones?',
                        'Demanda y pronóstico':'¿Qué esperamos de octubre a diciembre por categoría?', 'Dirección y servicio':'¿Cuáles son los tres problemas que más se repiten?',
                        'Diseño y contenido':'¿Qué le falta al brief antes de crear?', '*':'Dime qué pasó con las ventas.'}}},
