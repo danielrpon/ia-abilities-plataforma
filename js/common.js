@@ -8,7 +8,7 @@
   const U = { C };
   /* 29-oct (Daniel): textos propios de MP (tmp, intromp, promptsmp, muromp) donde la práctica cambió de forma; PCO conserva los suyos */
   if (C === 'mp') [].concat(...(window.NIVELES || []).map(n => (n.capitulos || []).map(c => c.tarjetas)), window.TARJETAS || [])
-    .flat().forEach(x => { if (!x) return; if (x.tmp) x.t = x.tmp; if (x.intromp) x.intro = x.intromp; if (x.promptsmp) x.prompts = x.promptsmp; if (x.muromp) x.muro = x.muromp; if (x.sinmuromp) delete x.muro; });
+    .flat().forEach(x => { if (!x) return; if (x.tmp) x.t = x.tmp; if (x.intromp) x.intro = x.intromp; if (x.promptsmp) x.prompts = x.promptsmp; if (x.muromp) x.muro = x.muromp; if (x.sinmuromp) delete x.muro; if (x.tipomp) x.tipo = x.tipomp; });
   /* 29-oct (Daniel): en MP la práctica 1 va en un solo capítulo: el archivo y los pasos 1 y 2a (N2-03, N2-04, N2-05) pasan al inicio de «Un archivo real»,
      para que en «Ahora» se vean todos los pasos juntos y en orden */
   if (C === 'mp' && window.NIVELES) {
