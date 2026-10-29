@@ -6,6 +6,9 @@
   document.documentElement.setAttribute('data-client', C);
 
   const U = { C };
+  /* 29-oct (Daniel): títulos propios de MP (campo tmp) donde la práctica cambió de forma; PCO conserva los suyos */
+  if (C === 'mp') [].concat(...(window.NIVELES || []).map(n => (n.capitulos || []).map(c => c.tarjetas)), window.TARJETAS || [])
+    .flat().forEach(x => { if (x && x.tmp) x.t = x.tmp; });
   U.$ = s => document.querySelector(s);
   U.v = x => (x && typeof x === 'object' && !Array.isArray(x)) ? x[C] : x;
   U.esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
