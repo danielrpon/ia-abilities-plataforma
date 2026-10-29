@@ -20,7 +20,7 @@
 <div class="offline" id="off" role="status" hidden>Sin conexión · mostrando lo último</div>
 <div class="rec" id="rec" hidden></div>
 <main id="main"></main>
-<footer><div class="rec-pie" id="rec-pie" hidden></div>IA-abilities · Coknow · Sus notas y borradores se guardan solo en este dispositivo; lo que publique en el muro lo ve su grupo.</footer>
+<footer><div class="rec-pie" id="rec-pie" hidden></div>IA-abilities · Sus notas y borradores se guardan solo en este dispositivo; lo que publique en el muro lo ve su grupo.</footer>
 
 <div class="modal-bg" id="rec-m" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="rec-t"><div class="kick">Grabación de la sesión</div><h2 id="rec-t" style="margin-top:6px">¿Autoriza que se grabe el audio?</h2><div id="rec-b"></div></div></div>
 <div class="modal-bg" id="enc" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="enc-t"><div class="kick">Encuesta</div><h2 id="enc-t" style="margin-top:6px"></h2><div id="enc-b"></div></div></div>
@@ -193,7 +193,9 @@ async function entrarComo(pid){
    que nunca llegaban a la base. Publica en la última tarjeta abierta que tenga muro (la base exige una tarjeta habilitada). */
 function agregarMio(){
   const hab = new Set((S && S.habilitadas) || []); let c = null;
-  NIVELES.forEach(n => (n.capitulos || []).forEach(x => x.tarjetas.forEach(t => { if (t.muro && hab.has(t.id)) c = t; })));
+  let cualquiera = null;   // si no hay tarjeta con muro abierta, sirve cualquier tarjeta abierta (la base solo exige que esté habilitada)
+  NIVELES.forEach(n => (n.capitulos || []).forEach(x => x.tarjetas.forEach(t => { if (hab.has(t.id)) { cualquiera = t; if (t.muro) c = t; } })));
+  c = c || cualquiera;
   if (!c) return '<p class="hint" style="margin-top:14px">«Agregar a mis prompts» se abre durante la sesión.</p>';
   return `<div class="tareas" style="margin-top:14px"><label class="lbl">Agregar a mis prompts</label>${postForm(c, { tipo: 'prompt', guia: 'Pegue el prompt que quiere guardar. Queda aquí abajo y en el muro, para retomarlo en la siguiente sesión.' }, 'mio')}</div>`;
 }
@@ -204,7 +206,7 @@ async function misPrompts(el){
   let L = [];
   try { L = await DB.misPublicaciones(YO.id); }
   catch (x) { el.innerHTML = `<p class="err">${esc(U.errMsg(x))}</p>`; return; }
-  if (!L.length) { el.innerHTML = '<p class="hint">Todavía no ha publicado nada. Lo que publique en el muro aparece aquí, nivel por nivel, para retomarlo en la siguiente sesión.</p>'; return; }
+  if (!L.length) { el.innerHTML = '<p class="hint">Todavía no ha guardado prompts. Péguelos en «Agregar a mis prompts» o publíquelos desde la tarjeta de la actividad. Lo que escribió en «Mis tres tareas» es una nota de este celular: no aparece aquí.</p>'; return; }
   const lab = p => `${U.actLabel(p.act_id)} · ${U.TIPOS[p.tipo] || ''} · ${U.dia(p.created_at)}${p.estado === 'oculta' ? ' · oculto por el facilitador' : ''}`;
   el.innerHTML = `<div class="prompt-a" style="padding:0 0 12px"><button class="btn alt dl" type="button" data-bajar-mios="1">${U.ICON_DL}Descargar mis prompts (.txt)</button></div>`
     + L.map(p => U.promptBox(p.texto, lab(p))).join('');
@@ -342,7 +344,7 @@ function vivo(F){
       <div class="act-b"><div class="acts" style="margin-top:12px">${g.ts.map(fila).join('')}</div></div></details>`).join('')}</div>`;
   }
   h += `<details class="act notas" id="g-mios"><summary><span class="num">✎</span><span><span class="act-t">Mis prompts</span><br><span class="act-m">lo que ha publicado en todos los niveles</span></span><span class="chev" aria-hidden="true"></span></summary>
-    <div class="act-b"><div id="mios-v"></div></div></details>`;
+    <div class="act-b">${agregarMio()}<div id="mios-v" style="margin-top:14px"></div></div></details>`;
   h += `<details class="act notas" id="g-notas"><summary><span class="num">✎</span><span class="act-t">Mis notas</span><span class="chev" aria-hidden="true"></span></summary>
     <div class="act-b"><textarea data-k="notas-${N.id}" aria-label="Mis notas del nivel" placeholder="Lo que quiero recordar de este nivel…"></textarea></div></details>`;
   $('#main').innerHTML = h;

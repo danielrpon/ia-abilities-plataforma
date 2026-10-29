@@ -1,6 +1,6 @@
 # Plataforma IA-abilities
 
-Plataforma de la capacitación IA-abilities (Coknow: Daniel Restrepo y Juan Gonzalo Tamayo) para dos equipos cliente (mercadeo y talento humano). Usa la misma arquitectura del Foro de Ideación (`~/code/foro-ideacion`).
+Plataforma de la capacitación IA-abilities (Daniel Restrepo y Juan Gonzalo Tamayo) para dos equipos cliente (mercadeo y talento humano). Usa la misma arquitectura del Foro de Ideación (`~/code/foro-ideacion`).
 
 | Pantalla | Quién | Qué hace |
 |---|---|---|

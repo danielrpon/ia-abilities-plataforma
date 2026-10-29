@@ -1,5 +1,5 @@
 // ============================================================
-// CONFIGURACIÓN · Plataforma IA-abilities (Coknow · Freaknerd)
+// CONFIGURACIÓN · Plataforma IA-abilities (Freaknerd)
 // ============================================================
 // Práctica sin backend: agregar ?demo=1 a la URL (o MODE 'local').
 // MODE 'local'    → demo sin backend (este navegador; se sincroniza entre pestañas).
