@@ -8,7 +8,19 @@
   const U = { C };
   /* 29-oct (Daniel): textos propios de MP (tmp, intromp, promptsmp, muromp) donde la práctica cambió de forma; PCO conserva los suyos */
   if (C === 'mp') [].concat(...(window.NIVELES || []).map(n => (n.capitulos || []).map(c => c.tarjetas)), window.TARJETAS || [])
-    .flat().forEach(x => { if (!x) return; if (x.tmp) x.t = x.tmp; if (x.intromp) x.intro = x.intromp; if (x.promptsmp) x.prompts = x.promptsmp; if (x.muromp) x.muro = x.muromp; });
+    .flat().forEach(x => { if (!x) return; if (x.tmp) x.t = x.tmp; if (x.intromp) x.intro = x.intromp; if (x.promptsmp) x.prompts = x.promptsmp; if (x.muromp) x.muro = x.muromp; if (x.sinmuromp) delete x.muro; });
+  /* 29-oct (Daniel): en MP la práctica 1 va en un solo capítulo: el archivo y los pasos 1 y 2a (N2-03, N2-04, N2-05) pasan al inicio de «Un archivo real»,
+     para que en «Ahora» se vean todos los pasos juntos y en orden */
+  if (C === 'mp' && window.NIVELES) {
+    const caps = [].concat(...window.NIVELES.map(n => n.capitulos || [])), c2 = caps.find(c => c.id === 'n2-c2'), c3 = caps.find(c => c.id === 'n2-c3');
+    if (c2 && c3) {
+      const mov = ['N2-03', 'N2-04', 'N2-05'], van = c2.tarjetas.filter(x => mov.includes(x.id));
+      /* en el mismo arreglo (lo comparten NIVELES y CAPITULOS) */
+      for (let i = c2.tarjetas.length - 1; i >= 0; i--) if (mov.includes(c2.tarjetas[i].id)) c2.tarjetas.splice(i, 1);
+      c3.tarjetas.unshift(...van);
+      (window.TARJETAS || []).forEach(x => { if (mov.includes(x.id)) x.capitulo = 'n2-c3'; });
+    }
+  }
   U.$ = s => document.querySelector(s);
   U.v = x => (x && typeof x === 'object' && !Array.isArray(x)) ? x[C] : x;
   U.esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));

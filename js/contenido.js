@@ -181,8 +181,11 @@ window.NIVELES = [
        intro:'Con el archivo de su mesa adjunto. Guarde la respuesta.',
        prompt:{mp:'Hazme las piezas de la campaña con este brief. (Mesa de diseño.) / Dime qué pasó con las ventas. (Las demás mesas.)', pco:'Hazme el informe para el comité con este archivo.'},
        /* Por mesa: el celular muestra el de la mesa de la persona (su grupo o su área); «*» = las demás mesas */
-       promptMesa:{mp:{'Diseño y contenido':'Hazme las piezas de la campaña con este brief.', '*':'Dime qué pasó con las ventas.'}}},
-      {id:'N2-05', t:'Paso 2 · Modo plan', tmp:'Paso 2a · Con plan: modo plan', tipo:'prompt',
+       intromp:'Adjunte el archivo de su grupo y pegue la pregunta tal cual, sin más instrucciones. Guarde la respuesta: es para comparar.',
+       promptMesa:{mp:{'Comercial':'¿Cada zona crece por asesoras, actividad u orden promedio?', 'Mercadeo y catálogo':'¿Qué explica la venta y dónde están las devoluciones?',
+                       'Demanda y pronóstico':'¿Qué esperamos de octubre a diciembre por categoría?', 'Dirección y servicio':'¿Cuáles son los tres problemas que más se repiten?',
+                       'Diseño y contenido':'¿Qué le falta al brief antes de crear?', '*':'Dime qué pasó con las ventas.'}}},
+      {id:'N2-05', t:'Paso 2 · Modo plan', tmp:'Paso 2a · Con plan: modo plan', sinmuromp:true, tipo:'prompt',
        intro:'En un chat nuevo, con el mismo archivo. ¿Cuántas preguntas hizo? ¿Qué vacío encontró que la primera versión rellenó inventando?',
        promptMesa:{mp:{'Diseño y contenido':'Necesito las piezas de la campaña de Navidad para [quién y para qué]. No ejecutes nada todavía. Hazme, una por una, las preguntas que necesites sobre el objetivo, los datos que tienes y los que te faltan, el formato, las restricciones y cómo sabremos que quedó bien. Cuando tengas todo, escribe el plan en pasos numerados, con lo que necesita cada paso, y espera mi aprobación antes de empezar.',
                        '*':'Necesito una lectura de una página para la reunión de mercadeo y comercial para [quién y para qué]. No ejecutes nada todavía. Hazme, una por una, las preguntas que necesites sobre el objetivo, los datos que tienes y los que te faltan, el formato, las restricciones y cómo sabremos que quedó bien. Cuando tengas todo, escribe el plan en pasos numerados, con lo que necesita cada paso, y espera mi aprobación antes de empezar.'}},
