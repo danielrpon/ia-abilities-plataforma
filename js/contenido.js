@@ -148,6 +148,10 @@ window.NIVELES = [
            '<b>El pura sangre:</b> sin arnés, se desboca.'],
     habilita:['<b>El mapa de la evolución</b> sobre la escalera.'],
     tarjetas:[
+      /* 28-oct (Daniel): la lista del nivel 01 a la mano durante el retorno en pareja; la lámina la pone en «Ahora» */
+      {id:'N2-00', t:'Su lista para revisar en pareja: las seis piezas y el semáforo', tipo:'checklist', semaforo:true,
+       intro:'Pase la lista por el prompt que usó en su trabajo: ¿qué pieza le faltó? Luego mire el color de lo que le dio a la IA.',
+       checklist:['Tarea · empieza con un verbo claro.','Contexto · lo que un colega nuevo necesitaría saber.','Formato · extensión, tono y cómo lo quiere recibir.','Rol · desde dónde responde.','Ejemplo · un caso o un criterio de calidad.','Restricciones · qué no hacer: no inventar, preguntar si falta algo.']},
       {id:'N2-01', t:'Retorno: ¿qué tuvo que corregir?', tipo:'encuesta', encuesta:'retorno-n2',
        intro:'Responda cuando se abra la encuesta. Su punto de partida de hoy es uno de los prompts que publicó en el nivel 01: lo encuentra en «Mis prompts».'},
       {id:'N2-02', t:'La evolución sobre la escalera', tipo:'texto',

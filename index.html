@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>IA-abilities · Tablero</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%230A0B0D%22/%3E%3Cpath d=%22M8 22h10%22 stroke=%22%2326E57C%22 stroke-width=%223%22/%3E%3C/svg%3E">
-<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/app.css?v=2026-10-28b">
 </head>
 <body>
 <header class="top">
@@ -26,11 +26,11 @@
 <div class="modal-bg" id="enc" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="enc-t"><div class="kick">Encuesta</div><h2 id="enc-t" style="margin-top:6px"></h2><div id="enc-b"></div></div></div>
 
 <script src="vendor/supabase.min.js"></script>
-<script src="js/config.js"></script>
-<script src="js/db.js"></script>
-<script src="js/contenido.js"></script>
-<script src="js/common.js"></script>
-<script src="js/grupos.js"></script>
+<script src="js/config.js?v=2026-10-28b"></script>
+<script src="js/db.js?v=2026-10-28b"></script>
+<script src="js/contenido.js?v=2026-10-28b"></script>
+<script src="js/common.js?v=2026-10-28b"></script>
+<script src="js/grupos.js?v=2026-10-28b"></script>
 <script>
 const { $, v, esc, store } = U;
 const AREAS = { mp: ['Mercadeo y catálogo', 'Comercial', 'Diseño y contenido', 'Demanda y pronóstico', 'Dirección y servicio', 'Otra'],
@@ -81,6 +81,9 @@ function postForm(c, m, n){
 const misTareas = id => `<div class="tareas"><label class="lbl" for="tareas-${id}">Mis tres tareas</label>
   <p class="hint" style="margin-top:2px">Las que nos contó en el formulario, o tres de su semana. Es una nota que se guarda solo en este celular: no se publica ni aparece en «Mis prompts». Para guardar un prompt, use «Agregar a mis prompts».</p>
   <textarea id="tareas-${id}" data-k="mis-tareas" maxlength="1200" style="min-height:96px" placeholder="1. …&#10;2. …&#10;3. …"></textarea></div>`;
+const LUCES = `<div class="light v"><b>● Verde · avance, revise antes de usar</b>Público, genérico o suyo, sin datos de personas.</div>
+  <div class="light a"><b>● Amarillo · solo con la cuenta de la empresa</b>Interno, sin identificar a nadie; agregados de 5 o más personas.</div>
+  <div class="light r"><b>● Rojo · no va en un chat</b>Datos que identifican a una persona, o conectar la IA con sistemas. Anonimice primero o pase por TI.</div>`;
 function cardBody(c){
   let h = c.tareas ? misTareas(c.id) : '';
   h += c.intro ? `<p>${v(c.intro)}</p>` : '';
@@ -104,12 +107,12 @@ function cardBody(c){
       else h += (A.some(x => x[2]) ? '<p class="hint">Toque «Trabajar con esta mesa» en la de su grupo.</p>' : '') + `<ul class="files">${A.map(x => li(x, false)).join('')}</ul>`;
       if (c.prompt) h += U.promptBox(v(c.prompt)); break;
     }
-    case 'checklist': h += `<ul class="checks">${c.checklist.map((x, j) => `<li><label><input type="checkbox" data-chk="${c.id}-${j}" ${store.get('chk-' + c.id + '-' + j) === '1' ? 'checked' : ''}>${esc(x)}</label></li>`).join('')}</ul>`; break;
+    case 'checklist': h += `<ul class="checks">${c.checklist.map((x, j) => `<li><label><input type="checkbox" data-chk="${c.id}-${j}" ${store.get('chk-' + c.id + '-' + j) === '1' ? 'checked' : ''}>${esc(x)}</label></li>`).join('')}</ul>`;
+      if (c.semaforo) h += `<div class="lights" style="margin-top:14px">${LUCES}</div>`;
+      break;
     case 'escalera-ref': h += `<ul class="map">${ESCALERA.map(e => `<li><span class="k">${e.k}</span><span><span class="t">${e.t}</span><div class="d">${e.d}</div><div class="w">${e.w}</div></span></li>`).join('')}</ul>`; break;
     case 'semaforo-ref':
-      h += `<div class="lights"><div class="light v"><b>● Verde · avance, revise antes de usar</b>Público, genérico o suyo, sin datos de personas.</div>
-        <div class="light a"><b>● Amarillo · solo con la cuenta de la empresa</b>Interno, sin identificar a nadie; agregados de 5 o más personas.</div>
-        <div class="light r"><b>● Rojo · no va en un chat</b>Datos que identifican a una persona, o conectar la IA con sistemas. Anonimice primero o pase por TI.</div></div>
+      h += `<div class="lights">${LUCES}</div>
         <ul class="cases">${SEMAFORO[U.C].map(([t, col, por], j) => `<li class="case" style="grid-template-columns:1fr"><span><b>${j + 1}. ${COLOR[col]}.</b> ${esc(t)}<br><span class="hint">${esc(por)}</span></span></li>`).join('')}</ul>`; break;
     case 'texto':
       if (pM && mesa && pM[mesa]) h += `<div class="card-box" style="margin-top:12px;background:var(--tint);border-color:var(--accdk)"><span class="mesa-tag">Su mesa · ${esc(mesaCorta(mesa))}</span><p>${esc(pM[mesa])}</p></div><details class="otras"><summary>Ver todas las mesas</summary>${v(c.html)}</details>`;
