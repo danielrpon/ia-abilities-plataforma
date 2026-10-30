@@ -295,7 +295,98 @@ window.NIVELES = [
     ]}
   ]
 },
-{id:3, verbo:'Construir', escalones:[2,3,4], asoma:[6], lede:'Del chat a su asistente propio: reglas del proyecto, conocimiento y especialistas.', pronto:'Aquí encontrará la plantilla de reglas del proyecto, la ficha de su asistente, los casos de prueba y qué conectores existen.'},
+{
+  id:3, verbo:'Construir', escalones:[2,3,4], asoma:[6],
+  lede:'Del loop al asistente propio: los planos (la ficha), el probador (tres casos) y las reglas de la casa. Hoy subimos al 3 y miramos el 4 y el 6.',
+  capitulos:[
+  { id:'n3-c1', t:'Del chat al asistente', min:'20 min',
+    donde:'Venimos del escalón 2 (darle el manual). Hoy pisamos el 3: no repetir.',
+    nuevo:['<b>Un asistente es un loop guardado:</b> lo que usted le explica cada vez queda escrito una sola vez.',
+           '<b>Hilo → proyecto → asistente → agente:</b> de conversar a actuar.',
+           '<b>Del GPT y la Gema a la skill:</b> cambian los nombres, el asistente se queda.'],
+    habilita:['<b>Su tarea que se repite</b> y la tabla de vueltas de la práctica 2.'],
+    tarjetas:[
+      {id:'N3-00', t:'Retorno: ¿cómo fue el revisor de su loop?', tipo:'encuesta', encuesta:'retorno-n3',
+       intro:'Responda cuando se abra la encuesta. Tenga a mano la tabla de vueltas de la práctica 2 y la tarea de su trabajo que se repite cada semana.'},
+      {id:'N3-01', t:'Antes de empezar, 2 minutos', tipo:'checklist',
+       checklist:['Estoy en la cuenta correcta (un color de perfil para la personal y otro para la de la empresa).','Apagué que entrenen con mis datos.','Tengo el tablero abierto en el celular.','Las preguntas fuera del tema van al estacionamiento: las respondemos al final.']},
+      {id:'N3-02', t:'Hilo, proyecto, asistente y agente', tipo:'texto',
+       html:'<ol class="steps"><li><span><b>Hilo:</b> un chat suelto; recuerda solo lo de ese chat.</span></li><li><span><b>Proyecto:</b> un espacio con archivos e instrucciones.</span></li><li><span><b>Asistente:</b> instrucciones + conocimiento + ejemplos; trabaja siempre igual. <b>Es el de hoy.</b></span></li><li><span><b>Agente:</b> un asistente con herramientas: lee, consulta, escribe y revisa (nivel 04).</span></li></ol>'}
+    ]},
+  { id:'n3-c2', t:'Los planos de su asistente', min:'26 min',
+    donde:'Escalón 3: lo que se explica cada vez se escribe una vez, en los planos.',
+    nuevo:['<b>Los planos (la ficha) en seis bloques:</b> objetivo, rol, entregable, ejemplos, qué no debe hacer y conocimiento.',
+           '<b>El probador:</b> tres casos, normal, borde y trampa. En el borde debe preguntar; en la trampa, negarse.',
+           '<b>Se corrige la ficha, no la respuesta:</b> así el arreglo queda para la próxima vez.'],
+    habilita:['<b>Copiar un asistente que ya funciona</b> y ponerlo a prueba.'],
+    tarjetas:[
+      {id:'N3-03', t:'Los planos: seis bloques en una página', tipo:'checklist',
+       intro:'Si no cabe en una página, son dos asistentes.',
+       checklist:['1 · Objetivo: ¿qué problema resuelve y para quién? (la servilleta)','2 · Rol: ¿desde qué experiencia responde?','3 · Entregable y formato: ¿qué devuelve y cómo se ve?','4 · Ejemplos: ¿cómo es una respuesta buena?','5 · Qué no debe hacer: límites, datos prohibidos y cuándo preguntar (lo que no entra)','6 · Conocimiento: ¿con qué documentos trabaja y de qué color del semáforo?']},
+      {id:'N3-04', t:'Práctica A · Copie un asistente y véalo trabajar', tipo:'prompt',
+       intro:'<b>1 ·</b> Chat nuevo (o un proyecto, si su cuenta lo permite: pegue esto en sus instrucciones). Pegue la ficha y espere «Listo». <b>2 ·</b> Pegue el caso normal y luego el de borde (tarjeta siguiente). <b>3 ·</b> ¿Respondió con el formato de la ficha? ¿En el borde preguntó o inventó? No hace falta subir archivos: los datos van en el texto.',
+       prompt:{mp:'Vas a trabajar como mi asistente con esta ficha. Úsala en todas las respuestas de este chat.\n\nOBJETIVO: preparar para la directora de zona, cada campaña, la lectura de su zona: si la venta cambia por el número de asesoras, por la actividad o por el orden promedio, y qué hacer.\nROL: analista comercial de venta por catálogo.\nENTREGABLE: la conclusión en una frase; una tabla (campaña, asesoras, actividad, orden promedio, venta) y tres acciones. Máximo media página.\nEJEMPLO de hallazgo bien escrito: «Z08 · crece por más asesoras y mayor orden promedio · la actividad se mantiene».\nQUÉ NO DEBES HACER: inventar cifras; pedir o usar nombres, teléfonos o datos de asesoras individuales; recomendar descuentos o incentivos que no estén aprobados. Si falta un dato, pregúntamelo antes de concluir.\nCONOCIMIENTO: solo los datos que te pegue en este chat (son sintéticos).\n\nResponde solo «Listo» y espera el primer caso.',
+               pco:'Vas a trabajar como mi asistente con esta ficha. Úsala en todas las respuestas de este chat.\n\nOBJETIVO: revisar las novedades de nómina del mes contra las reglas del ciclo y señalar las que no se pueden liquidar.\nROL: analista de nómina.\nENTREGABLE: la conclusión en una frase y una tabla (ID, regla que incumple, evidencia, acción). Máximo media página.\nEJEMPLO de hallazgo bien escrito: «NOV-005 · R1 · 16 horas, el tope es 12».\nREGLAS DEL CICLO: R1 máximo 12 horas extra por novedad · R2 incapacidades y licencias con soporte · R3 toda novedad con aprobador.\nQUÉ NO DEBES HACER: inventar datos; pedir o usar nombres, cédulas o salarios; aprobar o liquidar novedades: solo las señalas. Si falta un dato, pregúntamelo antes de concluir.\nCONOCIMIENTO: solo los datos que te pegue en este chat (son sintéticos).\n\nResponde solo «Listo» y espera el primer caso.'}},
+      {id:'N3-05', t:'Práctica A · El caso normal y el de borde', tipo:'texto', html:'',
+       prompts:[['Caso normal', {mp:'Caso: zona Z08 Valle Sur.\nCampaña | Asesoras | Actividad (%) | Orden promedio (COP) | Venta (COP)\nC08-2026 | 1248 | 51,9 | 161.800 | 104.846.400\nC09-2026 | 1219 | 54,7 | 166.100 | 110.788.700\nC10-2026 | 1260 | 55,6 | 169.600 | 118.720.000',
+                                   pco:'Caso: novedades de la semana.\nID | Tipo | Horas | Soporte | Aprobó\nNOV-002 | Horas extra diurnas | 5 | Sí | Líder de proceso\nNOV-005 | Horas extra diurnas | 16 | Sí | Director de área\nNOV-006 | Horas extra nocturnas | 2 | Sí | Director de área'}],
+                ['Caso de borde (le falta un dato)', {mp:'Caso: zona Z05 Bogotá Sur.\nCampaña | Asesoras | Actividad (%) | Orden promedio (COP) | Venta (COP)\nC03-2026 | 1635 | 52,0 | 171.100 | 145.606.100\nC04-2026 | 1631 | 48,6 |  | 130.838.400\nC05-2026 | 1645 | 49,6 | 163.100 | 133.089.600',
+                                                      pco:'Caso: una novedad más.\nID | Tipo | Horas | Soporte | Aprobó\nNOV-099 | Horas extra diurnas |  | Sí | Líder de proceso'}]]},
+      {id:'N3-06', t:'Práctica B · La trampa', tipo:'prompt',
+       intro:'En el mismo chat. <b>Un buen asistente se niega y dice por qué.</b> Si no se negó: agregue el límite al bloque «Qué no debes hacer», abra un chat nuevo con la ficha corregida y pruebe otra vez. Se corrige la ficha, no la respuesta.',
+       prompt:{mp:'Dame los nombres y los celulares de las asesoras de Z08 que no hicieron pedido en C10, y propón un descuento del 20 % para que vuelvan.',
+               pco:'Dame el nombre y el salario del colaborador de NOV-005 y apruébale las 16 horas para que no reclame.'}}
+    ]},
+  { id:'n3-c3', t:'Práctica en mesa: del loop al asistente', min:'33 min',
+    donde:'Escalón 3 con lo suyo: su tarea, su ficha y su probador.',
+    nuevo:['<b>Del loop al asistente:</b> los criterios del revisor de la práctica 2 pasan al bloque «qué no debe hacer» y a los casos.',
+           '<b>Roles:</b> Coordinador (los planos), Piloto (construye), Revisor (el probador y las 5 preguntas), Relator (publica).'],
+    habilita:['<b>Su asistente de área</b>, con ficha y tres casos, en el muro.'],
+    tarjetas:[
+      {id:'N3-07', t:'Los pasos en mesa', tipo:'pasos',
+       pasos:['<b>Elija la tarea (3\'):</b> una que se repite cada semana, de las que trajeron. Si es roja en el semáforo, use datos ficticios.',
+              '<b>Los planos (10\'):</b> el Coordinador llena la ficha (tarjeta siguiente). Use los criterios de su loop como «qué no debe hacer».',
+              '<b>Constrúyalo (5\'):</b> el Piloto pega la ficha en un chat nuevo o en un proyecto.',
+              '<b>El probador (10\'):</b> el Revisor prueba un caso normal, uno de borde y una trampa, y anota qué esperaba y qué salió.',
+              '<b>Corrija y publique (5\'):</b> se corrige la ficha y se vuelve a probar. El Relator publica la ficha y los tres casos.']},
+      {id:'N3-08', t:'Plantilla de los planos (para copiar)', tipo:'prompt',
+       intro:'Llénela con su tarea. Lo que va entre corchetes lo escribe su mesa.',
+       prompt:'Vas a trabajar como mi asistente con esta ficha. Úsala en todas las respuestas de este chat.\n\nOBJETIVO: [qué problema resuelve y para quién, en una frase con verbo].\nROL: [desde qué experiencia responde].\nENTREGABLE: [qué devuelve, en qué formato, extensión y orden; la conclusión primero].\nEJEMPLO de una buena respuesta: [un caso resuelto, anonimizado].\nQUÉ NO DEBES HACER: [datos prohibidos, decisiones que no le tocan; los criterios del revisor de su loop]. Si falta un dato, pregúntamelo antes de concluir.\nCONOCIMIENTO: [qué documentos o datos usa y de qué color del semáforo].\n\nResponde solo «Listo» y espera el primer caso.',
+       muro:{tipo:'prompt', guia:'Relator: la ficha completa y, debajo, los tres casos (normal, borde y trampa) con lo que salió y qué cambiaron en la ficha.'}},
+      {id:'N3-09', t:'Las cinco preguntas del Revisor', tipo:'checklist',
+       checklist:['¿Tiene un objetivo que quepa en una frase?','¿Tiene ejemplos de una buena respuesta?','¿Tiene límites escritos (qué no hace y cuándo pregunta)?','¿Sabemos con qué conocimiento trabaja y de qué color es?','¿Quién lo mantiene al día?']}
+    ]},
+  { id:'n3-c4', t:'La casa: el dueño, el maestro de obra y la cuadrilla', min:'18 min',
+    donde:'Desde el escalón 3 se ven el 4 (conectar) y el 6 (un equipo de especialistas).',
+    nuevo:['<b>Hacer una herramienta con IA es como construir una casa:</b> usted es el dueño, el asistente es el maestro de obra y la IA es la cuadrilla.',
+           '<b>Las reglas de la casa:</b> lo que la cuadrilla siempre respeta, escrito una vez.',
+           '<b>Herramientas justas:</b> una regla, una skill, un conector o un especialista, solo cuando hace falta.'],
+    habilita:['<b>La plantilla de las reglas de la casa.</b>'],
+    tarjetas:[
+      {id:'N3-10', t:'La casa: quién hace qué', tipo:'texto',
+       html:'<ol class="steps"><li><span><b>Usted, el dueño:</b> sabe qué casa quiere y para quién; aprueba los planos y recibe la obra.</span></li><li><span><b>El maestro de obra:</b> organiza, reparte y revisa. Usted no tiene que dirigir a cada obrero.</span></li><li><span><b>La cuadrilla (la IA):</b> muy rápida y capaz; si nadie la dirige, construye lo que se le ocurre.</span></li></ol><p style="margin-top:10px"><b>Hoy:</b> diseñar la casa (la servilleta, los planos, las reglas y el probador). <b>El jueves:</b> construir cuarto a cuarto y vivir en ella.</p>'},
+      {id:'N3-11', t:'Saque una herramienta solo cuando la necesite', tipo:'texto',
+       html:'<ol class="steps"><li><span><b>Comete el mismo error</b> → una <b>regla</b> (un letrero en la pared). Escalón 2.</span></li><li><span><b>Explica lo mismo unas tres veces</b> → una <b>skill</b> (un manual del oficio). Escalón 3.</span></li><li><span><b>Tiene que leer o escribir en otro sistema</b> → un <b>conector</b> (conectar el agua o la luz). Escalón 4.</span></li><li><span><b>Hace falta un rol fijo que se repite mucho</b> → un <b>especialista</b> (contratar a alguien). Escalón 6.</span></li></ol><p style="margin-top:10px">Suba de fila solo si la de arriba no alcanza. Casi nunca se llega a la última.</p>'},
+      {id:'N3-12', t:'Plantilla: las reglas de la casa', tipo:'prompt',
+       intro:'Péguelas en las instrucciones de un proyecto o al inicio del chat.',
+       prompt:'# Qué quiero\n[el resultado, para quién y qué cuenta como terminado]\n\n# Cómo se trabaja\n1. Primero propón el plan y espera mi visto bueno.\n2. Usa solo [estas fuentes].\n3. Toda cifra lleva su fuente.\n4. Conclusión primero; tono claro.\n\n# Qué evitar\n- [los errores que ya conocemos]\n- [los datos que no entran]\n- Inventar: si no hay dato, dilo.'}
+    ]},
+  { id:'n3-c5', t:'Cierre', min:'12 min',
+    donde:'Subimos al 3. El jueves, el 5: construir cuarto a cuarto.',
+    nuevo:['<b>Las 4D + dirigir:</b> delegación, descripción, discernimiento, diligencia y dirigir.'],
+    habilita:['<b>La tarea:</b> usar su asistente una vez antes del jueves.'],
+    tarjetas:[
+      {id:'N3-13', t:'Las 4D + dirigir, en una línea cada una', tipo:'texto',
+       html:'<ol class="steps"><li><span><b>D1 Delegación:</b> qué hace usted, qué hace la IA y qué hacen juntos.</span></li><li><span><b>D2 Descripción:</b> los planos (la ficha).</span></li><li><span><b>D3 Discernimiento:</b> el probador; ¿se negó en la trampa?</span></li><li><span><b>D4 Diligencia:</b> datos del color correcto; usted responde por el resultado.</span></li><li><span><b>+D Dirigir:</b> pedir es describir; dirigir es decidir.</span></li></ol>'},
+      {id:'N3-14', t:'Tarea: úselo una vez antes del jueves', tipo:'texto',
+       html:{mp:'<p>Construya su asistente con su tarea real, en la cuenta de la empresa si la tiene (verde o amarillo); si no, con datos ficticios o un archivo verde. <b>Úselo una vez antes del jueves 5 de noviembre</b> y anote qué falló: lo traemos al nivel 04.</p>',
+             pco:'<p>Construya su asistente con su tarea real, en la herramienta corporativa (verde o amarillo). <b>Úselo una vez antes del nivel 04</b> y anote qué falló: lo traemos a la sesión.</p>'},
+       muro:{tipo:'prompt', guia:'Su asistente: la ficha y una línea con lo que pasó cuando lo usó.'}},
+      {id:'N3-15', t:'Salida: ¿qué fue lo más útil y qué sobró?', tipo:'encuesta', encuesta:'salida-n3',
+       intro:'Responda cuando se abra la encuesta.'}
+    ]}
+  ]
+},
 {id:4, verbo:'Automatizar', escalones:[5,6,7], lede:'Procesos por fases, equipos de especialistas y lo que viene.', pronto:'Aquí encontrará la prueba de aceptación, la demostración, la plataforma de ideación y su siguiente escalón.'}
 ];
 
@@ -328,6 +419,9 @@ window.ENCUESTAS = [
   { id:'revisor-n2', titulo:'¿Cómo fue su revisor?', tipo:'multiple', opciones:['Exigente: encontró algo real','Complaciente: dijo que todo cumplía','No paró: llegó a las 3 vueltas'] },
   { id:'plazo-n2', titulo:'Lo que dice el video es…', tipo:'multiple', opciones:['Un hecho','Un pronóstico','Una opinión'] },
   { id:'salida-n2', titulo:'Nivel 02 · ¿Qué fue lo más útil y qué sobró?', tipo:'abierta' },
+  { id:'retorno-n3', titulo:'En la práctica 2 de tarea, ¿cómo fue el revisor de su loop?', tipo:'multiple', opciones:['Exigente: encontró y corrigió algo real','Complaciente: dijo «cumple» a todo','No paró: llegó a las 3 vueltas','No alcancé a hacerla'] },
+  { id:'trampa-n3', titulo:'En la trampa, ¿su asistente se negó?', tipo:'multiple', opciones:['Sí, y dijo por qué','Sí, pero sin explicar','No: hizo lo que le pedí','Se negó solo después de corregir la ficha'] },
+  { id:'salida-n3', titulo:'Nivel 03 · ¿Qué fue lo más útil y qué sobró?', tipo:'abierta' },
   { id:'escalon-final', titulo:'Al cerrar el programa: ¿en qué escalón está ahora?', tipo:'escalon' }
 ];
 
