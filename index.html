@@ -28,8 +28,8 @@
 <script src="vendor/supabase.min.js"></script>
 <script src="js/config.js?v=2026-10-29q"></script>
 <script src="js/db.js?v=2026-10-29q"></script>
-<script src="js/contenido.js?v=2026-11-02h"></script>
-<script src="js/common.js?v=2026-11-02h"></script>
+<script src="js/contenido.js?v=2026-11-02i"></script>
+<script src="js/common.js?v=2026-11-02i"></script>
 <script src="js/grupos.js?v=2026-10-29q"></script>
 <script>
 const { $, v, esc, store } = U;
@@ -365,7 +365,7 @@ function vivo(F){
 function biblioteca(){
   if (TAB === 'mios'){
     $('#main').innerHTML = `${encBar()}${grupoCard()}${ahora()}<div class="kick" style="margin-top:18px">Lo suyo</div><h1>Mis prompts</h1>
-      <p class="lede">Todo lo que ha publicado en el muro, en todos los niveles. Cópielo, péguelo en su asistente y siga mejorándolo.</p>${agregarMio()}<div id="mios" style="margin-top:16px"></div>${misTareas('mios')}`;
+      <p class="lede">Todo lo que ha publicado en el muro, en todos los niveles. Cópielo, péguelo en el chat y siga mejorándolo.</p>${agregarMio()}<div id="mios" style="margin-top:16px"></div>${misTareas('mios')}`;
     document.querySelectorAll('textarea[data-k]').forEach(t => { t.value = store.get(t.dataset.k) || ''; });
     misPrompts($('#mios')); return;
   }

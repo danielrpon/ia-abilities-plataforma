@@ -11,10 +11,11 @@
     .flat().forEach(x => { if (!x) return; if (x.tmp) x.t = x.tmp; if (x.intromp) x.intro = x.intromp; if (x.promptsmp) x.prompts = x.promptsmp; if (x.muromp) x.muro = x.muromp; if (x.sinmuromp) delete x.muro; if (x.tipomp) x.tipo = x.tipomp; });
   /* 2-nov (Daniel): «soloMp» = textos que valen SOLO para MP (conceptos del deck N3: skill, agente, conectores, la casa con agentes). PCO no cambia.
      Se aplica a niveles, capítulos (NIVELES y su copia CAPITULOS) y tarjetas. */
-  if (C === 'mp') (window.ESCALERA || []).forEach(e => { if (e.soloMp) Object.assign(e, e.soloMp); });
+  if (C === 'mp') [].concat(window.ESCALERA || [], window.ENCUESTAS || []).forEach(e => { if (e && e.soloMp) Object.assign(e, e.soloMp); });
   if (C === 'mp') [].concat(window.NIVELES || [], ...(window.NIVELES || []).map(n => n.capitulos || []), window.CAPITULOS || [],
     ...(window.NIVELES || []).map(n => (n.capitulos || []).map(c => c.tarjetas || [])).flat(), window.TARJETAS || [])
     .forEach(x => { if (x && x.soloMp) Object.assign(x, x.soloMp); if (x && x.sinTarjetasMp && x.tarjetas) x.tarjetas = x.tarjetas.filter(t => !x.sinTarjetasMp.includes(t.id)); });
+  if (C === 'mp' && window.TARJETAS) { const fuera = [].concat(...(window.CAPITULOS || []).map(c => c.sinTarjetasMp || [])); if (fuera.length) window.TARJETAS = window.TARJETAS.filter(t => !fuera.includes(t.id)); }
   /* Capítulos con la estructura nueva (dondemp, nuevomp, habilitamp, minmp), en NIVELES y en su copia CAPITULOS; MP y PCO */
   [].concat(...(window.NIVELES || []).map(n => n.capitulos || []), window.CAPITULOS || []).forEach(x => {
     if (!x) return; if (x.dondemp) x.donde = x.dondemp; if (x.nuevomp) x.nuevo = x.nuevomp; if (x.habilitamp) x.habilita = x.habilitamp; if (x.minmp) x.min = x.minmp;
@@ -74,7 +75,7 @@
       try { document.execCommand('copy'); } catch (_) {}
       a.remove();
     }
-    U.toast('<i>✓</i> Copiado. Péguelo en su asistente.');
+    U.toast('<i>✓</i> Copiado. Péguelo en el chat.');
   };
   U.whatsapp = text => window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank', 'noopener');
   U.errMsg = e => {
