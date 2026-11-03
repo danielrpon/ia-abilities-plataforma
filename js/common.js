@@ -9,6 +9,11 @@
   /* 29-oct (Daniel): la estructura nueva de la práctica (campos tmp, intromp, promptsmp, muromp…) nació en MP y desde el 29-oct (noche) vale también para PCO */
   [].concat(...(window.NIVELES || []).map(n => (n.capitulos || []).map(c => c.tarjetas)), window.TARJETAS || [])
     .flat().forEach(x => { if (!x) return; if (x.tmp) x.t = x.tmp; if (x.intromp) x.intro = x.intromp; if (x.promptsmp) x.prompts = x.promptsmp; if (x.muromp) x.muro = x.muromp; if (x.sinmuromp) delete x.muro; if (x.tipomp) x.tipo = x.tipomp; });
+  /* 2-nov (Daniel): «soloMp» = textos que valen SOLO para MP (conceptos del deck N3: skill, agente, conectores, la casa con agentes). PCO no cambia.
+     Se aplica a niveles, capítulos (NIVELES y su copia CAPITULOS) y tarjetas. */
+  if (C === 'mp') [].concat(window.NIVELES || [], ...(window.NIVELES || []).map(n => n.capitulos || []), window.CAPITULOS || [],
+    ...(window.NIVELES || []).map(n => (n.capitulos || []).map(c => c.tarjetas || [])).flat(), window.TARJETAS || [])
+    .forEach(x => { if (x && x.soloMp) Object.assign(x, x.soloMp); });
   /* Capítulos con la estructura nueva (dondemp, nuevomp, habilitamp, minmp), en NIVELES y en su copia CAPITULOS; MP y PCO */
   [].concat(...(window.NIVELES || []).map(n => n.capitulos || []), window.CAPITULOS || []).forEach(x => {
     if (!x) return; if (x.dondemp) x.donde = x.dondemp; if (x.nuevomp) x.nuevo = x.nuevomp; if (x.habilitamp) x.habilita = x.habilitamp; if (x.minmp) x.min = x.minmp;
