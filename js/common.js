@@ -13,7 +13,7 @@
      Se aplica a niveles, capítulos (NIVELES y su copia CAPITULOS) y tarjetas. */
   if (C === 'mp') [].concat(window.NIVELES || [], ...(window.NIVELES || []).map(n => n.capitulos || []), window.CAPITULOS || [],
     ...(window.NIVELES || []).map(n => (n.capitulos || []).map(c => c.tarjetas || [])).flat(), window.TARJETAS || [])
-    .forEach(x => { if (x && x.soloMp) Object.assign(x, x.soloMp); });
+    .forEach(x => { if (x && x.soloMp) Object.assign(x, x.soloMp); if (x && x.sinTarjetasMp && x.tarjetas) x.tarjetas = x.tarjetas.filter(t => !x.sinTarjetasMp.includes(t.id)); });
   /* Capítulos con la estructura nueva (dondemp, nuevomp, habilitamp, minmp), en NIVELES y en su copia CAPITULOS; MP y PCO */
   [].concat(...(window.NIVELES || []).map(n => n.capitulos || []), window.CAPITULOS || []).forEach(x => {
     if (!x) return; if (x.dondemp) x.donde = x.dondemp; if (x.nuevomp) x.nuevo = x.nuevomp; if (x.habilitamp) x.habilita = x.habilitamp; if (x.minmp) x.min = x.minmp;
