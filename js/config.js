@@ -12,6 +12,6 @@ window.IAAB_CONFIG = {
   MODE: 'supabase',
   SUPABASE_URL: 'https://zccrvdytrmrloahnbajl.supabase.co',
   SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpjY3J2ZHl0cm1ybG9haG5iYWpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4NDA2NzQsImV4cCI6MjEwNDQxNjY3NH0.blfohUbSXniU_WMHzGAsek9DA_7ZsGNgxsoDJeC7hDg',
-  SESION: 'mp-ensayo',
+  SESION: 'mp-2026',  // 2-nov-2026: por defecto la sesión real de MP (antes mp-ensayo); el ensayo se abre con ?s=mp-ensayo
   POLL_MS: 4000
 };
