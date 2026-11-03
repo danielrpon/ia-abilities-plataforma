@@ -343,7 +343,7 @@ window.NIVELES = [
            '<b>Roles:</b> Coordinador (los planos), Piloto (construye), Revisor (el probador y las 5 preguntas), Relator (publica).'],
     habilita:['<b>Su asistente de área</b>, con ficha y tres casos, en el muro.'],
     tarjetas:[
-      {id:'N3-07', t:'Los pasos en mesa', tipo:'pasos', soloMp:{pasos:['<b>Elija la tarea (2\'):</b> una que se repite cada semana, de las que trajeron. Amarillo, solo en la cuenta de la empresa; si es roja o no hay cuenta de empresa, con datos ficticios.',
+      {id:'N3-07', t:'Los pasos en mesa', tipo:'pasos', soloMp:{pasos:['<b>Elija la tarea (2\'):</b> una que se repite cada semana, de las que trajeron. En clase, con datos ficticios o sintéticos; con datos reales, en la tarea y en la cuenta de la empresa.',
               '<b>Los planos (10\'):</b> el Coordinador llena la ficha con los 6 bloques (tarjeta siguiente) en la plantilla. Use los criterios de su loop como «qué no debe hacer».',
               '<b>Constrúyala (3\'):</b> el Piloto pega la ficha en un chat nuevo o en un proyecto.',
               '<b>El probador (10\'):</b> el Revisor prueba un caso normal, uno de borde y una trampa, y anota qué esperaba y qué salió.',
