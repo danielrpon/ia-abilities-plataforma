@@ -11,6 +11,7 @@
     .flat().forEach(x => { if (!x) return; if (x.tmp) x.t = x.tmp; if (x.intromp) x.intro = x.intromp; if (x.promptsmp) x.prompts = x.promptsmp; if (x.muromp) x.muro = x.muromp; if (x.sinmuromp) delete x.muro; if (x.tipomp) x.tipo = x.tipomp; });
   /* 2-nov (Daniel): «soloMp» = textos que valen SOLO para MP (conceptos del deck N3: skill, agente, conectores, la casa con agentes). PCO no cambia.
      Se aplica a niveles, capítulos (NIVELES y su copia CAPITULOS) y tarjetas. */
+  if (C === 'mp') (window.ESCALERA || []).forEach(e => { if (e.soloMp) Object.assign(e, e.soloMp); });
   if (C === 'mp') [].concat(window.NIVELES || [], ...(window.NIVELES || []).map(n => n.capitulos || []), window.CAPITULOS || [],
     ...(window.NIVELES || []).map(n => (n.capitulos || []).map(c => c.tarjetas || [])).flat(), window.TARJETAS || [])
     .forEach(x => { if (x && x.soloMp) Object.assign(x, x.soloMp); if (x && x.sinTarjetasMp && x.tarjetas) x.tarjetas = x.tarjetas.filter(t => !x.sinTarjetasMp.includes(t.id)); });
