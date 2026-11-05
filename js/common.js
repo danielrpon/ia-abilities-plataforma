@@ -15,6 +15,11 @@
   if (C === 'mp') [].concat(window.NIVELES || [], ...(window.NIVELES || []).map(n => n.capitulos || []), window.CAPITULOS || [],
     ...(window.NIVELES || []).map(n => (n.capitulos || []).map(c => c.tarjetas || [])).flat(), window.TARJETAS || [])
     .forEach(x => { if (x && x.soloMp) Object.assign(x, x.soloMp); if (x && x.sinTarjetasMp && x.tarjetas) x.tarjetas = x.tarjetas.filter(t => !x.sinTarjetasMp.includes(t.id)); });
+  /* 4-nov (Daniel): niveles cuyos capítulos llegan por soloMp (N4 de MP): se agregan a CAPITULOS y TARJETAS */
+  if (C === 'mp' && window.CAPITULOS && window.TARJETAS) (window.NIVELES || []).forEach(N => {
+    if (!N.capitulos || window.CAPITULOS.some(c => c.nivel === N.id)) return;
+    N.capitulos.forEach(c => { window.CAPITULOS.push(Object.assign({ nivel: N.id }, c)); c.tarjetas.forEach(t => window.TARJETAS.push(Object.assign({ nivel: N.id, capitulo: c.id }, t))); });
+  });
   if (C === 'mp' && window.TARJETAS) { const fuera = [].concat(...(window.CAPITULOS || []).map(c => c.sinTarjetasMp || [])); if (fuera.length) window.TARJETAS = window.TARJETAS.filter(t => !fuera.includes(t.id)); }
   /* Capítulos con la estructura nueva (dondemp, nuevomp, habilitamp, minmp), en NIVELES y en su copia CAPITULOS; MP y PCO */
   [].concat(...(window.NIVELES || []).map(n => n.capitulos || []), window.CAPITULOS || []).forEach(x => {

@@ -395,7 +395,67 @@ window.NIVELES = [
     ]}
   ]
 },
-{id:4, verbo:'Automatizar', escalones:[5,6,7], lede:'Procesos por fases, equipos de especialistas y lo que viene.', soloMp:{lede:'De la <i>skill</i> al agente: procesos por fases, equipos de agentes especialistas y lo que viene.'}, pronto:'Aquí encontrará la prueba de aceptación, la demostración, la plataforma de ideación y su siguiente escalón.'}
+{id:4, verbo:'Automatizar', escalones:[5,6,7], lede:'Procesos por fases, equipos de especialistas y lo que viene.', soloMp:{lede:'Su primer agente: planear por fases, contratar a un especialista con su ficha, delegarle el trabajo y ver hacia dónde crece (un equipo con maestro y el piloto automático). Hoy subimos los escalones 5, 6 y 7.',
+  /* 4-nov (Daniel): N4 de MP «Su primer agente» (propuesta de Juan, montada en el chasis). Solo MP: en PCO el nivel 4 sigue en «pronto».
+     common.js agrega estos capítulos a CAPITULOS y TARJETAS cuando C === 'mp'. */
+  capitulos:[
+  { id:'n4-c1', m:'Inicio', t:'Retorno, su grafo y la escalera', min:'15 min',
+    donde:'Venimos del escalón 4. Hoy subimos el 5 (por fases), el 6 (su primer agente especialista) y el 7 (piloto automático).',
+    nuevo:['<b>Sus resúmenes en .md ya son un grafo:</b> cada punto es un archivo; Obsidian los dibuja y los conecta entre sí y entre proyectos.','<b>Obsidian es infraestructura, como Drive:</b> guarda y conecta sus archivos de contexto. No es la libreta del agente ni se configura en su ficha.'],
+    habilita:['<b>El video para después del curso:</b> conectar sus notas con Obsidian y Claude Code.'],
+    tarjetas:[
+      {id:'N4-01', t:'Antes de empezar, 2 minutos', tipo:'checklist',
+       checklist:['Estoy en la cuenta correcta (un color de perfil para la personal y otro para la de la empresa).','Apagué que entrenen con mis datos.','Tengo el tablero abierto en el celular, en el nivel 04.','Las preguntas fuera del tema van al estacionamiento: las respondemos al final.']},
+      {id:'N4-02', t:'Para después del curso: Obsidian + Claude Code', tipo:'enlace', label:'Ver el video en YouTube', url:'https://www.youtube.com/watch?v=lZO3rsLkvAI',
+       intro:'«Obsidian + Claude Code: construye tu segundo cerebro IA», de Víctor Pérez. Siga el paso a paso y conecte sus notas .md. <b>Requiere permisos de instalación:</b> practíquelo en su equipo personal mientras TI evalúa la viabilidad en MP. Obsidian es gratis; Claude Code requiere Claude Pro o superior. Lo recomendamos; no lo producimos.'},
+      {id:'N4-03', t:'La escalera: el piso y siete escalones', tipo:'escalera-ref', intro:'Hoy subimos los escalones 5, 6 y 7.'}
+    ]},
+  { id:'n4-c2', m:'1', t:'Su primer agente, pieza a pieza', min:'30 min',
+    donde:'Escalón 5 (por fases) y escalón 6 (un equipo de agentes especialistas): hoy contrata al primero.',
+    nuevo:['<b>Por fases:</b> planear, ejecutar, verificar. Antes de contratar agentes, el plano de todo el equipo.','<b>Un agente es un empleado con un solo oficio, y vive en un archivo de texto.</b> Se contrata una vez; trabaja cada vez que usted lo llama.','<b>Skill o agente:</b> con la <i>skill</i>, Claude aprende cómo y lo hace él mismo; con el agente, le delega el trabajo a su especialista, que trabaja aparte y devuelve un resumen.','<b>La ficha tiene siete piezas:</b> nombre y cargo, llaves y herramientas, experiencia, libreta, <i>skills</i>, manual y cómo llamarlo.'],
+    habilita:['<b>Leer y escribir la ficha</b> de un especialista.'],
+    tarjetas:[
+      {id:'N4-04', t:'Pida el plan por fases', tipo:'prompt', intro:'Para cualquier proyecto grande, antes de crear agentes.',
+       prompt:'Vamos a planear este proyecto por fases. No ejecutes nada todavía: propón las fases, qué especialista hace cada una y el criterio de «listo» de cada fase. Espera mi aprobación.'},
+      {id:'N4-05', t:'Las siete piezas de la ficha', tipo:'texto',
+       html:'<ol class="steps"><li><span><b>1 · Nombre y cargo</b> (<code>name</code> · <code>description</code>): el cargo es la línea más importante. Fórmula: qué hace + «úsalo cuando…». Si es vago, Claude nunca sabe cuándo llamarlo.</span></li><li><span><b>2 · Llaves y herramientas</b> (<code>tools</code>): mirar (Read, Glob, Grep), escribir (Edit, Write), internet (WebSearch, WebFetch), conectores y la llave maestra (Bash, riesgo alto). Llaves mínimas para su oficio.</span></li><li><span><b>3 · Experiencia</b> (<code>model</code>): un modelo rápido, balanceado o de razonamiento avanzado. Empiece con uno balanceado.</span></li><li><span><b>4 · Libreta</b> (<code>memory</code>): lo que recuerda de una vez a la otra. En el proyecto (se comparte), en su usuario o en su equipo.</span></li><li><span><b>5 · Skills</b> (<code>skills</code>): los manuales del estante. Las que nombra la ficha llegan ya leídas.</span></li><li><span><b>6 · Manual</b> (debajo de la ficha): quién es, cómo trabaja, qué NO hace, si falta algo y qué entrega. En español normal.</span></li><li><span><b>7 · Llamarlo:</b> automático, por nombre, con @ o abriendo la sesión con él.</span></li></ol>'},
+      {id:'N4-06', t:'Ficha de ejemplo: el revisor de los textos del catálogo', tipo:'prompt', intro:'Así se ve el archivo por dentro. Arriba, entre las rayas, la hoja de vida; abajo, el manual. No hay que programar nada.',
+       prompt:'---\nname: revisor-de-catalogo\ndescription: Revisa textos de producto del catálogo: ortografía, tono y promesas no aprobadas. Úsalo cuando pidan revisar o pulir textos de catálogo.\ntools: Read, Edit\nmodel: sonnet\nmemory: project\nskills: [tono-de-marca]\n---\n\nEres el editor de los textos de producto del catálogo.\n1. Revisa ortografía, luego tono (cercano, frases cortas), luego promesas del producto.\n2. Nunca cambies precios, códigos ni ingredientes. No prometas resultados que no estén aprobados.\n3. Si no sabes si una promesa está aprobada, márcala y pregunta.\n4. Corrige en el archivo y entrega una lista corta de cambios.\n5. Antes de empezar, revisa tu memoria; al terminar, anota lo que aprendiste del tono.'}
+    ]},
+  { id:'n4-c3', m:'2', t:'Práctica: su ficha en papel', min:'15 min',
+    donde:'Escalón 6: su primer especialista, en papel.',
+    nuevo:['<b>En grupo, una sola ficha.</b> No hace falta abrir ninguna herramienta: si la ficha está clara en papel, el resto es copiarla.'],
+    habilita:['<b>La ficha de su grupo</b> en el muro; puede alimentar la sesión de ideación.'],
+    tarjetas:[
+      {id:'N4-07', t:'Los pasos (15\')', tipo:'pasos',
+       pasos:['<b>Elijan el oficio (3\'):</b> uno que se repita y que siempre expliquen igual. Ej.: revisar textos, resumir la venta de la campaña, clasificar pedidos de diseño. En clase, solo datos ficticios.','<b>Llenen la ficha (7\'):</b> nombre con guiones · cargo con «úsalo cuando…» · llaves mínimas · experiencia · libreta sí o no · <i>skills</i> que lleva.','<b>Escriban el manual (5\'):</b> quién es, cómo trabaja, qué NO hace, si falta algo y qué entrega.','<b>La prueba:</b> si alguien de otra área lee la ficha, ¿sabría cuándo llamar al especialista y qué esperar de él?']},
+      {id:'N4-08', t:'Plantilla de la ficha (para llenar)', tipo:'prompt', intro:'Copie, llene los corchetes con su grupo y publique la ficha aquí abajo.',
+       prompt:'FICHA DEL ESPECIALISTA\n1 · NOMBRE (minúsculas y guiones): [revisor-de-…]\n1 · CARGO: [qué hace]. Úsalo cuando [las palabras con que lo pedirían].\n2 · LLAVES Y HERRAMIENTAS: [solo las que su oficio necesita: leer / editar / escribir / internet / un conector]\n3 · EXPERIENCIA: [rápido / balanceado / razonamiento avanzado], porque [mecánico o de criterio; cuántas veces lo llaman; qué tan caro sale que se equivoque]\n4 · LIBRETA: [sí, del proyecto / no] · qué debe anotar: […]\n5 · SKILLS QUE LLEVA: […]\n6 · MANUAL\n- Quién es: [su oficio en una frase]\n- Cómo trabaja: [los pasos, en orden]\n- Qué NO hace: [los límites]\n- Si falta algo: pregunta; no inventa.\n- Qué entrega: [la forma del resultado]',
+       muro:{tipo:'prompt', guia:'La ficha de su grupo: las siete piezas.'}}
+    ]},
+  { id:'n4-c4', m:'3', t:'Llamarlo y delegar', min:'20 min',
+    donde:'Escalón 6: su especialista ya está contratado; ahora, a trabajar.',
+    nuevo:['<b>Cuatro formas de llamarlo:</b> automática (Claude lo decide por el cargo), por nombre, con @ (la más segura) o abriendo la sesión con él.','<b>El timbre (<i>hook</i>):</b> «cuando pase X, haga Y», con lo que pasa en su sesión. Lo que llega de afuera, como un correo, es piloto automático.','<b>El especialista no estuvo en la reunión:</b> el encargo trae quién, con qué, qué entrega y qué no toca.','<b>La última palabra es suya:</b> que el especialista diga «listo» no es permiso para enviar o publicar.'],
+    habilita:['<b>Delegar un encargo completo</b> y revisarlo.'],
+    tarjetas:[
+      {id:'N4-09', t:'Cuatro formas de llamarlo', tipo:'texto',
+       html:'<ol class="steps"><li><span><b>Automática:</b> usted pide («Corrige este texto») y, si encaja con el cargo, Claude lo llama solo. Necesita un buen cargo.</span></li><li><span><b>Por nombre:</b> «Usa el revisor-de-catalogo para esto». La más común.</span></li><li><span><b>Con arroba:</b> <code>@agent-revisor-de-catalogo revisa esto</code>. La más segura.</span></li><li><span><b>Toda la sesión:</b> <code>claude --agent revisor-de-catalogo</code>. Para jornadas de un solo oficio.</span></li></ol><p style="margin-top:10px"><b>El timbre (<i>hook</i>):</b> «cuando pase X, haga Y». Ej.: cada vez que pida algo de la presentación de MP, el timbre le recuerda a Claude llamar al diseñador con el manual de marca.</p>'},
+      {id:'N4-10', t:'El encargo completo', tipo:'prompt', intro:'Quién · con qué · qué entrega · qué no toca. La prueba: ¿lo entendería alguien que acaba de llegar a la oficina?',
+       prompt:'Usa el [nombre-del-especialista] con [el archivo exacto, con su ruta]. [Qué debe hacer]. Entrégame [dónde y en qué forma]. No toques [el límite de este encargo].'},
+      {id:'N4-11', t:'Contrátelo esta semana', tipo:'prompt', intro:'En Claude Code o en Codex. Claude Code requiere Claude Pro o superior (Codex viene con los planes de ChatGPT) y permisos de instalación: practíquelo en su equipo personal mientras TI evalúa la viabilidad en MP.',
+       prompt:'Convierte esta ficha en un agente de este proyecto: [pegue aquí su ficha en papel]. Antes de guardarlo, muéstrame el archivo para revisar las llaves y lo que no debe hacer.'}
+    ]},
+  { id:'n4-c5', m:'4', t:'Lo que sigue y el cierre', min:'35 min',
+    donde:'Escalones 6 y 7: un equipo con maestro y el piloto automático. Y el cierre del programa.',
+    nuevo:['<b>Un especialista ya le sirve; varios necesitan quien los dirija:</b> el maestro (Claude o un agente maestro) reparte por fases y con revisión, y así gasta menos contexto.','<b>La llave Agent</b> le dice al maestro a quién puede llamar. Para que solo él reparta, a los especialistas no les dé esa llave.','<b>Piloto automático:</b> su agente trabaja solo a la hora o con el evento que usted defina (tareas programadas, con Claude Pro o superior). Lo programado también pasa por su revisión.'],
+    habilita:['<b>Su plan personal:</b> una acción de su trabajo que va a hacer con IA, antes de una fecha, y a quién se la va a mostrar.'],
+    tarjetas:[
+      {id:'N4-12', t:'El maestro y el piloto automático', tipo:'texto',
+       html:'<ol class="steps"><li><span><b>El maestro también tiene ficha:</b> <code>tools: Agent(revisor-de-catalogo, redactor-de-redes)</code> limita a quién llama cuando se abre con <code>claude --agent orquestador</code>. «Eres el maestro del equipo. No haces el trabajo tú mismo: reparte, pide resúmenes cortos y entrega la conclusión.»</span></li><li><span><b>Piloto automático:</b> a una hora (cada hora, día, semana o mes), ante un evento o cuando otro sistema lo llame. En la nube de Claude sigue con el computador apagado; en su equipo, tiene que estar prendido.</span></li><li><span><b>¿Con ChatGPT o Windows?</b> El agente le deja un archivo de comandos y el Programador de tareas de Windows lo corre a la hora fijada, con el equipo prendido. Eso se hace con TI.</span></li></ol>'},
+      {id:'N4-13', t:'Cuestionario final del programa', tipo:'enlace', label:'Abrir el cuestionario', url:'https://docs.google.com/forms/d/e/1FAIpQLSdAsLsm1ptrsKhFQI9SlaAp_TbNO8mfYBRGDkMkvn3FcMqeKA/viewform',
+       intro:'Cinco minutos. Es anónimo y se ve solo en conjunto. Después, la entrega de certificados.'}
+    ]}
+  ]}, pronto:'Aquí encontrará la prueba de aceptación, la demostración, la plataforma de ideación y su siguiente escalón.'}
 ];
 
 /* Casos del semáforo (encuesta «semaforo») y su respuesta */
