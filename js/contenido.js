@@ -452,7 +452,7 @@ window.NIVELES = [
     tarjetas:[
       {id:'N4-12', t:'El maestro y el piloto automático', tipo:'texto',
        html:'<ol class="steps"><li><span><b>El maestro también tiene ficha:</b> <code>tools: Agent(revisor-de-catalogo, redactor-de-redes)</code> limita a quién llama cuando se abre con <code>claude --agent orquestador</code>. «Eres el maestro del equipo. No haces el trabajo tú mismo: reparte, pide resúmenes cortos y entrega la conclusión.»</span></li><li><span><b>Piloto automático:</b> a una hora (cada hora, día, semana o mes), ante un evento o cuando otro sistema lo llame. En la nube de Claude sigue con el computador apagado; en su equipo, tiene que estar prendido.</span></li><li><span><b>¿Con ChatGPT o Windows?</b> El agente le deja un archivo de comandos y el Programador de tareas de Windows lo corre a la hora fijada, con el equipo prendido. Eso se hace con TI.</span></li></ol>'},
-      {id:'N4-13', t:'Cuestionario final del programa', tipo:'enlace', label:'Abrir el cuestionario', url:'https://docs.google.com/forms/d/e/1FAIpQLSdAsLsm1ptrsKhFQI9SlaAp_TbNO8mfYBRGDkMkvn3FcMqeKA/viewform',
+      {id:'N4-13', t:'Cuestionario final del programa', tipo:'enlace', label:'Abrir el cuestionario', url:'https://docs.google.com/forms/d/e/1FAIpQLSfrozMeiyLfKnL0dtzqRl_dpp9KdisdEFQ3f1ucJUqNDR1y5Q/viewform',
        intro:'Cinco minutos. Es anónimo y se ve solo en conjunto. Después, la entrega de certificados.'}
     ]}
   ]}, pronto:'Aquí encontrará la prueba de aceptación, la demostración, la plataforma de ideación y su siguiente escalón.'}
