@@ -29,7 +29,7 @@ window.NIVELES = [
   id:1, verbo:'Entender', escalones:[0,1],
   lede:'Qué es la IA, qué datos sí y qué datos no, y cómo pedirle bien las cosas. Hoy subimos del piso al escalón 1.',
   capitulos:[
-  { id:'n1-c0', m:'Inicio', t:'La escalera', min:'12 min',
+  { id:'n1-c0', m:'Inicio', t:'La escalera', min:'10 min', minmp:'12 min',
     donde:'En el piso, mirando la escalera completa.',
     nuevo:['<b>La IA no es una herramienta: es una escalera de formas de trabajar.</b> Cada escalón contiene al anterior; nada se reemplaza, se acumula.',
            '<b>Como aprender a conducir:</b> primero el carro parqueado, luego la ruta planeada… y al final el piloto automático con usted mirando. Las marcas cambian; la forma de conducir no.'],
@@ -47,7 +47,7 @@ window.NIVELES = [
       {id:'N1-02', m:'Inicio', t:'La escalera: el piso y siete escalones', tipo:'escalera-ref',
        intro:'Todo lo que vamos a ver cabe aquí. Inspirada en los niveles de uso de Juan Gabriel Gomila, traducida al trabajo de su equipo.'}
     ]},
-  { id:'n1-c1', m:'1–2', t:'¿Qué es y cómo «piensa»?', min:'30 min',
+  { id:'n1-c1', m:'1–2', t:'¿Qué es y cómo «piensa»?', min:'22 min', minmp:'30 min',
     donde:'El piso: antes de subir, sepa qué está pisando.',
     nuevo:['<b>Predice, no sabe:</b> escoge la continuación más probable, como el teclado del celular. Lo probable no siempre es lo verdadero.',
            '<b>Lo que no está en la ventana no existe,</b> y más contexto no es mejor contexto: rinde peor mucho antes de llenarse.',
@@ -70,7 +70,7 @@ window.NIVELES = [
                  pco:[['demo 01 Compendio de políticas 2022-2026 (largo).docx','El documento largo'],['demo 02 Circular vigente de teletrabajo (corto).docx','La circular vigente']]},
        prompt:{mp:'Con base en el documento adjunto, ¿cuál es hoy el porcentaje de ganancia de una asesora en la categoría Básicos? Cita la sección de donde lo sacas.', pco:'Con base en el documento adjunto, ¿cuántos días de teletrabajo por semana permite hoy la política? Cita la sección de donde lo sacas.'}}
     ]},
-  { id:'n1-c2', m:'3', t:'¿Qué datos sí?', min:'20 min',
+  { id:'n1-c2', m:'3', t:'¿Qué datos sí?', min:'12 min', minmp:'20 min',
     donde:'No es un escalón: es la baranda que acompaña toda la escalera.',
     nuevo:['<b>El semáforo:</b> público, interno, sensible.',
            '<b>Habeas Data</b> (Ley 1581 de 2012): el nombre y la imagen de una persona son datos personales.',
@@ -88,7 +88,7 @@ window.NIVELES = [
       {id:'N1-08', m:'3a', t:'El semáforo de datos', tipo:'semaforo-ref',
        intro:'La regla, y por qué cada caso tiene su color.'}
     ]},
-  { id:'n1-c3', m:'4', t:'Manos a la obra', min:'40 min',
+  { id:'n1-c3', m:'4', t:'Manos a la obra', min:'60 min', minmp:'40 min',
     donde:'Escalón 1: no es pedir más rápido, es tener intención.',
     nuevo:['<b>Anatomía del prompt:</b> tres obligatorias (tarea, contexto, formato) y tres que lo suben de nivel (rol, ejemplos, restricciones). Como un colega brillante que llegó ayer.',
            '<b>El atajo de la entrevista:</b> deje que la IA le pregunte antes de ejecutar.',
@@ -97,9 +97,9 @@ window.NIVELES = [
     tarjetas:[
       {id:'N1-18', m:'4b', t:'El mismo pedido, dos resultados', tipo:'comparar',
        intro:'Corra el primero en un chat nuevo y el segundo en otro. Compare los dos resultados.',
-       antes:{mp:'Hazme el texto de este producto para el catálogo.', pco:'Hazme un correo para el reto de bienestar.'},
+       antes:{mp:'Hazme el texto de este producto para el catálogo.', pco:'Hazme el texto de la e-card de bienvenida de la persona que entra.'},
        despues:{mp:'Actúa como redactora de catálogo de una empresa colombiana de venta directa. Escribe el texto de producto para [referencia] de la próxima campaña. La clienta lo ve en el catálogo y lo compra a través de su asesora. La ficha técnica dice: [material, tallas, colores]. El beneficio que queremos resaltar es la comodidad de todo el día. Dame un título de máximo 6 palabras, un texto de máximo 35 palabras y dos títulos alternativos. Usa un tono como este: «Te acompaña de la mañana a la noche». No inventes materiales ni precios, no hagas promesas de resultados y, si te falta información, pregúntame antes de escribir.',
-                pco:'Actúa como analista de comunicaciones internas de una empresa de lealtad en Colombia. Redacta un correo que invite a los colaboradores a inscribirse al reto de pausas activas de noviembre. El reto dura 4 semanas y la inscripción es en [enlace]. El año pasado participó el 40 % y este año queremos llegar al 60 %. El público va desde áreas comerciales hasta tecnología. Dame un asunto de máximo 8 palabras, un cuerpo de máximo 120 palabras con un solo llamado a la acción, y dos asuntos alternativos. Usa un tono como este: «Esta semana nos movemos juntos, ¿te sumas?». No uses emojis en el asunto, no inventes premios y, si te falta información, pregúntame antes de escribir.'},
+                pco:'Actúa como analista de comunicaciones internas de una empresa de lealtad en Colombia. Redacta el texto de la e-card de bienvenida de una persona que entra a la compañía. La recibe toda la compañía por correo. Los datos son: [nombre de pila], [cargo], [área] y [dos datos de su trayectoria que la persona autorizó compartir]. Dame un título de máximo 6 palabras, un texto de máximo 50 palabras y dos títulos alternativos. Usa un tono como este: «Hoy llega alguien nuevo a sumar con nosotros». No inventes logros ni agregues datos personales que no estén aquí y, si te falta información, pregúntame antes de escribir.'},
        nota:'El segundo tiene las seis piezas: rol, tarea, contexto, formato, ejemplo y restricciones. Cambie los corchetes por un producto o un dato real (en verde o amarillo).'},
       {id:'N1-09', m:'4d', t:'Paso 1 · Pídalo como lo haría hoy', tipo:'pasos', tareas:true,
        pasos:['Escoja una de sus tres tareas (anótelas en la casilla de arriba) o una de la tarjeta «Ideas de tareas».', 'Pídasela a la IA <b>como lo haría hoy, en una sola frase</b>.', 'Corra el prompt. <b>No borre la respuesta:</b> la vamos a comparar.']},
@@ -114,7 +114,7 @@ window.NIVELES = [
        checklist:['Empieza con un verbo claro.','Tiene el contexto que un colega nuevo necesitaría.','Dice el formato, la extensión y el tono.','Le da un rol.','Tiene un ejemplo o un criterio de calidad.','Dice qué no hacer: no inventar, preguntar si falta algo.','Está en verde o amarillo.']},
       {id:'N1-13', m:'4d', t:'Ideas de tareas (y cómo arreglar una roja)', tipo:'texto',
        html:{mp:'<p><b>Ideas:</b> textos de producto, brief de una pieza para diseño, resumen de ventas de una campaña para el comité, guion de mensaje para asesoras, preguntas de una encuesta a clientas.</p><p><b>Tarea roja → reformúlela:</b> en vez de «analiza los pedidos de María», pida «una lista de señales para detectar asesoras que bajan su orden promedio».</p><p><b>Ejemplo resuelto:</b> «Hazme el texto de este producto para el catálogo» frente a: «Actúa como redactora de catálogo de una empresa colombiana de venta directa. Escribe el texto de producto para [referencia]… Dame un título de máximo 6 palabras… No inventes materiales ni precios y, si te falta información, pregúntame».</p>',
-             pco:'<p><b>Ideas:</b> convocatoria interna, preguntas de entrevista por competencias, resumen de una política, plan de bienestar del mes.</p><p><b>Tarea roja → reformúlela:</b> en vez de «revisa la nómina de Pedro», pida «una lista de validaciones para las novedades de nómina».</p><p><b>Ejemplo resuelto:</b> «Hazme un correo para el reto de bienestar» frente a: «Actúa como analista de comunicaciones internas de una empresa colombiana. Redacta un correo que invite a inscribirse al reto de pausas activas de noviembre… Dame un asunto de máximo 8 palabras… No inventes premios y, si te falta información, pregúntame».</p>'}},
+             pco:'<p><b>Ideas de su propio equipo</b> (del formulario, siempre con datos ficticios): el listado de cumpleaños del mes, el texto de la e-card de bienvenida, la lista de validaciones de las novedades de nómina, la actualización de la maestra de costo laboral, el seguimiento del presupuesto de formación, la consolidación de exámenes médicos, la documentación de un proceso de las plataformas, el resumen de pendientes de correos y reuniones.</p><p><b>Tarea roja → reformúlela:</b> en vez de «revisa la nómina de Pedro», pida «una lista de validaciones para las novedades de nómina» y pruébela con un archivo inventado.</p><p><b>Ejemplo resuelto:</b> «Hazme el texto de la e-card de bienvenida» frente a: «Actúa como analista de comunicaciones internas de una empresa de lealtad en Colombia. Redacta el texto de la e-card de bienvenida de una persona que entra… Dame un título de máximo 6 palabras… No inventes logros ni agregues datos personales y, si te falta información, pregúntame».</p>'}},
       {id:'N1-14', m:'2f', t:'Qué modelo para qué (opcional)', tipo:'pasos',
        pasos:['Corra su prompt final con el <b>modelo rápido</b> y con el <b>de razonamiento</b>.', 'Compare solo la estructura: ¿cuál planeó mejor?', 'Regla: planee y revise con el de razonamiento; produzca con el rápido.']},
       {id:'N1-15', m:'4d', t:'Paso 4 · Al muro: su par y sus tres prompts', tipo:'muro-card',
