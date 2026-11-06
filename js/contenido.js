@@ -14,10 +14,10 @@ window.ESCALERA = [
   {k:0, t:'Piso · Buscador', d:'Le pregunta cosas sueltas, como a Google.', w:'Nivel 01'},
   {k:1, t:'Planear antes de pedir', d:'Deja que la IA le pregunte y arme el plan antes de producir.', w:'Nivel 01 · Nivel 02'},
   {k:2, t:'Darle el manual', d:'La IA ya sabe quién es usted, su tono y sus reglas, sin repetírselo.', w:'Nivel 02 · Nivel 03'},
-  {k:3, t:'No repetir', d:'Lo que hace cada semana queda guardado en un asistente propio.', w:'Nivel 03', soloMp:{d:'Lo que hace cada semana queda guardado en una skill propia.'}},
-  {k:4, t:'Conectar', d:'La IA lee el correo, el Drive o una base sin copiar y pegar (con TI).', w:'Nivel 03 · Nivel 04'},
+  {k:3, t:'No repetir', d:'Lo que hace cada semana queda guardado en una skill propia.', w:'Nivel 03'},
+  {k:4, t:'Conectar', d:'La IA lee el correo, OneDrive o SharePoint, o una base, sin copiar y pegar (con TI).', w:'Nivel 03 · Nivel 04'},
   {k:5, t:'Por fases', d:'Un trabajo grande en etapas, cada una con su criterio de «listo».', w:'Nivel 02 (asoma) · Nivel 04'},
-  {k:6, t:'Un equipo de especialistas', d:'Uno investiga, otro redacta, otro revisa.', w:'Nivel 02 (asoma) · Nivel 04', soloMp:{t:'Un equipo de agentes especialistas', d:'Un agente investiga, otro redacta, otro revisa.', w:'Nivel 02 y 03 (asoma) · Nivel 04'}},
+  {k:6, t:'Un equipo de agentes especialistas', d:'Un agente investiga, otro redacta, otro revisa.', w:'Nivel 02 (asoma) · Nivel 04'},
   {k:7, t:'Piloto automático', d:'El trabajo corre solo y usted revisa el resultado.', w:'Nivel 04'}
 ];
 
