@@ -131,7 +131,7 @@ window.NIVELES = [
        html:'<p>Use uno de sus tres prompts en una <b>tarea real</b> esta semana y anote <b>qué pidió, qué salió y qué tuvo que corregir</b>. Con eso arrancamos el nivel 02.</p>'},
       {id:'N1-17', m:'Cierre', t:'¿Qué nos llevamos? Cuestionario de salida', tipo:'enlace',
        intro:'Cinco minutos, anónimo.',
-       url:{mp:'https://docs.google.com/forms/d/e/1FAIpQLScWOPPwLxiEZy4XrXUEoOuLRsRlMF_AzT6-p-UheOVnYfOi4w/viewform', pco:'https://docs.google.com/forms/d/e/1FAIpQLScxBWzEuw34wVQnCD9TaUgsfQNZQevHTxIMuDm67QsZegGfDQ/viewform'},
+       url:{mp:'https://docs.google.com/forms/d/e/1FAIpQLScWOPPwLxiEZy4XrXUEoOuLRsRlMF_AzT6-p-UheOVnYfOi4w/viewform', pco:'https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=DQSIkWdsW0yxEjajBLZtrQAAAAAAAAAAAAZAAI_p-2dURTdNQ1VHRlNPM1ZGVzFJNFgyMk1LMDhLUy4u'},
        label:'Abrir el cuestionario'}
     ]}
   ]
