@@ -33,7 +33,7 @@ let S = null, TAB = 'sesion', ENC_VER = null, firma = '', armadoBorrar = false, 
 let PART = null, PREV = null, G_OPC = { modo: 'area', tam: 4 }, armadoGrupos = false;
 const G_VENTANA_MIN = 3;   // activo = hizo ping (cada 60 s) en los últimos 3 minutos
 const G_AREAS = { mp: ['Mercadeo y catálogo', 'Comercial', 'Diseño y contenido', 'Demanda y pronóstico', 'Dirección y servicio', 'Otra'],
-                  pco: ['Compensación', 'Selección', 'Nómina', 'Talento y bienestar', 'Plataformas core', 'Otra'] }[U.C];
+                  pco: ['Compensación', 'Selección', 'Nómina', 'Talento y bienestar', 'Plataformas core', 'Cultura y liderazgo', 'Otra'] }[U.C];
 /* 29-oct (Daniel): con grupos mezclados en MP, cada grupo recibe su caso al formar (grupo 1 → pedidos, 2 → ventas, 3 → demanda, 4 → comentarios, y vuelve a empezar).
    El brief (Diseño y contenido) no entra: ya se vio en la demo. En PCO no se asigna nada (su N2 es de Juan). */
 const G_CASOS = { mp: ['Comercial', 'Mercadeo y catálogo', 'Demanda y pronóstico', 'Dirección y servicio'], pco: ['Nómina', 'Compensación', 'Selección', 'Talento y bienestar'] }[U.C] || null;
