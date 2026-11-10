@@ -291,7 +291,12 @@ window.NIVELES = [
        muro:{tipo:'prompt', guia:'Prompt 1 de hoy: el de su mesa, con modo plan (el que funcionó en la práctica 1).'},
        muro2:{tipo:'loop', guia:'Prompt 2 de hoy: su loop con los criterios de su mesa. Los dos quedan en «Mis prompts» para el nivel 03.'}},
       {id:'N2-19', t:'Salida: ¿qué fue lo más útil y qué sobró?', tipo:'encuesta', encuesta:'salida-n2',
-       intro:'Responda cuando se abra la encuesta.'}
+       intro:'Responda cuando se abra la encuesta.'},
+      /* 9-nov (Daniel): cuestionario de salida del N2 en el tablero (PCO en Microsoft Forms; MP, el Google Form del 29-oct) */
+      {id:'N2-21', t:'¿Qué nos llevamos? Cuestionario de salida', tipo:'enlace',
+       intro:'Cinco minutos, anónimo.',
+       url:{mp:'https://docs.google.com/forms/d/e/1FAIpQLSdwM1QnANRhZ7zVF51ldVhEWwZ5YXkMRj2tHk97fZJsyRs4DQ/viewform', pco:'https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=DQSIkWdsW0yxEjajBLZtrQAAAAAAAAAAAAZAAI_p-2dUMVUyUTlIU1FTV0c5N1kyMkk1NFYxRThXQS4u'},
+       label:'Abrir el cuestionario'}
     ]}
   ]
 },
