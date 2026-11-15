@@ -17,7 +17,12 @@
     .forEach(x => { if (x && x.soloMp) Object.assign(x, x.soloMp); if (x && x.sinTarjetasMp && x.tarjetas) x.tarjetas = x.tarjetas.filter(t => !x.sinTarjetasMp.includes(t.id)); });
   /* 4-nov (Daniel): niveles cuyos capítulos llegan por soloMp (N4 de MP): se agregan a CAPITULOS y TARJETAS */
   if (C === 'mp' && window.CAPITULOS && window.TARJETAS) (window.NIVELES || []).forEach(N => {
-    if (!N.capitulos || window.CAPITULOS.some(c => c.nivel === N.id)) return;
+    if (!N.capitulos) return;
+    /* 14-nov: el nivel 4 tiene capítulos por defecto (PCO) y los de MP en soloMp. Si los de CAPITULOS/TARJETAS no son los de N.capitulos, se reemplazan */
+    if (window.CAPITULOS.some(c => c.nivel === N.id)) {
+      if (N.capitulos.every(c => window.CAPITULOS.some(x => x.tarjetas === c.tarjetas))) return;
+      window.CAPITULOS = window.CAPITULOS.filter(c => c.nivel !== N.id); window.TARJETAS = window.TARJETAS.filter(t => t.nivel !== N.id);
+    }
     N.capitulos.forEach(c => { window.CAPITULOS.push(Object.assign({ nivel: N.id }, c)); c.tarjetas.forEach(t => window.TARJETAS.push(Object.assign({ nivel: N.id, capitulo: c.id }, t))); });
   });
   if (C === 'mp' && window.TARJETAS) { const fuera = [].concat(...(window.CAPITULOS || []).map(c => c.sinTarjetasMp || [])); if (fuera.length) window.TARJETAS = window.TARJETAS.filter(t => !fuera.includes(t.id)); }
