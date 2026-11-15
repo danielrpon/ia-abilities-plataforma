@@ -476,7 +476,7 @@ window.NIVELES = [
     habilita:['<b>Saber en 3 minutos</b> si va por el plan A o por el plan B, y qué le dejó a su asistente la tarea del nivel 03.'],
     tarjetas:[
       {id:'N4-14', t:'Control de la cuenta: mire su barra lateral', tipo:'encuesta', encuesta:'control-n4',
-       intro:'Antes de empezar: ¿está en la cuenta de Puntos Colombia y no en la personal del celular? Mire su barra lateral y responda cuando el facilitador abra la encuesta. Si no ve tareas programadas, no pasa nada: hay camino para usted.'},
+       intro:'Antes de empezar: ¿está en la cuenta de la empresa y no en la personal del celular? Mire su barra lateral y responda cuando el facilitador abra la encuesta. Si no ve tareas programadas, no pasa nada: hay camino para usted.'},
       {id:'N4-15', t:'Retorno: ¿qué le pasó a su asistente con una tarea real?', tipo:'encuesta', encuesta:'tarea-n3',
        intro:'Responda cuando se abra la encuesta. Tenga a mano lo que anotó al usar su asistente con una tarea real. No hace falta mostrar el asistente ni ningún dato.'}
     ]},
@@ -492,7 +492,7 @@ window.NIVELES = [
        html:`<ol class="steps">
         <li><span><b>Asistente y agente.</b> Un asistente sigue los pasos que usted escribió; un agente recibe un objetivo, decide los pasos y usa herramientas. Muchos ya les dicen «agentes» a sus asistentes: hoy vemos qué les falta para serlo.</span></li>
         <li><span><b>Hoja de vida y manual.</b> Su ficha ya es el manual de funciones. Al especialista le faltan la hoja de vida (el cargo: qué hace y cuándo se le llama), las llaves, la prueba y el horario.</span></li>
-        <li><span><b>Las llaves las entrega TI.</b> Entre más abre la llave, más riesgo y más revisión: un empleado nuevo no recibe la llave de la caja fuerte el primer día. Como ejemplo de cómo suele ordenarse: buscar en fuentes públicas es lo más liviano; usar archivos con datos reales del proceso pide revisión; conectar sistemas, agentes del espacio de trabajo o tareas por evento los decide TI. <b>La regla es la política interna de Puntos Colombia:</b> consúltela con TI antes de usar datos reales o conectores.</span></li>
+        <li><span><b>Las llaves las entrega TI.</b> Entre más abre la llave, más riesgo y más revisión: un empleado nuevo no recibe la llave de la caja fuerte el primer día. Como ejemplo de cómo suele ordenarse: buscar en fuentes públicas es lo más liviano; usar archivos con datos reales del proceso pide revisión; conectar sistemas, agentes del espacio de trabajo o tareas por evento los decide TI. <b>La regla es la política interna de la empresa:</b> consúltela con TI antes de usar datos reales o conectores.</span></li>
         <li><span><b>El especialista no estuvo en la reunión.</b> El encargo trae todo: quién es, con qué fuentes, qué entrega, qué no hace y cuándo está listo.</span></li>
         <li><span><b>Por fases.</b> Un trabajo grande se parte en etapas (plan, ejecución, entrega) y cada una tiene su criterio de «listo».</span></li></ol>`}
     ]},
@@ -504,9 +504,9 @@ window.NIVELES = [
     habilita:['<b>El encargo completo de su vigía,</b> con sus cuatro criterios de «listo», en el muro.'],
     tarjetas:[
       {id:'N4-17', t:'Práctica 1 · Escriba el encargo de su vigía y córralo por fases', tipo:'prompt',
-       intro:'Individual, en su cuenta de Puntos Colombia, con fuentes públicas y ningún dato de personas ni del proceso. Su vigía vigila la fuente de la verdad de la que depende su asistente y avisa cuando la ficha se quedó vieja. <b>Escoja el tema según su asistente:</b> nómina y relaciones laborales, cambios en normas laborales y de seguridad social; compensación, indicadores públicos que mueven la política salarial; selección, señales públicas del mercado laboral; desarrollo, cultura, bienestar y comunicaciones, dos a cuatro publicaciones que su área ya sigue (con nombre). Las fuentes las define cada quien y las valida con el área responsable. Si no tiene un tema con fuente externa, o su cuenta no busca en la web, pase a la práctica 3 con la variante «Ritual de revisión».',
+       intro:'Individual, en su cuenta de la empresa, con fuentes públicas y ningún dato de personas ni del proceso. Su vigía vigila la fuente de la verdad de la que depende su asistente y avisa cuando la ficha se quedó vieja. <b>Escoja el tema según su asistente:</b> nómina y relaciones laborales, cambios en normas laborales y de seguridad social; compensación, indicadores públicos que mueven la política salarial; selección, señales públicas del mercado laboral; desarrollo, cultura, bienestar y comunicaciones, dos a cuatro publicaciones que su área ya sigue (con nombre). Las fuentes las define cada quien y las valida con el área responsable. Si no tiene un tema con fuente externa, o su cuenta no busca en la web, pase a la práctica 3 con la variante «Ritual de revisión».',
        pasos:['<b>Abra y llene (4\'):</b> copie el prompt y reemplace los corchetes: tema, proceso, nombre de su asistente, dos a cuatro fuentes, ventana (del 1 de noviembre a hoy) y área responsable.',
-              '<b>Pegue (1\'):</b> chat nuevo en ChatGPT de Puntos Colombia. Si puede elegir modelo, uno de razonamiento; con la búsqueda en la web activada.',
+              '<b>Pegue (1\'):</b> chat nuevo en ChatGPT de la empresa. Si puede elegir modelo, uno de razonamiento; con la búsqueda en la web activada.',
               '<b>Fase 1 (2\'):</b> la IA devuelve el plan y hasta tres preguntas. No debe haber buscado todavía; si buscó, ya hay algo que corregir en el encargo.',
               '<b>Fases 2 y 3 (3\'):</b> responda las preguntas y escriba: «Aprobado. Ejecuta las fases 2 y 3».',
               '<b>Publique (2\'):</b> pegue en el muro su encargo (no el boletín) y marque ✅ en Teams.'],
@@ -591,7 +591,7 @@ Fuentes: fuente-oficial-1, revisada, con cambios. fuente-oficial-2, revisada, co
     tarjetas:[
       {id:'N4-19', t:'Práctica 3 · Programe su vigía: primero una vez, después cada semana', tipo:'texto',
        intro:'Primero una vez, dentro de pocos minutos; cuando llegue y pase la prueba, cada semana. Pegue su encargo ya corregido donde se indica. El facilitador dicta la hora.',
-       pasos:['<b>Cree (3\'):</b> chat nuevo, <b>fuera de cualquier proyecto</b>, en la cuenta de Puntos Colombia. Pegue el prompt 1. ChatGPT muestra la confirmación de la tarea.',
+       pasos:['<b>Cree (3\'):</b> chat nuevo, <b>fuera de cualquier proyecto</b>, en la cuenta de la empresa. Pegue el prompt 1. ChatGPT muestra la confirmación de la tarea.',
               '<b>Encuéntrela (3\'):</b> abra «Scheduled» en la barra lateral (o el menú ••• del chat, ver tareas programadas). Abra su tarea y lea la instrucción y el horario. En Ajustes › Notifications, revise que le avise por correo o por notificación.',
               '<b>Coseche (3\'):</b> a la hora dictada llega el resultado. Compruébelo a ojo con dos criterios: ¿enlaces de la lista?, ¿una línea por fuente? Si tiene tiempo, páselo por su revisor.',
               '<b>Déjela sola (3\'):</b> pegue el prompt 2 para volverla semanal y confirme en Scheduled que quedó recurrente. Si no va a leerla cada lunes, páusela.',
@@ -645,7 +645,7 @@ Termina con: «Responsable: [MI NOMBRE]. Próxima revisión: en un mes».`],
                   'Antes del 11 de diciembre: listé los GPT de los que dependo y guardé sus instrucciones y tres prompts de prueba.',
                   'Cuando aparezca la opción en «Mis GPT», lo migro a <i>plugin</i> (o lo paso a un proyecto) y lo pruebo con los tres casos.']},
       {id:'N4-21', t:'Qué pedirle a TI', tipo:'texto',
-       intro:'Antes de usar datos reales del proceso o conectores, consulte la política interna de Puntos Colombia con TI. Estas tres cosas no se practicaron hoy: se piden.',
+       intro:'Antes de usar datos reales del proceso o conectores, consulte la política interna de la empresa con TI. Estas tres cosas no se practicaron hoy: se piden.',
        html:`<ol class="steps">
         <li><span><b>Tareas de equipo:</b> corren en la nube y las mantiene el equipo. Se piden a TI.</span></li>
         <li><span><b>Agentes del espacio de trabajo:</b> instrucciones, conocimiento, <i>skills</i>, apps, memoria y horario. Vienen apagados por defecto: los habilita el administrador.</span></li>
@@ -658,7 +658,7 @@ Termina con: «Responsable: [MI NOMBRE]. Próxima revisión: en un mes».`],
     nuevo:['<b>No fue magia:</b> cada nivel puso una pieza. La ideación y la priorización van en otro espacio; la fecha llega por correo.'],
     habilita:['<b>El cuestionario final</b> y la ronda de diez minutos para ustedes.'],
     tarjetas:[
-      {id:'N4-22', t:'Cuestionario final del programa', tipo:'enlace', label:'Abrir el cuestionario', url:'PENDIENTE_FORMS_N4',
+      {id:'N4-22', t:'Cuestionario final del programa', tipo:'enlace', label:'Abrir el cuestionario', url:'https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=DQSIkWdsW0yxEjajBLZtrQAAAAAAAAAAAAZAAI_p-2dUM1Y1VEw3QUtHNjNNVTVHS0VKR0VaNE9QQS4u',
        intro:'Unos seis minutos, anónimo, en Microsoft Forms. Las tres últimas preguntas son sobre el programa completo: escríbalas antes de que conversemos. Los certificados se envían hoy mismo por correo.'},
       {id:'N4-23', t:'Diez minutos para ustedes: qué se queda, qué cambiaría y qué necesitan', tipo:'pasos',
        pasos:['<b>¿Qué se queda en su trabajo?</b>','<b>¿Qué cambiaría?</b>','<b>¿Qué necesita para aplicarlo?</b> Por ejemplo: tiempo, permisos de TI, acompañamiento, más práctica.'],
