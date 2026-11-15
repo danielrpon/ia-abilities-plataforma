@@ -404,7 +404,7 @@ window.NIVELES = [
     ]}
   ]
 },
-{id:4, verbo:'Automatizar', escalones:[5,6,7], lede:'Su asistente recibe llaves, una prueba y un horario: el encargo por fases, el revisor aparte y la tarea programada. Hoy subimos los escalones 5, 6 y 7, con el 4 aterrizado junto a TI.', soloMp:{lede:'Su primer agente: planear por fases, contratar a un especialista con su ficha, delegarle el trabajo y ver hacia dónde crece (un equipo con maestro y el piloto automático). Hoy subimos los escalones 5, 6 y 7.',
+{id:4, verbo:'Automatizar', escalones:[5,6,7], lede:'Su asistente recibe llaves, una prueba y un horario: el encargo por fases, el revisor aparte y la tarea programada. Hoy subimos los escalones 5, 6 y 7; el 4 (conectar) lo vemos para entenderlo.', soloMp:{lede:'Su primer agente: planear por fases, contratar a un especialista con su ficha, delegarle el trabajo y ver hacia dónde crece (un equipo con maestro y el piloto automático). Hoy subimos los escalones 5, 6 y 7.',
   /* 4-nov (Daniel): N4 de MP «Su primer agente» (propuesta de Juan, montada en el chasis). Los capítulos de MP van aquí, en soloMp; los de PCO son los capítulos por defecto del nivel (abajo).
      common.js agrega estos capítulos a CAPITULOS y TARJETAS cuando C === 'mp'. */
   capitulos:[
@@ -470,7 +470,7 @@ window.NIVELES = [
      Muros: N4-17 (encargo-n4) y N4-23 (retro-programa). Encuestas nuevas: control-n4, tarea-n3, revisor-n4, piloto-n4 (ver ENCUESTAS). */
   capitulos:[
   { id:'n4-c1', t:'Control de la cuenta y retorno del nivel 03', min:'19 min',
-    donde:'Última sesión del programa. Hoy su asistente recibe llaves, una prueba y un horario: subimos los escalones 5, 6 y 7, con el 4 aterrizado junto a TI.',
+    donde:'Última sesión del programa. Hoy su asistente recibe llaves, una prueba y un horario: subimos los escalones 5, 6 y 7. El 4 lo vemos para entenderlo: dónde se habilita y por qué lo decide TI.',
     nuevo:['<b>Las tres piezas que faltan:</b> llaves, prueba y horario. Con ellas, un asistente se convierte en un especialista al que se le puede soltar la rienda.',
            '<b>Los nombres cambian; las piezas se quedan:</b> el «modo agente» ahora es Work y los GPT se retiran el 11 de diciembre. Por eso enseñamos piezas, no botones.'],
     habilita:['<b>Saber en 3 minutos</b> si va por el plan A o por el plan B, y qué le dejó a su asistente la tarea del nivel 03.'],
@@ -481,7 +481,7 @@ window.NIVELES = [
        intro:'Responda cuando se abra la encuesta. Tenga a mano lo que anotó al usar su asistente con una tarea real. No hace falta mostrar el asistente ni ningún dato.'}
     ]},
   { id:'n4-c2', t:'Del asistente al agente', min:'12 min',
-    donde:'Escalones 4 (se aterriza), 5 y 6: qué le falta a su asistente para ser un especialista.',
+    donde:'Escalón 4 (se entiende, no se practica), 5 y 6: qué le falta a su asistente para ser un especialista.',
     nuevo:['<b>Un asistente sigue los pasos que usted escribió; un agente recibe un objetivo, decide los pasos y usa herramientas.</b>',
            '<b>Las llaves las entrega TI:</b> entre más abre la llave, más riesgo y más revisión.',
            '<b>El especialista no estuvo en la reunión:</b> el encargo tiene que traer todo.',
@@ -650,6 +650,7 @@ Termina con: «Responsable: [MI NOMBRE]. Próxima revisión: en un mes».`],
         <li><span><b>Tareas de equipo:</b> corren en la nube y las mantiene el equipo. Se piden a TI.</span></li>
         <li><span><b>Agentes del espacio de trabajo:</b> instrucciones, conocimiento, <i>skills</i>, apps, memoria y horario. Vienen apagados por defecto: los habilita el administrador.</span></li>
         <li><span><b>Conectores</b> (Outlook, SharePoint, Teams): apagados por defecto; los habilita el administrador.</span></li></ol>
+        <p style="margin-top:10px"><b>Cómo se conecta (se muestra, no se practica):</b> la <b>API</b> es la puerta que abre cada sistema; el <b>MCP</b> es el enchufe estándar, el «USB» de la IA; en ChatGPT usted ve <b>apps</b>: unas ya vienen hechas y otras las arma TI. Todas las enciende el administrador. Lo que quiera conectar, o los agentes que quiera construir, se conversa con TI.</p>
         <p style="margin-top:10px">Los «dots» pueden aparecer en su cuenta en estos días: son otra forma del mismo principio y los decide el administrador.</p>`,
        prompts:[['Mensaje para TI (si su cuenta no tiene tareas programadas)', `Buenos días. Estoy en el programa IA-abilities y quiero usar tareas programadas de ChatGPT con fuentes públicas, sin datos de personas. ¿Está habilitada esa función en mi cuenta? Si no, ¿qué se necesita para habilitarla?`]]}
     ]},
@@ -702,7 +703,7 @@ window.ENCUESTAS = [
   { id:'retorno-n3', titulo:'En la práctica 2 de tarea, ¿cómo fue el revisor de su loop?', tipo:'multiple', opciones:['Exigente: encontró y corrigió algo real','Complaciente: dijo «cumple» a todo','No paró: llegó a las 3 vueltas','No alcancé a hacerla'] },
   { id:'trampa-n3', titulo:'En la trampa, ¿su asistente se negó?', soloMp:{titulo:'En la trampa, con su skill, ¿la IA se negó?'}, tipo:'multiple', opciones:['Sí, y dijo por qué','Sí, pero sin explicar','No: hizo lo que le pedí','Se negó solo después de corregir la ficha'] },
   { id:'salida-n3', titulo:'Nivel 03 · ¿Qué fue lo más útil y qué sobró?', tipo:'abierta' },
-  { id:'control-n4', titulo:'Mire su barra lateral: ¿qué ve?', tipo:'multiple', opciones:['Veo «Tareas programadas» (Scheduled)','No veo tareas programadas','No alcancé a mirar','Estoy en mi cuenta personal, no en la de Puntos Colombia'] },
+  { id:'control-n4', titulo:'Mire su barra lateral: ¿qué ve?', tipo:'multiple', opciones:['Veo «Tareas programadas» (Scheduled)','No veo tareas programadas','No alcancé a mirar','Estoy en mi cuenta personal, no en la de la empresa'] },
   { id:'tarea-n3', titulo:'Al usar su asistente con una tarea real, ¿qué fue lo que más le pasó?', tipo:'multiple', opciones:['Respondió con información vieja o genérica','Hizo bien una parte y se perdió en el trabajo largo','Entregó algo con errores y casi no me doy cuenta','Tuve que explicarle otra vez lo mismo: la ficha quedó corta','Funcionó; el problema es que solo lo uso yo','No alcancé a usarlo'] },
   { id:'revisor-n4', titulo:'Mi revisor…', tipo:'multiple', opciones:['Encontró las fallas de la trampa y devolvió algo de mi boletín','Encontró las fallas de la trampa y aprobó mi boletín','Aprobó la trampa a la primera (tuve que endurecerlo)','No alcancé'] },
   { id:'piloto-n4', titulo:'Mi tarea programada…', tipo:'multiple', opciones:['Quedó creada y ya corrió','Quedó creada, aún no corre','Mi cuenta no tiene tareas: quedé con el plan B','No pude'] },
