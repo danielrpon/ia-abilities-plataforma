@@ -536,15 +536,15 @@ LISTO CUANDO (criterios que yo puedo comprobar):
     donde:'Escalón 6 y el loop: quien hace no se califica.',
     nuevo:['<b>El loop no termina cuando la IA dice «listo»:</b> termina cuando pasa la prueba.',
            '<b>Juez y parte:</b> quien hace no se califica. El revisor va en un chat aparte, con solo el resultado y los criterios.',
-           '<b>Un revisor que aprueba todo no está revisando:</b> primero se prueba al revisor con un caso que tiene fallas.',
+           '<b>Un revisor que aprueba todo no está revisando:</b> se prueba con una trampa que usted le pone a su propio boletín.',
            '<b>Máximo dos vueltas;</b> el juez final es usted.'],
     habilita:['<b>Un revisor probado</b> y una vuelta completa de loop.'],
     tarjetas:[
       {id:'N4-18', t:'Práctica 2 · Contrate al revisor en un chat aparte', tipo:'texto',
-       intro:'Chat <b>nuevo</b>, no el de la práctica 1. Primero la trampa: su revisor debe encontrar al menos dos de las tres fallas. Después, su boletín.',
-       pasos:['<b>Pruebe al revisor (3\'):</b> pegue el prompt del revisor con los criterios y el boletín con trampa de más abajo. Debe salir «NO PASA» con al menos dos de las tres fallas. Si dice «PASA», su revisor es complaciente: agregue al prompt «busca primero qué está mal» y repita.',
-              '<b>Revise lo suyo (3\'):</b> en el mismo chat del revisor, escriba «Ahora revisa este otro boletín con los mismos criterios» y pegue su boletín de la práctica 1.',
-              '<b>Una vuelta de loop (3\'):</b> si salió «NO PASA», vuelva al chat 1 y pegue el prompt de devolución con las correcciones; lleve el boletín corregido al revisor. Máximo dos vueltas. Si salió «PASA» a la primera, abra usted un enlace y compruebe una fecha a mano.',
+       intro:'Chat <b>nuevo</b>, no el de la práctica 1. Todo con <b>su propio encargo y su propio boletín</b>. Al final, le pone una trampa a su revisor para comprobar que sí revisa.',
+       pasos:['<b>Contrate al revisor (3\'):</b> chat nuevo. Pegue el prompt 1 y llene (A) con <b>sus criterios</b>: copie de su encargo las secciones LLAVES, VENTANA y LISTO CUANDO. En (B), <b>su boletín</b> de la práctica 1.',
+              '<b>Una vuelta de loop (3\'):</b> si dice «NO PASA», vaya al chat del vigía, pegue el prompt 2 con las correcciones y lleve el boletín corregido al revisor. Máximo dos vueltas. Si dice «PASA», abra usted un enlace y compruebe una fecha a mano.',
+              '<b>Póngale una trampa (3\'):</b> en el chat del revisor, pegue el prompt 3 con su boletín y <b>un error a propósito</b> (ideas abajo). Si no lo encuentra, es complaciente: agréguele «busca primero qué está mal» y repita.',
               '<b>Corrija el encargo y vote (2\'):</b> si la falla se debió a algo que el encargo no decía, agréguelo al encargo. Responda la encuesta cuando el facilitador la abra.'],
        prompts:[['1 · El revisor', `Eres un revisor exigente. No escribiste este boletín y no te importa quedar bien con quien lo escribió. Tu trabajo es comprobar, no opinar.
 
@@ -558,28 +558,17 @@ Reglas:
 - Termina con una sola línea: «VEREDICTO: PASA» solo si todos los criterios pasan. Si no, «VEREDICTO: NO PASA» y la lista de correcciones para devolver.
 
 (A) CRITERIOS
-[pegue aquí los criterios de «listo» de su encargo, con la lista de fuentes y la ventana]
+[copie de su encargo las secciones LLAVES, VENTANA y LISTO CUANDO]
 
 (B) BOLETÍN
-[pegue aquí el boletín]`],
-                ['2 · Boletín con trampa (ficticio, con sus criterios)', `CRITERIOS DEL EJEMPLO
-Fuentes permitidas: fuente-oficial-1.ejemplo, fuente-oficial-2.ejemplo, fuente-oficial-3.ejemplo.
-Ventana: del 1 al 15 de noviembre de 2026.
-1. Cada cambio trae un enlace a una de las fuentes de la lista y su fecha de publicación.
-2. Todas las fechas están dentro de la ventana.
-3. Al final hay una línea por cada fuente: «revisada, con cambios», «revisada, sin cambios» o «no pude abrirla».
-4. Si no hubo cambios, el boletín dice «Sin novedades en la ventana» y no rellena.
+[pegue el boletín que le entregó su vigía en la práctica 1]`],
+                ['2 · Devolver al vigía (en el chat de la práctica 1)', `Un revisor aparte comprobó tu boletín contra los criterios y devolvió esto. Corrige solo lo que señala, no cambies lo que ya pasaba y entrégame el boletín completo otra vez.
 
-BOLETÍN DEL VIGÍA (EJEMPLO FICTICIO: las normas no existen)
-| Qué cambió | Fuente | Fecha | Qué toca |
-| Circular ficticia 014: nuevo plazo para reportar incapacidades | https://fuente-oficial-1.ejemplo/circular-014 | 5-nov-2026 | Reporte de incapacidades |
-| Resolución ficticia 220: cambia el formato del certificado laboral | https://blog-de-rrhh.ejemplo/resolucion-220 | 9-nov-2026 | Certificados laborales |
-| Decreto ficticio 77: ajuste del auxilio de conectividad | https://fuente-oficial-2.ejemplo/decreto-77 | 20-oct-2026 | Liquidación de nómina |
-Fuentes: fuente-oficial-1, revisada, con cambios. fuente-oficial-2, revisada, con cambios.`],
-                ['3 · Devolver al que hizo el trabajo (en el chat 1)', `Un revisor aparte comprobó tu boletín contra los criterios y devolvió esto. Corrige solo lo que señala, no cambies lo que ya pasaba y entrégame el boletín completo otra vez.
+[pegue aquí las correcciones del revisor]`],
+                ['3 · La trampa (en el chat del revisor)', `Revisa este otro boletín con los mismos criterios y las mismas reglas.
 
-[pegue aquí las correcciones del revisor]`]],
-       html:`<details class="otras"><summary>Al terminar: las tres fallas del boletín con trampa</summary><p>La fila 2 cita un blog que no está en la lista de fuentes; la fila 3 tiene una fecha fuera de la ventana; y falta la línea de la fuente 3.</p></details>`}
+[pegue su boletín con UN error que usted metió a propósito]`]],
+       html:`<details class="otras" open><summary>Ideas de trampa para su boletín (escoja una)</summary><ul><li>Cambie una fecha por una de octubre: queda fuera de la ventana.</li><li>Cambie un enlace por uno de un blog o una noticia: no está en sus fuentes.</li><li>Borre la línea final de una de sus fuentes («revisada, con cambios»…).</li></ul><p>Un buen revisor la encuentra y dice «NO PASA». Si dice «PASA», no estaba revisando.</p></details>`}
     ]},
   { id:'n4-c5', t:'El piloto automático · Práctica 3 · Su tarea programada', min:'30 min',
     donde:'Escalón 7: su especialista, ya probado, trabaja solo; usted revisa lo que entrega.',
@@ -705,7 +694,7 @@ window.ENCUESTAS = [
   { id:'salida-n3', titulo:'Nivel 03 · ¿Qué fue lo más útil y qué sobró?', tipo:'abierta' },
   { id:'control-n4', titulo:'Mire su barra lateral: ¿qué ve?', tipo:'multiple', opciones:['Veo «Tareas programadas» (Scheduled)','No veo tareas programadas','No alcancé a mirar','Estoy en mi cuenta personal, no en la de la empresa'] },
   { id:'tarea-n3', titulo:'Al usar su asistente con una tarea real, ¿qué fue lo que más le pasó?', tipo:'multiple', opciones:['Respondió con información vieja o genérica','Hizo bien una parte y se perdió en el trabajo largo','Entregó algo con errores y casi no me doy cuenta','Tuve que explicarle otra vez lo mismo: la ficha quedó corta','Funcionó; el problema es que solo lo uso yo','No alcancé a usarlo'] },
-  { id:'revisor-n4', titulo:'Mi revisor…', tipo:'multiple', opciones:['Encontró las fallas de la trampa y devolvió algo de mi boletín','Encontró las fallas de la trampa y aprobó mi boletín','Aprobó la trampa a la primera (tuve que endurecerlo)','No alcancé'] },
+  { id:'revisor-n4', titulo:'Mi revisor…', tipo:'multiple', opciones:['Encontró mi trampa y devolvió algo de mi boletín','Encontró mi trampa y aprobó mi boletín','No vio mi trampa: tuve que endurecerlo','No alcancé'] },
   { id:'piloto-n4', titulo:'Mi tarea programada…', tipo:'multiple', opciones:['Quedó creada y ya corrió','Quedó creada, aún no corre','Mi cuenta no tiene tareas: quedé con el plan B','No pude'] },
   { id:'escalon-final', titulo:'Al cerrar el programa: ¿en qué escalón está ahora?', tipo:'escalon' }
 ];
