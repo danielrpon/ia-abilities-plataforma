@@ -491,7 +491,7 @@ window.NIVELES = [
       {id:'N4-16', t:'Las tres piezas que faltan: llaves, prueba y horario', tipo:'texto',
        html:`<ol class="steps">
         <li><span><b>Asistente y agente.</b> Un asistente sigue los pasos que usted escribió; un agente recibe un objetivo, decide los pasos y usa herramientas. Muchos ya les dicen «agentes» a sus asistentes: hoy vemos qué les falta para serlo.</span></li>
-        <li><span><b>Hoja de vida y manual.</b> Su ficha ya es el manual de funciones. Al especialista le faltan la hoja de vida (el cargo: qué hace y cuándo se le llama), las llaves, la prueba y el horario.</span></li>
+        <li><span><b>Descripción del cargo y manual.</b> Su ficha ya es el manual de funciones. Al especialista le faltan la descripción del cargo (qué servicio presta y cuándo se le llama; no es el rol: el rol es cómo trabaja), las llaves, la prueba y el horario.</span></li>
         <li><span><b>Las llaves las entrega TI.</b> Entre más abre la llave, más riesgo y más revisión: un empleado nuevo no recibe la llave de la caja fuerte el primer día. Como ejemplo de cómo suele ordenarse: buscar en fuentes públicas es lo más liviano; usar archivos con datos reales del proceso pide revisión; conectar sistemas, agentes del espacio de trabajo o tareas por evento los decide TI. <b>La regla es la política interna de la empresa:</b> consúltela con TI antes de usar datos reales o conectores.</span></li>
         <li><span><b>El especialista no estuvo en la reunión.</b> El encargo trae todo: quién es, con qué fuentes, qué entrega, qué no hace y cuándo está listo.</span></li>
         <li><span><b>Por fases.</b> Un trabajo grande se parte en etapas (plan, ejecución, entrega) y cada una tiene su criterio de «listo».</span></li></ol>`}
