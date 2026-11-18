@@ -505,11 +505,11 @@ window.NIVELES = [
     tarjetas:[
       {id:'N4-17', t:'Práctica 1 · Escriba el encargo de su vigía y córralo por fases', tipo:'prompt',
        intro:'Individual, en su cuenta de la empresa, con fuentes públicas y ningún dato de personas ni del proceso. Su vigía vigila la fuente de la verdad de la que depende su asistente y avisa cuando la ficha se quedó vieja. <b>Escoja el tema según su asistente:</b> nómina y relaciones laborales, cambios en normas laborales y de seguridad social; compensación, indicadores públicos que mueven la política salarial; selección, señales públicas del mercado laboral; desarrollo, cultura, bienestar y comunicaciones, dos a cuatro publicaciones que su área ya sigue (con nombre). Las fuentes las define cada quien y las valida con el área responsable. Si no tiene un tema con fuente externa, o su cuenta no busca en la web, pase a la práctica 3 con la variante «Ritual de revisión».',
-       pasos:['<b>Abra y llene (4\'):</b> copie el prompt y reemplace los corchetes: tema, proceso, nombre de su asistente, dos a cuatro fuentes, ventana (del 1 de noviembre a hoy) y área responsable.',
+       pasos:['<b>Abra y llene (4\'):</b> es el encargo de la lámina 13 en versión completa (las mismas cuatro piezas, más fases y «listo»). Copie el prompt y reemplace los corchetes: tema, proceso, nombre de su asistente, dos a cuatro fuentes, ventana (del 1 de noviembre a hoy) y área responsable.',
               '<b>Pegue (1\'):</b> chat nuevo en ChatGPT de la empresa. Si puede elegir modelo, uno de razonamiento; con la búsqueda en la web activada.',
               '<b>Fase 1 (2\'):</b> la IA devuelve el plan y hasta tres preguntas. No debe haber buscado todavía; si buscó, ya hay algo que corregir en el encargo.',
               '<b>Fases 2 y 3 (3\'):</b> responda las preguntas y escriba: «Aprobado. Ejecuta las fases 2 y 3».',
-              '<b>Publique (2\'):</b> pegue en el muro su encargo (no el boletín) y marque ✅ en Teams.'],
+              '<b>Publique (2\'):</b> pegue en el muro el encargo completo, con los corchetes llenos (no el boletín que le devolvió la IA), y escriba ✅ en el chat de Teams.'],
        prompt:`Vas a trabajar como mi especialista «Vigía de [TEMA]». No estuviste en ninguna reunión: todo lo que necesitas está en este encargo.
 
 CARGO. Revisas si hubo cambios en [TEMA] que afecten [MI PROCESO; por ejemplo, la validación de novedades de nómina] y me los señalas. Se te llama cuando quiero saber si mi asistente «[NOMBRE DE MI ASISTENTE]» quedó desactualizado.
