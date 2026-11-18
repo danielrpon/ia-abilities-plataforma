@@ -483,15 +483,15 @@ window.NIVELES = [
   { id:'n4-c2', t:'Del asistente al agente', min:'12 min',
     donde:'Escalón 4 (se entiende, no se practica), 5 y 6: qué le falta a su asistente para ser un especialista.',
     nuevo:['<b>Un asistente sigue los pasos que usted escribió; un agente recibe un objetivo, decide los pasos y usa herramientas.</b>',
-           '<b>Las llaves las entrega TI:</b> entre más abre la llave, más riesgo y más revisión.',
+           '<b>Las llaves las entrega TI:</b> entre más acceso da la llave y más sensible es lo que hay detrás, más revisión y seguridad pide.',
            '<b>El especialista no estuvo en la reunión:</b> el encargo tiene que traer todo.',
            '<b>Un trabajo grande va por fases,</b> y cada fase tiene su «listo».'],
     habilita:['<b>Leer su ficha como la de un especialista:</b> cargo, llaves, plan y horario.'],
     tarjetas:[
-      {id:'N4-16', t:'Las tres piezas que faltan: llaves, plan y horario', tipo:'texto',
+      {id:'N4-16', t:'Lo que le falta a su especialista: llaves, plan y horario', tipo:'texto',
        html:`<ol class="steps">
         <li><span><b>Asistente y agente.</b> Un asistente sigue los pasos que usted escribió; un agente recibe un objetivo, decide los pasos y usa herramientas. Muchos ya les dicen «agentes» a sus asistentes: hoy vemos qué les falta para serlo.</span></li>
-        <li><span><b>Descripción del cargo y manual.</b> Su ficha ya es el manual de funciones. Al especialista le faltan la descripción del cargo (qué servicio presta y cuándo se le llama; no es el rol: el rol es cómo trabaja), las llaves, el plan de trabajo y el horario.</span></li>
+        <li><span><b>Su ficha ya dice cómo trabaja.</b> Es lo del nivel 03: no se escribe de nuevo. Se le agrega <b>una línea con la descripción del cargo</b> (qué servicio presta y cuándo se le llama; no es el rol: el rol es cómo trabaja) y <b>tres piezas: llaves, plan y horario.</b></span></li>
         <li><span><b>Las llaves las entrega TI.</b> Entre más acceso da la llave y más sensible es lo que hay detrás, más revisión y seguridad pide: un empleado nuevo no recibe la llave de la caja fuerte el primer día. Como ejemplo de cómo suele ordenarse: buscar en fuentes públicas es lo más liviano; usar archivos con datos reales del proceso pide revisión; conectar sistemas, agentes del espacio de trabajo o tareas por evento los decide TI. <b>La regla es la política interna de la empresa:</b> consúltela con TI antes de usar datos reales o conectores.</span></li>
         <li><span><b>El especialista no estuvo en la reunión.</b> El encargo trae todo: quién es, con qué fuentes, qué entrega, qué no hace y cuándo está listo.</span></li>
         <li><span><b>El plan de trabajo.</b> Un trabajo grande se parte en fases, cada una con quién la hace y su criterio de «listo»; un revisor aparte comprueba, y el loop repite el plan hasta que pase.</span></li></ol>`}
@@ -504,7 +504,7 @@ window.NIVELES = [
     habilita:['<b>El encargo completo de su vigía,</b> con sus cuatro criterios de «listo», en el muro.'],
     tarjetas:[
       {id:'N4-17', t:'Práctica 1 · Escriba el encargo de su vigía y córralo por fases', tipo:'prompt',
-       intro:'Individual, en su cuenta de la empresa, con fuentes públicas y ningún dato de personas ni del proceso. Su vigía vigila la fuente de la verdad de la que depende su asistente y avisa cuando la ficha se quedó vieja. <b>Escoja el tema según su asistente:</b> nómina y relaciones laborales, cambios en normas laborales y de seguridad social; compensación, indicadores públicos que mueven la política salarial; selección, señales públicas del mercado laboral; desarrollo, cultura, bienestar y comunicaciones, dos a cuatro publicaciones que su área ya sigue (con nombre). Las fuentes las define cada quien y las valida con el área responsable. Si no tiene un tema con fuente externa, o su cuenta no busca en la web, pase a la práctica 3 con la variante «Ritual de revisión».',
+       intro:'Individual, en su cuenta de la empresa, con fuentes públicas y ningún dato de personas ni del proceso. Su vigía vigila la fuente de la verdad de la que depende su asistente y avisa cuando la ficha se quedó vieja. <b>Escoja el tema según su asistente:</b> nómina y relaciones laborales, cambios en normas laborales y de seguridad social; compensación, indicadores públicos que mueven la política salarial; selección, señales públicas del mercado laboral; desarrollo, cultura, bienestar y comunicaciones, dos a cuatro publicaciones que su área ya sigue (con nombre). Las fuentes las define cada quien y las valida con el área responsable. Si no tiene un tema con fuente externa, use dos a cuatro publicaciones que su área ya sigue. Si su cuenta no busca en la web, abra usted las fuentes en el navegador, copie el texto de una novedad y péguelo en el chat como fuente.',
        pasos:['<b>Abra y llene (4\'):</b> es el encargo de la lámina 13 en versión completa (las mismas cuatro piezas, más fases y «listo»). Copie el prompt y reemplace los corchetes: tema, proceso, nombre de su asistente, dos a cuatro fuentes, ventana (del 1 de noviembre a hoy) y área responsable.',
               '<b>Pegue (1\'):</b> chat nuevo en ChatGPT de la empresa. Si puede elegir modelo, uno de razonamiento; con la búsqueda en la web activada.',
               '<b>El vigía le muestra el plan (2\', fase 1):</b> la IA devuelve el plan y hasta tres preguntas. No debe haber buscado todavía; si buscó, ya hay algo que corregir en el encargo.',
@@ -530,7 +530,8 @@ LISTO CUANDO (criterios que yo puedo comprobar):
 2. Todas las fechas están dentro de la ventana.
 3. Al final hay una línea por cada fuente: «revisada, con cambios», «revisada, sin cambios» o «no pude abrirla».
 4. Si no hubo cambios, el boletín dice «Sin novedades en la ventana» y no rellena.`,
-       muro:{tipo:'prompt', guia:'Su encargo completo (no el boletín), con los cuatro criterios de «listo». Sin datos de personas.'}}
+       muro:{tipo:'prompt', guia:'Su encargo completo (no el boletín), con los cuatro criterios de «listo». Sin datos de personas.'},
+       html:`<details class="otras" open><summary>¿Su criterio de «listo» sirve? Tres pruebas</summary><ol class="steps"><li><span><b>Se responde sí o no</b> mirando el boletín, sin opinar.</span></li><li><span><b>Dice dónde mirar:</b> una columna, una fila, una fecha, un enlace.</span></li><li><span><b>Otra persona llegaría a la misma respuesta.</b></span></li></ol><p><b>Moldes:</b> «Cada ___ trae ___» · «Todas las ___ están dentro de ___» · «Hay una ___ por cada ___» · «Si no hay ___, dice ___».</p><p><b>Palabras que avisan que no sirve:</b> bien, completo, claro, adecuado, profesional. Cámbielas por algo que se pueda contar o señalar.</p></details>`}
     ]},
   { id:'n4-c4', t:'El agente con loop · Práctica 2 · El revisor aparte', min:'23 min',
     donde:'Escalón 6 y el loop: quien hace no se califica.',
@@ -578,29 +579,16 @@ Reglas:
            '<b>Lo programado también se revisa,</b> y cada corrida consume uso de la cuenta: deje activa solo la que va a leer.'],
     habilita:['<b>Una tarea programada creada en su cuenta,</b> corrida una vez y dejada recurrente (o el plan B con calendario).'],
     tarjetas:[
-      {id:'N4-19', t:'Práctica 3 · Programe su vigía: primero una vez, después cada semana', tipo:'texto',
-       intro:'Primero una vez, dentro de pocos minutos; cuando llegue y pase la prueba, cada semana. Pegue su encargo ya corregido donde se indica. El facilitador dicta la hora.',
-       pasos:['<b>Cree (3\'):</b> chat nuevo, <b>fuera de cualquier proyecto</b>, en la cuenta de la empresa. Pegue el prompt 1. ChatGPT muestra la confirmación de la tarea.',
-              '<b>Encuéntrela (3\'):</b> abra «Scheduled» en la barra lateral (o el menú ••• del chat, ver tareas programadas). Abra su tarea y lea la instrucción y el horario. En Ajustes › Notifications, revise que le avise por correo o por notificación.',
-              '<b>Coseche (3\'):</b> a la hora dictada llega el resultado. Compruébelo a ojo con dos criterios: ¿enlaces de la lista?, ¿una línea por fuente? Si tiene tiempo, páselo por su revisor.',
-              '<b>Déjela sola (3\'):</b> pegue el prompt 2 para volverla semanal y confirme en Scheduled que quedó recurrente. Si no va a leerla cada lunes, páusela.',
-              '<b>Vote (1\').</b> Responda la encuesta cuando el facilitador la abra.',
-              '<b>Muestra (3\'):</b> dos personas comparten pantalla 90 segundos cada una: su tarea en Scheduled y lo que les llegó.'],
-       prompts:[['1 · Crear la tarea (una vez, para probarla)', `Crea una tarea programada.
-Nombre: «Vigía de [TEMA]».
-Cuándo: hoy a las [HORA QUE DICTE EL FACILITADOR], una sola vez.
+      {id:'N4-19', t:'Práctica 3 · Programe un vigía sencillo: primero una vez, después cada semana', tipo:'texto',
+       intro:'Una tarea corta y sencilla: el mismo tema de su vigía, pero solo dos fuentes y una tabla de tres columnas. Primero corre una vez, dentro de pocos minutos; si llega bien, la vuelve semanal. El facilitador dicta la hora.',
+       pasos:['<b>Cree (5\'):</b> chat nuevo, <b>fuera de cualquier proyecto</b>, en la cuenta de la empresa. Pegue el prompt 1 y llene tres cosas: el tema, dos fuentes y la hora que dicte el facilitador. ChatGPT muestra la confirmación de la tarea.',
+              '<b>Encuéntrela (3\'):</b> abra las tareas programadas («Scheduled») en la barra lateral, o el menú ••• del chat. Lea la instrucción y la hora.',
+              '<b>Recíbala (3\'):</b> cuando llegue el resultado, abra un enlace y compruebe la fecha. Eso es revisar lo que hizo solo.',
+              '<b>Vuélvala semanal (3\'):</b> pegue el prompt 2 en el chat de la tarea y confirme que quedó recurrente. Si no la va a leer cada lunes, páusela.',
+              '<b>Vote y muestre (4\'):</b> responda la encuesta cuando el facilitador la abra. Dos personas comparten pantalla 90 segundos: su tarea y lo que les llegó.'],
+       prompts:[['1 · Crear la tarea (una vez, para probarla)', `Crea una tarea programada para hoy a las [HORA QUE DICTE EL FACILITADOR], una sola vez. Nombre: «Vigía de [TEMA]».
 
-Instrucción completa de la tarea (no dependas de este chat, de archivos ni de mi memoria):
-
-Eres mi especialista «Vigía de [TEMA]».
-CARGO. Revisas si hubo cambios en [TEMA] que afecten [MI PROCESO] y me los señalas.
-LLAVES. Solo puedes buscar en la web, y solo en estas fuentes: [FUENTE 1], [FUENTE 2], [FUENTE 3]. No uses blogs, noticias ni redes. No uses archivos ni datos de personas.
-VENTANA. Los últimos 7 días.
-ENTREGA. Una tabla: qué cambió · fuente (enlace) · fecha de publicación · qué parte de mi proceso toca · qué revisaría yo en la ficha de mi asistente «[NOMBRE]».
-QUÉ NO HACES. No concluyes jurídicamente ni recomiendas decisiones sobre personas: señalas y remites a [ÁREA RESPONSABLE]. No inventas normas, cifras ni fechas.
-NADIE TE VA A RESPONDER. No hagas preguntas. Si te falta algo o no puedes abrir una fuente, escribe una línea «Me faltó: …» y sigue con lo demás.
-LISTO CUANDO: 1) cada cambio trae enlace a una fuente de la lista y su fecha; 2) todas las fechas están en la ventana; 3) hay una línea por fuente: «revisada, con cambios», «revisada, sin cambios» o «no pude abrirla»; 4) si no hubo cambios, dice «Sin novedades en la ventana» y no rellena.
-Antes de entregar, comprueba tú mismo los cuatro criterios y termina con una línea «Autocontrol: …». La revisión de verdad la hago yo.`],
+Instrucción de la tarea: revisa en [FUENTE 1] y [FUENTE 2] si en los últimos 7 días se publicaron cambios sobre [TEMA]. Entrégame una tabla con tres columnas: qué cambió · enlace · fecha de publicación. Usa solo esas dos fuentes. Si no hubo cambios, escribe «Sin novedades» y no rellenes. No hagas preguntas: si no pudiste abrir una fuente, dilo en una línea.`],
                 ['2 · Volverla semanal (en el mismo chat de la tarea)', `La tarea pasó la prueba. Cámbiala a recurrente: todos los lunes a las 7:30 a. m., hora de Colombia. No cambies la instrucción.`],
                 ['Variante sin búsqueda en la web · El ritual de revisión', `Crea una tarea programada.
 Nombre: «Revisión mensual de [NOMBRE DE MI ASISTENTE]».
@@ -614,8 +602,8 @@ Recuérdame hacer la gestión del desempeño de mi asistente «[NOMBRE]», que s
 3. Si algo falló, corrija la ficha, no la respuesta, y vuelva a probar en un chat nuevo.
 4. Anote en la ficha: fecha de la revisión, qué cambió y el nombre del responsable.
 Termina con: «Responsable: [MI NOMBRE]. Próxima revisión: en un mes».`],
-                ['Variante sin búsqueda · Volverla mensual', `Cámbiala a recurrente: el primer lunes de cada mes a las 8:00 a. m., hora de Colombia.`]],
-       html:`<details class="otras"><summary>Plan B: si su cuenta no tiene tareas programadas</summary><ul class="checks" style="list-style:none;padding-left:0"><li>Haga completas las prácticas 1 y 2: no dependen de nada.</li><li>En la práctica 3, corra el prompt 1 a mano en un chat nuevo, quitando las tres primeras líneas (la de «Crea una tarea programada», el nombre y el «Cuándo»).</li><li>Cree en Outlook una <b>cita recurrente</b> (lunes 7:30 a. m.) con el encargo pegado en el cuerpo: el calendario avisa, usted pega y corre. Es su «piloto semiautomático».</li><li>Si no tiene búsqueda en la web, use la variante «Ritual de revisión».</li><li>Pídale a TI la función (la tarjeta «Qué pedirle a TI» trae el mensaje) y marque la opción del plan B en la encuesta.</li></ul></details>`}
+                ['Variante sin búsqueda · Volverla mensual', `Cámbiala a recurrente: el día 1 de cada mes a las 8:00 a. m., hora de Colombia.`]],
+       html:`<details class="otras"><summary>Plan B: si su cuenta no tiene tareas programadas</summary><ul class="checks" style="list-style:none;padding-left:0"><li>Haga completas las prácticas 1 y 2: no dependen de nada.</li><li>En la práctica 3, corra el prompt 1 a mano en un chat nuevo, copiando solo el texto que va después de «Instrucción de la tarea:».</li><li>Cree en Outlook una <b>cita recurrente</b> (lunes 7:30 a. m.) con el encargo pegado en el cuerpo: el calendario avisa, usted pega y corre. Es su «piloto semiautomático».</li><li>Si no tiene búsqueda en la web, use la variante «Ritual de revisión».</li><li>Pídale a TI la función (la tarjeta «Qué pedirle a TI» trae el mensaje) y marque la opción del plan B en la encuesta.</li></ul></details>`}
     ]},
   { id:'n4-c6', t:'Cuidarlo y lo que sigue con TI', min:'6 min',
     donde:'Un agente también tiene gestión del desempeño. Y lo que sigue se hace con TI.',
@@ -636,11 +624,11 @@ Termina con: «Responsable: [MI NOMBRE]. Próxima revisión: en un mes».`],
       {id:'N4-21', t:'Qué pedirle a TI', tipo:'texto',
        intro:'Antes de usar datos reales del proceso o conectores, consulte la política interna de la empresa con TI. Estas tres cosas no se practicaron hoy: se piden.',
        html:`<ol class="steps">
-        <li><span><b>Tareas de equipo:</b> corren en la nube y las mantiene el equipo. Se piden a TI.</span></li>
-        <li><span><b>Agentes del espacio de trabajo:</b> instrucciones, conocimiento, <i>skills</i>, apps, memoria y horario. Vienen apagados por defecto: los habilita el administrador.</span></li>
-        <li><span><b>Conectores</b> (Outlook, SharePoint, Teams): apagados por defecto; los habilita el administrador.</span></li></ol>
-        <p style="margin-top:10px"><b>Cómo se conecta (se muestra, no se practica):</b> la <b>API</b> es la puerta que abre cada sistema; el <b>MCP</b> es el enchufe estándar, el «USB» de la IA; en ChatGPT usted ve <b>apps</b>: unas ya vienen hechas y otras las arma TI. Todas las enciende el administrador. Lo que quiera conectar, o los agentes que quiera construir, se conversa con TI.</p>
-        <p style="margin-top:10px">Los «dots» pueden aparecer en su cuenta en estos días: son otra forma del mismo principio y los decide el administrador.</p>`,
+        <li><span><b>Tareas de equipo:</b> corren en la nube y las mantiene el equipo. Se piden a TI y al administrador.</span></li>
+        <li><span><b>Agentes del espacio de trabajo:</b> instrucciones, conocimiento, <i>skills</i>, apps, memoria y horario. Vienen apagados por defecto. Se piden al administrador.</span></li>
+        <li><span><b>Conectores</b> (Outlook, SharePoint, Teams): apagados por defecto. Se piden a TI: es la llave de más riesgo.</span></li></ol>
+        <p style="margin-top:10px"><b>Cómo se conecta (se muestra, no se practica):</b> la <b>API</b> es la puerta que abre cada sistema; el <b>MCP</b> es el tramitador: hace la diligencia por usted y lleva su llave hasta esa puerta (habla el idioma de todas las IA, como un «USB»); en ChatGPT usted ve <b>apps</b>: unas ya vienen hechas y otras las arma TI. Todas las enciende el administrador. <b>El MCP no decide quién entra: eso lo decide la llave.</b> Hay dos: <b>su cuenta</b> (usted autoriza en la página del servicio, la IA nunca recibe su contraseña y ve lo que usted ve) y la <b>API key</b> (una llave técnica que funciona para quien la tenga; por eso la configura TI). Lo que quiera conectar, o los agentes que quiera construir, se conversa con TI.</p>
+        <p style="margin-top:10px">Antes de pedir una llave, tenga claro el encargo: la llave abre la puerta; el encargo dice a qué se entra.</p>`,
        prompts:[['Mensaje para TI (si su cuenta no tiene tareas programadas)', `Buenos días. Estoy en el programa IA-abilities y quiero usar tareas programadas de ChatGPT con fuentes públicas, sin datos de personas. ¿Está habilitada esa función en mi cuenta? Si no, ¿qué se necesita para habilitarla?`]]}
     ]},
   { id:'n4-c7', t:'Cierre del programa y retroalimentación', min:'18 min',
@@ -694,7 +682,7 @@ window.ENCUESTAS = [
   { id:'salida-n3', titulo:'Nivel 03 · ¿Qué fue lo más útil y qué sobró?', tipo:'abierta' },
   { id:'control-n4', titulo:'Mire su barra lateral: ¿qué ve?', tipo:'multiple', opciones:['Veo «Tareas programadas» (Scheduled)','No veo tareas programadas','No alcancé a mirar','Estoy en mi cuenta personal, no en la de la empresa'] },
   { id:'tarea-n3', titulo:'Al usar su asistente con una tarea real, ¿qué fue lo que más le pasó?', tipo:'multiple', opciones:['Respondió con información vieja o genérica','Hizo bien una parte y se perdió en el trabajo largo','Entregó algo con errores y casi no me doy cuenta','Tuve que explicarle otra vez lo mismo: la ficha quedó corta','Funcionó; el problema es que solo lo uso yo','No alcancé a usarlo'] },
-  { id:'revisor-n4', titulo:'Mi revisor…', tipo:'multiple', opciones:['Encontró mi trampa y devolvió algo de mi boletín','Encontró mi trampa y aprobó mi boletín','No vio mi trampa: tuve que endurecerlo','No alcancé'] },
+  { id:'revisor-n4', titulo:'Cuando le puse la trampa, mi revisor…', tipo:'multiple', opciones:['La encontró y dijo «NO PASA»','No la vio: tuve que endurecerlo','No alcancé a ponerle la trampa'] },
   { id:'piloto-n4', titulo:'Mi tarea programada…', tipo:'multiple', opciones:['Quedó creada y ya corrió','Quedó creada, aún no corre','Mi cuenta no tiene tareas: quedé con el plan B','No pude'] },
   { id:'escalon-final', titulo:'Al cerrar el programa: ¿en qué escalón está ahora?', tipo:'escalon' }
 ];
