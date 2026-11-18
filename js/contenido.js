@@ -404,7 +404,7 @@ window.NIVELES = [
     ]}
   ]
 },
-{id:4, verbo:'Automatizar', escalones:[5,6,7], lede:'Su asistente recibe llaves, una prueba y un horario: el encargo por fases, el revisor aparte y la tarea programada. Hoy subimos los escalones 5, 6 y 7; el 4 (conectar) lo vemos para entenderlo.', soloMp:{lede:'Su primer agente: planear por fases, contratar a un especialista con su ficha, delegarle el trabajo y ver hacia dónde crece (un equipo con maestro y el piloto automático). Hoy subimos los escalones 5, 6 y 7.',
+{id:4, verbo:'Automatizar', escalones:[5,6,7], lede:'Su asistente recibe llaves, un plan de trabajo y un horario: el encargo por fases, el revisor aparte y la tarea programada. Hoy subimos los escalones 5, 6 y 7; el 4 (conectar) lo vemos para entenderlo.', soloMp:{lede:'Su primer agente: planear por fases, contratar a un especialista con su ficha, delegarle el trabajo y ver hacia dónde crece (un equipo con maestro y el piloto automático). Hoy subimos los escalones 5, 6 y 7.',
   /* 4-nov (Daniel): N4 de MP «Su primer agente» (propuesta de Juan, montada en el chasis). Los capítulos de MP van aquí, en soloMp; los de PCO son los capítulos por defecto del nivel (abajo).
      common.js agrega estos capítulos a CAPITULOS y TARJETAS cuando C === 'mp'. */
   capitulos:[
@@ -470,8 +470,8 @@ window.NIVELES = [
      Muros: N4-17 (encargo-n4) y N4-23 (retro-programa). Encuestas nuevas: control-n4, tarea-n3, revisor-n4, piloto-n4 (ver ENCUESTAS). */
   capitulos:[
   { id:'n4-c1', t:'Control de la cuenta y retorno del nivel 03', min:'19 min',
-    donde:'Última sesión del programa. Hoy su asistente recibe llaves, una prueba y un horario: subimos los escalones 5, 6 y 7. El 4 lo vemos para entenderlo: dónde se habilita y por qué lo decide TI.',
-    nuevo:['<b>Las tres piezas que faltan:</b> llaves, prueba y horario. Con ellas, un asistente se convierte en un especialista al que se le puede soltar la rienda.',
+    donde:'Última sesión del programa. Hoy su asistente recibe llaves, un plan de trabajo y un horario: subimos los escalones 5, 6 y 7. El 4 lo vemos para entenderlo: dónde se habilita y por qué lo decide TI.',
+    nuevo:['<b>Las tres piezas que faltan:</b> llaves, plan y horario. Con ellas, un asistente se convierte en un especialista al que se le puede soltar la rienda.',
            '<b>Los nombres cambian; las piezas se quedan:</b> el «modo agente» ahora es Work y los GPT se retiran el 11 de diciembre. Por eso enseñamos piezas, no botones.'],
     habilita:['<b>Saber en 3 minutos</b> si va por el plan A o por el plan B, y qué le dejó a su asistente la tarea del nivel 03.'],
     tarjetas:[
@@ -486,15 +486,15 @@ window.NIVELES = [
            '<b>Las llaves las entrega TI:</b> entre más abre la llave, más riesgo y más revisión.',
            '<b>El especialista no estuvo en la reunión:</b> el encargo tiene que traer todo.',
            '<b>Un trabajo grande va por fases,</b> y cada fase tiene su «listo».'],
-    habilita:['<b>Leer su ficha como la de un especialista:</b> cargo, llaves, prueba y horario.'],
+    habilita:['<b>Leer su ficha como la de un especialista:</b> cargo, llaves, plan y horario.'],
     tarjetas:[
-      {id:'N4-16', t:'Las tres piezas que faltan: llaves, prueba y horario', tipo:'texto',
+      {id:'N4-16', t:'Las tres piezas que faltan: llaves, plan y horario', tipo:'texto',
        html:`<ol class="steps">
         <li><span><b>Asistente y agente.</b> Un asistente sigue los pasos que usted escribió; un agente recibe un objetivo, decide los pasos y usa herramientas. Muchos ya les dicen «agentes» a sus asistentes: hoy vemos qué les falta para serlo.</span></li>
-        <li><span><b>Descripción del cargo y manual.</b> Su ficha ya es el manual de funciones. Al especialista le faltan la descripción del cargo (qué servicio presta y cuándo se le llama; no es el rol: el rol es cómo trabaja), las llaves, la prueba y el horario.</span></li>
+        <li><span><b>Descripción del cargo y manual.</b> Su ficha ya es el manual de funciones. Al especialista le faltan la descripción del cargo (qué servicio presta y cuándo se le llama; no es el rol: el rol es cómo trabaja), las llaves, el plan de trabajo y el horario.</span></li>
         <li><span><b>Las llaves las entrega TI.</b> Entre más abre la llave, más riesgo y más revisión: un empleado nuevo no recibe la llave de la caja fuerte el primer día. Como ejemplo de cómo suele ordenarse: buscar en fuentes públicas es lo más liviano; usar archivos con datos reales del proceso pide revisión; conectar sistemas, agentes del espacio de trabajo o tareas por evento los decide TI. <b>La regla es la política interna de la empresa:</b> consúltela con TI antes de usar datos reales o conectores.</span></li>
         <li><span><b>El especialista no estuvo en la reunión.</b> El encargo trae todo: quién es, con qué fuentes, qué entrega, qué no hace y cuándo está listo.</span></li>
-        <li><span><b>Por fases.</b> Un trabajo grande se parte en etapas (plan, ejecución, entrega) y cada una tiene su criterio de «listo».</span></li></ol>`}
+        <li><span><b>El plan de trabajo.</b> Un trabajo grande se parte en fases, cada una con quién la hace y su criterio de «listo»; un revisor aparte comprueba, y el loop repite el plan hasta que pase.</span></li></ol>`}
     ]},
   { id:'n4-c3', t:'Práctica 1 · El encargo por fases', min:'12 min',
     donde:'Escalón 5: por fases. Su asistente se convierte en el encargo de un especialista.',
