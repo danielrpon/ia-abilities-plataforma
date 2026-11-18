@@ -537,15 +537,15 @@ LISTO CUANDO (criterios que yo puedo comprobar):
     donde:'Escalón 6 y el loop: quien hace no se califica.',
     nuevo:['<b>El loop no termina cuando la IA dice «listo»:</b> termina cuando pasa la prueba.',
            '<b>Juez y parte:</b> quien hace no se califica. El revisor va en un chat aparte, con solo el resultado y los criterios.',
-           '<b>Un revisor que aprueba todo no está revisando:</b> se prueba con una trampa que usted le pone a su propio boletín.',
+           '<b>Un revisor que aprueba todo no está revisando:</b> aunque diga «PASA», usted comprueba un enlace y una fecha. Y cada mes, el asistente se prueba con tres casos: normal, de borde y trampa.',
            '<b>Máximo dos vueltas;</b> el juez final es usted.'],
     habilita:['<b>Un revisor probado</b> y una vuelta completa de loop.'],
     tarjetas:[
       {id:'N4-18', t:'Práctica 2 · Contrate al revisor en un chat aparte', tipo:'texto',
-       intro:'Chat <b>nuevo</b>, no el de la práctica 1. Todo con <b>su propio encargo y su propio boletín</b>. Al final, le pone una trampa a su revisor para comprobar que sí revisa.',
-       pasos:['<b>Contrate al revisor (3\'):</b> chat nuevo. Pegue el prompt 1 y llene (A) con <b>sus criterios</b>: copie de su encargo las secciones LLAVES, VENTANA y LISTO CUANDO. En (B), <b>su boletín</b> de la práctica 1.',
-              '<b>Una vuelta de loop (3\'):</b> si dice «NO PASA», vaya al chat del vigía, pegue el prompt 2 con las correcciones y lleve el boletín corregido al revisor. Máximo dos vueltas. Si dice «PASA», abra usted un enlace y compruebe una fecha a mano.',
-              '<b>Póngale una trampa (3\'):</b> en el chat del revisor, pegue el prompt 3 con su boletín y <b>un error a propósito</b> (ideas abajo). Si no lo encuentra, es complaciente: agréguele «busca primero qué está mal» y repita.',
+       intro:'Chat <b>nuevo</b>, no el de la práctica 1. Todo con <b>su propio encargo y su propio boletín</b>: un hilo hace, otro revisa, y usted lleva y trae.',
+       pasos:['<b>Contrate al revisor (4\'):</b> chat nuevo. Pegue el prompt 1 y llene (A) con <b>sus criterios</b>: copie de su encargo las secciones LLAVES, VENTANA y LISTO CUANDO. En (B), <b>su boletín</b> de la práctica 1.',
+              '<b>Una vuelta de loop (4\'):</b> si dice «NO PASA», vaya al chat del vigía, pegue el prompt 2 con las correcciones y lleve el boletín corregido al revisor. Máximo dos vueltas.',
+              '<b>Compruebe usted (2\'):</b> aunque diga «PASA», abra un enlace y mire una fecha. El juez final es usted.',
               '<b>Corrija el encargo y vote (2\'):</b> si la falla se debió a algo que el encargo no decía, agréguelo al encargo. Responda la encuesta cuando el facilitador la abra.'],
        prompts:[['1 · El revisor', `Eres un revisor exigente. No escribiste este boletín y no te importa quedar bien con quien lo escribió. Tu trabajo es comprobar, no opinar.
 
@@ -565,11 +565,7 @@ Reglas:
 [pegue el boletín que le entregó su vigía en la práctica 1]`],
                 ['2 · Devolver al vigía (en el chat de la práctica 1)', `Un revisor aparte comprobó tu boletín contra los criterios y devolvió esto. Corrige solo lo que señala, no cambies lo que ya pasaba y entrégame el boletín completo otra vez.
 
-[pegue aquí las correcciones del revisor]`],
-                ['3 · La trampa (en el chat del revisor)', `Revisa este otro boletín con los mismos criterios y las mismas reglas.
-
-[pegue su boletín con UN error que usted metió a propósito]`]],
-       html:`<details class="otras" open><summary>Ideas de trampa para su boletín (escoja una)</summary><ul><li>Cambie una fecha por una de octubre: queda fuera de la ventana.</li><li>Cambie un enlace por uno de un blog o una noticia: no está en sus fuentes.</li><li>Borre la línea final de una de sus fuentes («revisada, con cambios»…).</li></ul><p>Un buen revisor la encuentra y dice «NO PASA». Si dice «PASA», no estaba revisando.</p></details>`}
+[pegue aquí las correcciones del revisor]`]]}
     ]},
   { id:'n4-c5', t:'El piloto automático · Práctica 3 · Su tarea programada', min:'30 min',
     donde:'Escalón 7: su especialista, ya probado, trabaja solo; usted revisa lo que entrega.',
@@ -682,7 +678,7 @@ window.ENCUESTAS = [
   { id:'salida-n3', titulo:'Nivel 03 · ¿Qué fue lo más útil y qué sobró?', tipo:'abierta' },
   { id:'control-n4', titulo:'Mire su barra lateral: ¿qué ve?', tipo:'multiple', opciones:['Veo «Tareas programadas» (Scheduled)','No veo tareas programadas','No alcancé a mirar','Estoy en mi cuenta personal, no en la de la empresa'] },
   { id:'tarea-n3', titulo:'Al usar su asistente con una tarea real, ¿qué fue lo que más le pasó?', tipo:'multiple', opciones:['Respondió con información vieja o genérica','Hizo bien una parte y se perdió en el trabajo largo','Entregó algo con errores y casi no me doy cuenta','Tuve que explicarle otra vez lo mismo: la ficha quedó corta','Funcionó; el problema es que solo lo uso yo','No alcancé a usarlo'] },
-  { id:'revisor-n4', titulo:'Cuando le puse la trampa, mi revisor…', tipo:'multiple', opciones:['La encontró y dijo «NO PASA»','No la vio: tuve que endurecerlo','No alcancé a ponerle la trampa'] },
+  { id:'revisor-n4', titulo:'Mi revisor…', tipo:'multiple', opciones:['Dijo «NO PASA» y corregí con el vigía','Dijo «PASA» y lo comprobé con un enlace','No alcancé'] },
   { id:'piloto-n4', titulo:'Mi tarea programada…', tipo:'multiple', opciones:['Quedó creada y ya corrió','Quedó creada, aún no corre','Mi cuenta no tiene tareas: quedé con el plan B','No pude'] },
   { id:'escalon-final', titulo:'Al cerrar el programa: ¿en qué escalón está ahora?', tipo:'escalon' }
 ];
