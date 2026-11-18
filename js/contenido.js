@@ -508,7 +508,7 @@ window.NIVELES = [
        pasos:['<b>Abra y llene (4\'):</b> es el encargo de la lámina 13 en versión completa (las mismas cuatro piezas, más fases y «listo»). Copie el prompt y reemplace los corchetes: tema, proceso, nombre de su asistente, dos a cuatro fuentes, ventana (del 1 de noviembre a hoy) y área responsable.',
               '<b>Pegue (1\'):</b> chat nuevo en ChatGPT de la empresa. Si puede elegir modelo, uno de razonamiento; con la búsqueda en la web activada.',
               '<b>Fase 1 (2\'):</b> la IA devuelve el plan y hasta tres preguntas. No debe haber buscado todavía; si buscó, ya hay algo que corregir en el encargo.',
-              '<b>Fases 2 y 3 (3\'):</b> responda las preguntas y escriba: «Aprobado. Ejecuta las fases 2 y 3».',
+              '<b>Fases 2 y 3 · búsqueda y boletín (3\'):</b> responda las preguntas del plan y escriba: «Aprobado. Ejecuta las fases 2 y 3». El vigía busca y le entrega el boletín.',
               '<b>Publique (2\'):</b> pegue en el muro el encargo completo, con los corchetes llenos (no el boletín que le devolvió la IA), y escriba ✅ en el chat de Teams.'],
        prompt:`Vas a trabajar como mi especialista «Vigía de [TEMA]». No estuviste en ninguna reunión: todo lo que necesitas está en este encargo.
 
